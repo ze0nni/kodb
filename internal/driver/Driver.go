@@ -5,6 +5,7 @@ import "github.com/ze0nni/kodb/internal/entry"
 type (
 	// Driver type
 	Driver interface {
+		Prefixes() ([]string, error)
 		Get(prefix string, id string) (entry.Entry, error)
 		Put(prefix string, id string, entry entry.Entry) error
 	}

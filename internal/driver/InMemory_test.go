@@ -53,3 +53,22 @@ func TestInMemory_PutEquals(t *testing.T) {
 	assert.Equal(t, "world", e2["hello"])
 	assert.Equal(t, "", e2["world"])
 }
+
+func TestInMemory_Prefixes_Empty(t *testing.T) {
+	m := InMemory()
+
+	p, err := m.Prefixes()
+
+	assert.NoError(t, err)
+	assert.Equal(t, []string{}, p)
+}
+
+func TestInMemory_Prefixes(t *testing.T) {
+	m := InMemory()
+	m.Put("foo", "value", make(entry.Entry))
+
+	p, err := m.Prefixes()
+
+	assert.NoError(t, err)
+	assert.Equal(t, []string{"foo"}, p)
+}

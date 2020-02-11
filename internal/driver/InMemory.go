@@ -12,6 +12,14 @@ type inMemory struct {
 	data map[string](map[string]entry.Entry)
 }
 
+func (d *inMemory) Prefixes() ([]string, error) {
+	out := []string{}
+	for k, _ := range d.data {
+		out = append(out, k)
+	}
+	return out, nil
+}
+
 func (d *inMemory) Get(prefix string, id string) (entry.Entry, error) {
 	entrys := d.data[prefix]
 
