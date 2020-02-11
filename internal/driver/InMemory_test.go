@@ -14,7 +14,7 @@ func TestInMemory(t *testing.T) {
 func TestInMemory_EntryNotExists(t *testing.T) {
 	m := InMemory()
 
-	err, e := m.Get("foo", "bar")
+	e, err := m.Get("foo", "bar")
 
 	assert.NoError(t, err)
 
@@ -28,7 +28,7 @@ func TestInMemory_Put(t *testing.T) {
 
 	assert.NoError(t, err)
 
-	err, e := m.Get("foo", "bar")
+	e, err := m.Get("foo", "bar")
 
 	assert.NoError(t, err)
 

@@ -10,14 +10,14 @@ type inMemory struct {
 	data map[string]map[string]Entry
 }
 
-func (d *inMemory) Get(prefix string, id string) (error, Entry) {
+func (d *inMemory) Get(prefix string, id string) (Entry, error) {
 	entrys := d.data[prefix]
 
 	if nil == entrys {
 		return nil, nil
 	}
 
-	return nil, entrys[id]
+	return entrys[id], nil
 }
 
 func (d *inMemory) Put(prefix string, id string, entry Entry) error {
