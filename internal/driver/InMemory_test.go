@@ -35,3 +35,21 @@ func TestInMemory_Put(t *testing.T) {
 
 	assert.NotNil(t, e)
 }
+
+func TestInMemory_PutEquals(t *testing.T) {
+	m := InMemory()
+
+	e1 := make(entry.Entry)
+	e1["hello"] = "world"
+
+	err := m.Put("foo", "bar", e1)
+
+	assert.NoError(t, err)
+
+	e2, err := m.Get("foo", "bar")
+
+	assert.NoError(t, err)
+
+	assert.Equal(t, "world", e2["hello"])
+	assert.Equal(t, "", e2["world"])
+}
