@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/ze0nni/kodb/internal/entry"
 )
 
 func TestInMemory(t *testing.T) {
@@ -24,7 +25,7 @@ func TestInMemory_EntryNotExists(t *testing.T) {
 func TestInMemory_Put(t *testing.T) {
 	m := InMemory()
 
-	err := m.Put("foo", "bar", make(Entry))
+	err := m.Put("foo", "bar", make(entry.Entry))
 
 	assert.NoError(t, err)
 

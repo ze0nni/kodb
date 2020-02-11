@@ -1,16 +1,18 @@
 package driver
 
+import "github.com/ze0nni/kodb/internal/entry"
+
 func InMemory() Driver {
 	return &inMemory{
-		data: make(map[string]map[string]Entry),
+		data: make(map[string](map[string]entry.Entry)),
 	}
 }
 
 type inMemory struct {
-	data map[string]map[string]Entry
+	data map[string](map[string]entry.Entry)
 }
 
-func (d *inMemory) Get(prefix string, id string) (Entry, error) {
+func (d *inMemory) Get(prefix string, id string) (entry.Entry, error) {
 	entrys := d.data[prefix]
 
 	if nil == entrys {
@@ -20,15 +22,15 @@ func (d *inMemory) Get(prefix string, id string) (Entry, error) {
 	return entrys[id], nil
 }
 
-func (d *inMemory) Put(prefix string, id string, entry Entry) error {
+func (d *inMemory) Put(prefix string, id string, e entry.Entry) error {
 	entrys := d.data[prefix]
 
 	if nil == entrys {
-		entrys = make(map[string]Entry)
+		entrys = make(map[string]entry.Entry)
 		d.data[prefix] = entrys
 	}
 
-	entrys[id] = entry
+	entrys[id] = e
 
 	return nil
 }

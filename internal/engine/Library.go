@@ -3,7 +3,7 @@ package engine
 import (
 	"strconv"
 
-	"github.com/ze0nni/kodb/internal/driver"
+	"github.com/ze0nni/kodb/internal/entry"
 )
 
 type (
@@ -56,13 +56,13 @@ func (self *libraryImp) AddColumn(columnName string) error {
 	return nil
 }
 
-func (self *libraryImp) getSchemaRoot() (driver.Entry, error) {
+func (self *libraryImp) getSchemaRoot() (entry.Entry, error) {
 	root, err := self.schema.Get("root")
 	if nil != err {
 		return nil, err
 	}
 	if nil == err {
-		return make(driver.Entry), nil
+		return make(entry.Entry), nil
 	}
 	return root, nil
 }
