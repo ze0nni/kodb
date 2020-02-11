@@ -66,9 +66,13 @@ func (self *libraryImp) AddColumn(columnName string) error {
 
 	columnIdentity := columnV4.String()
 	entry.SetString("column_"+strconv.Itoa(num), columnIdentity, root)
-	entry.SetString(columnIdentity+",name", columnName, root) //TODO move column data to self.schema[columnIdentity]
 
+	columnEntry := make(entry.Entry)
+	entry.SetString("name", columnName, columnEntry)
+
+	self.schema.Put(columnIdentity, columnEntry)
 	self.schema.Put("root", root)
+
 	return nil
 }
 
@@ -78,7 +82,11 @@ func (self *libraryImp) Column(index int) (string, error) {
 		return "", err
 	}
 	if columnIdentity, ok := root["column_"+strconv.Itoa(index)]; ok {
-		return root[columnIdentity+",name"], nil
+		columnEntry, err := self.schema.Get(columnIdentity)
+		if nil != err {
+			return "", err
+		}
+		return columnEntry["name"], nil
 	}
 
 	return "", errors.New("not found")
