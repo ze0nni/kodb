@@ -2,5 +2,5 @@ package entry
 
 type (
 	// Entry type
-	Entry = map[string]string
+	Entry = (map[string]string)
 )
