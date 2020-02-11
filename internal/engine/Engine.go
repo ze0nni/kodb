@@ -26,7 +26,12 @@ func (self *engine) GetLibrary(name string) Library {
 	if storedLib := self.librarys[name]; nil != storedLib {
 		return storedLib
 	}
-	newLib := newLibraryInst(name)
+	newLib := newLibraryInst(
+		name,
+		LensOf(name+"$schema", self.driver),
+		LensOf(name+"$data", self.driver),
+		LensOf(name+"$meta", self.driver),
+	)
 	self.librarys[name] = newLib
 	return newLib
 }
