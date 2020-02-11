@@ -24,6 +24,7 @@ func newLibraryInst(
 	data Lens,
 	meta Lens,
 ) *libraryImp {
+	schema.Put("root", make(entry.Entry))
 	return &libraryImp{
 		name:   name,
 		schema: schema,

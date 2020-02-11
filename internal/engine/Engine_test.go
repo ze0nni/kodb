@@ -32,3 +32,34 @@ func TestEngine_Library_Name(t *testing.T) {
 
 	assert.Equal(t, "foo", foo.Name())
 }
+
+func TestEngine_Librarys_empty(t *testing.T) {
+	eng := New(driver.InMemory())
+
+	ls := eng.Librarys()
+
+	assert.Equal(t, []string{}, ls)
+}
+
+func TestEngine_Librarys(t *testing.T) {
+	eng := New(driver.InMemory())
+
+	eng.GetLibrary("foo")
+	eng.GetLibrary("bar")
+	ls := eng.Librarys()
+
+	assert.ElementsMatch(t, []string{"foo", "bar"}, ls)
+}
+
+func TestEngine_Librarys_onLoad(t *testing.T) {
+	m := driver.InMemory()
+	eng1 := New(m)
+
+	eng1.GetLibrary("foo")
+	eng1.GetLibrary("bar")
+
+	eng2 := New(m)
+	ls := eng2.Librarys()
+
+	assert.ElementsMatch(t, []string{"foo", "bar"}, ls)
+}
