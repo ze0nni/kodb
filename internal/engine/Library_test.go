@@ -51,3 +51,78 @@ func TestLibrary_Column(t *testing.T) {
 	assert.Equal(t, "foo", c1)
 	assert.Equal(t, "bar", c2)
 }
+
+func TestLibrary_Rows_empty(t *testing.T) {
+	l, _ := emptyUsersLibrary()
+
+	assert.Equal(t, 0, l.Rows())
+}
+
+func TestLibrary_AddRow_NewRow(t *testing.T) {
+	l, _ := emptyUsersLibrary()
+
+	_, err := l.NewRow()
+
+	assert.NoError(t, err)
+	assert.Equal(t, 1, l.Rows())
+}
+
+func TestLibrary_AddRow_NewRow_IdsNotEqual(t *testing.T) {
+	l, _ := emptyUsersLibrary()
+
+	id1, _ := l.NewRow()
+	id2, _ := l.NewRow()
+
+	assert.NotEqual(t, id1, id2)
+}
+
+func TestLibrary_AddRow(t *testing.T) {
+	l, _ := emptyUsersLibrary()
+
+	l.AddRow(RowId("foo"))
+
+	assert.Equal(t, 1, l.Rows())
+}
+
+func TestLibrary_AddRow_errorOnDuplicate(t *testing.T) {
+	l, _ := emptyUsersLibrary()
+
+	l.AddRow(RowId("foo"))
+	err := l.AddRow(RowId("foo"))
+
+	assert.Error(t, err)
+	assert.Equal(t, 1, l.Rows())
+}
+
+func TestLibrary_HasRow(t *testing.T) {
+	l, _ := emptyUsersLibrary()
+
+	rowId, _ := l.NewRow()
+
+	assert.True(t, l.HasRow(rowId))
+}
+
+func TestLibrary_HasRow_notFound(t *testing.T) {
+	l, _ := emptyUsersLibrary()
+
+	assert.False(t, l.HasRow(RowId("foo")))
+}
+
+func emptyLibrary(libraryName LibraryName) (Library, driver.Driver) {
+	d := driver.InMemory()
+	l := newLibraryInst(
+		libraryName,
+		LensOf("schema", d),
+		LensOf("data", d),
+		LensOf("meta", d),
+	)
+	return l, d
+}
+
+func emptyUsersLibrary() (Library, driver.Driver) {
+	l, d := emptyLibrary(LibraryName("users"))
+	l.AddColumn("first_name")
+	l.AddColumn("second_name")
+	l.AddColumn("age")
+	return l, d
+}

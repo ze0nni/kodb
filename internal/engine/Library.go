@@ -11,12 +11,19 @@ import (
 type (
 	LibraryName string
 
+	RowId string
+
 	Library interface {
 		Name() LibraryName
 
 		Columns() int
 		AddColumn(columnName string) error
 		Column(index int) (string, error)
+
+		Rows() int
+		NewRow() (RowId, error)
+		AddRow(RowId) error
+		HasRow(RowId) bool
 	}
 )
 
@@ -36,6 +43,7 @@ func newLibraryInst(
 		schema: schema,
 		data:   data,
 		meta:   meta,
+		rows:   []RowId{},
 	}
 }
 
@@ -44,6 +52,7 @@ type libraryImp struct {
 	schema Lens
 	data   Lens
 	meta   Lens
+	rows   []RowId
 }
 
 func (self *libraryImp) Name() LibraryName {
@@ -108,4 +117,39 @@ func (self *libraryImp) getSchemaRoot() (entry.Entry, error) {
 		return make(entry.Entry), nil
 	}
 	return root, nil
+}
+
+func (self *libraryImp) Rows() int {
+	return len(self.rows)
+}
+
+func (self *libraryImp) NewRow() (RowId, error) {
+	rowV4, err := uuid.NewV4()
+	if nil != err {
+		return RowId(""), err
+	}
+	rowId := RowId(rowV4.String())
+
+	err = self.AddRow(rowId)
+	if nil != err {
+		return RowId(""), err
+	}
+
+	return rowId, nil
+}
+
+func (self *libraryImp) AddRow(rowId RowId) error {
+
+	self.rows = append(self.rows, rowId)
+
+	return nil
+}
+
+func (self *libraryImp) HasRow(rowId RowId) bool {
+	for _, r := range self.rows {
+		if r == rowId {
+			return true
+		}
+	}
+	return false
 }
