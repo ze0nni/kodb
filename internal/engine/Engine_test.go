@@ -30,7 +30,7 @@ func TestEngine_Library_Name(t *testing.T) {
 
 	foo := eng.GetLibrary("foo")
 
-	assert.Equal(t, "foo", foo.Name())
+	assert.Equal(t, LibraryName("foo"), foo.Name())
 }
 
 func TestEngine_Librarys_empty(t *testing.T) {
@@ -38,7 +38,7 @@ func TestEngine_Librarys_empty(t *testing.T) {
 
 	ls := eng.Librarys()
 
-	assert.Equal(t, []string{}, ls)
+	assert.Equal(t, []LibraryName{}, ls)
 }
 
 func TestEngine_Librarys(t *testing.T) {
@@ -48,7 +48,7 @@ func TestEngine_Librarys(t *testing.T) {
 	eng.GetLibrary("bar")
 	ls := eng.Librarys()
 
-	assert.ElementsMatch(t, []string{"foo", "bar"}, ls)
+	assert.ElementsMatch(t, []LibraryName{LibraryName("foo"), LibraryName("bar")}, ls)
 }
 
 func TestEngine_Librarys_onLoad(t *testing.T) {
@@ -61,5 +61,5 @@ func TestEngine_Librarys_onLoad(t *testing.T) {
 	eng2 := New(m)
 	ls := eng2.Librarys()
 
-	assert.ElementsMatch(t, []string{"foo", "bar"}, ls)
+	assert.ElementsMatch(t, []LibraryName{LibraryName("foo"), LibraryName("bar")}, ls)
 }

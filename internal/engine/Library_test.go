@@ -10,7 +10,7 @@ import (
 func TestLibrary_Name(t *testing.T) {
 	l := newLibraryInst("foo", LensOf("schema", driver.InMemory()), nil, nil)
 
-	assert.Equal(t, "foo", l.Name())
+	assert.Equal(t, LibraryName("foo"), l.Name())
 }
 
 func TestLibrary_Columns(t *testing.T) {

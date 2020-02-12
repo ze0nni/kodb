@@ -9,7 +9,7 @@ import (
 func New(driver driver.Driver) Engine {
 	e := &engine{
 		driver:   driver,
-		librarys: make(map[string]*libraryImp),
+		librarys: make(map[LibraryName]*libraryImp),
 	}
 
 	loadLibrarys(e)
@@ -18,27 +18,28 @@ func New(driver driver.Driver) Engine {
 }
 
 type Engine interface {
-	Librarys() []string
-	GetLibrary(name string) Library
+	Librarys() []LibraryName
+	GetLibrary(name LibraryName) Library
 }
 
 type engine struct {
 	driver   driver.Driver
-	librarys map[string]*libraryImp
+	librarys map[LibraryName]*libraryImp
 }
 
 func loadLibrarys(e *engine) {
 	if ps, err := e.driver.Prefixes(); nil == err {
 		for _, p := range ps {
 			if strings.HasSuffix(p, "$schema") {
-				e.GetLibrary(p[:len(p)-7])
+				libraryName := LibraryName(p[:len(p)-7])
+				e.GetLibrary(libraryName)
 			}
 		}
 	}
 }
 
-func (self *engine) Librarys() []string {
-	out := []string{}
+func (self *engine) Librarys() []LibraryName {
+	out := []LibraryName{}
 
 	for k, _ := range self.librarys {
 		out = append(out, k)
@@ -47,15 +48,15 @@ func (self *engine) Librarys() []string {
 	return out
 }
 
-func (self *engine) GetLibrary(name string) Library {
+func (self *engine) GetLibrary(name LibraryName) Library {
 	if storedLib := self.librarys[name]; nil != storedLib {
 		return storedLib
 	}
 	newLib := newLibraryInst(
 		name,
-		LensOf(name+"$schema", self.driver),
-		LensOf(name+"$data", self.driver),
-		LensOf(name+"$meta", self.driver),
+		LensOf(name.ToString()+"$schema", self.driver),
+		LensOf(name.ToString()+"$data", self.driver),
+		LensOf(name.ToString()+"$meta", self.driver),
 	)
 	self.librarys[name] = newLib
 	return newLib

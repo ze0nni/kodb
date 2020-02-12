@@ -9,8 +9,10 @@ import (
 )
 
 type (
+	LibraryName string
+
 	Library interface {
-		Name() string
+		Name() LibraryName
 
 		Columns() int
 		AddColumn(columnName string) error
@@ -18,8 +20,12 @@ type (
 	}
 )
 
+func (name LibraryName) ToString() string {
+	return string(name)
+}
+
 func newLibraryInst(
-	name string,
+	name LibraryName,
 	schema Lens,
 	data Lens,
 	meta Lens,
@@ -34,13 +40,13 @@ func newLibraryInst(
 }
 
 type libraryImp struct {
-	name   string
+	name   LibraryName
 	schema Lens
 	data   Lens
 	meta   Lens
 }
 
-func (self *libraryImp) Name() string {
+func (self *libraryImp) Name() LibraryName {
 	return self.name
 }
 
