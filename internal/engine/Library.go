@@ -9,23 +9,28 @@ import (
 )
 
 type (
+	// LibraryName type
 	LibraryName string
 
-	ColumnId string
-	RowId string
+	// ColumnID type
+	ColumnID string
 
+	// RowID type
+	RowID string
+
+	// Library type
 	Library interface {
 		Name() LibraryName
 
 		Columns() int
-		NewColumn(columnName string) (ColumnId, error)
-		AddColumn(id ColumnId, columnName string) error
+		NewColumn(columnName string) (ColumnID, error)
+		AddColumn(id ColumnID, columnName string) error
 		Column(index int) (string, error)
 
 		Rows() int
-		NewRow() (RowId, error)
-		AddRow(RowId) error
-		HasRow(RowId) bool
+		NewRow() (RowID, error)
+		AddRow(RowID) error
+		HasRow(RowID) bool
 	}
 )
 
@@ -33,8 +38,8 @@ func (name LibraryName) ToString() string {
 	return string(name)
 }
 
-func (columnId ColumnId) ToString() string {
-	return string(columnId)
+func (id ColumnID) ToString() string {
+	return string(id)
 }
 
 func newLibraryInst(
@@ -49,7 +54,7 @@ func newLibraryInst(
 		schema: schema,
 		data:   data,
 		meta:   meta,
-		rows:   []RowId{},
+		rows:   []RowID{},
 	}
 }
 
@@ -58,36 +63,36 @@ type libraryImp struct {
 	schema Lens
 	data   Lens
 	meta   Lens
-	rows   []RowId
+	rows   []RowID
 }
 
-func (self *libraryImp) Name() LibraryName {
-	return self.name
+func (lib *libraryImp) Name() LibraryName {
+	return lib.name
 }
 
-func (self *libraryImp) Columns() int {
-	root, err := self.getSchemaRoot()
+func (lib *libraryImp) Columns() int {
+	root, err := lib.getSchemaRoot()
 	if nil != err {
 		return 0
 	}
 	return entry.IntDef("columns", 0, root)
 }
 
-func (self *libraryImp) NewColumn(columnName string) (ColumnId, error) {
+func (lib *libraryImp) NewColumn(columnName string) (ColumnID, error) {
 	columnV4, err := uuid.NewV4()
 	if nil != err {
-		return ColumnId(""), err
+		return ColumnID(""), err
 	}
 
-	columnId := ColumnId(columnV4.String())
-	if err := self.AddColumn(columnId, columnName); nil != err {
-		return ColumnId(""), err
+	columnID := ColumnID(columnV4.String())
+	if err := lib.AddColumn(columnID, columnName); nil != err {
+		return ColumnID(""), err
 	}
 
-	return columnId, nil
+	return columnID, nil
 }
 
-func (lib *libraryImp) AddColumn(id ColumnId, name string) error {
+func (lib *libraryImp) AddColumn(id ColumnID, name string) error {
 	root, err := lib.getSchemaRoot()
 	if nil != err {
 		return err
@@ -111,13 +116,13 @@ func (lib *libraryImp) AddColumn(id ColumnId, name string) error {
 	return nil
 }
 
-func (self *libraryImp) Column(index int) (string, error) {
-	root, err := self.getSchemaRoot()
+func (lib *libraryImp) Column(index int) (string, error) {
+	root, err := lib.getSchemaRoot()
 	if nil != err {
 		return "", err
 	}
 	if columnIdentity, ok := root["column_"+strconv.Itoa(index)]; ok {
-		columnEntry, err := self.schema.Get(columnIdentity)
+		columnEntry, err := lib.schema.Get(columnIdentity)
 		if nil != err {
 			return "", err
 		}
@@ -127,8 +132,8 @@ func (self *libraryImp) Column(index int) (string, error) {
 	return "", errors.New("not found")
 }
 
-func (self *libraryImp) getSchemaRoot() (entry.Entry, error) {
-	root, err := self.schema.Get("root")
+func (lib *libraryImp) getSchemaRoot() (entry.Entry, error) {
+	root, err := lib.schema.Get("root")
 	if nil != err {
 		return nil, err
 	}
@@ -138,35 +143,35 @@ func (self *libraryImp) getSchemaRoot() (entry.Entry, error) {
 	return root, nil
 }
 
-func (self *libraryImp) Rows() int {
-	return len(self.rows)
+func (lib *libraryImp) Rows() int {
+	return len(lib.rows)
 }
 
-func (self *libraryImp) NewRow() (RowId, error) {
+func (lib *libraryImp) NewRow() (RowID, error) {
 	rowV4, err := uuid.NewV4()
 	if nil != err {
-		return RowId(""), err
+		return RowID(""), err
 	}
-	rowId := RowId(rowV4.String())
+	rowId := RowID(rowV4.String())
 
-	err = self.AddRow(rowId)
+	err = lib.AddRow(rowId)
 	if nil != err {
-		return RowId(""), err
+		return RowID(""), err
 	}
 
 	return rowId, nil
 }
 
-func (self *libraryImp) AddRow(rowId RowId) error {
+func (self *libraryImp) AddRow(rowID RowID) error {
 
-	self.rows = append(self.rows, rowId)
+	self.rows = append(self.rows, rowID)
 
 	return nil
 }
 
-func (self *libraryImp) HasRow(rowId RowId) bool {
+func (self *libraryImp) HasRow(rowID RowID) bool {
 	for _, r := range self.rows {
-		if r == rowId {
+		if r == rowID {
 			return true
 		}
 	}

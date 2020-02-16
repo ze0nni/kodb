@@ -51,8 +51,8 @@ func TestLibrary_Column(t *testing.T) {
 func TestLibrary_AddCoumn_error_on_duplicate(t *testing.T) {
 	l := newLibraryInst("foo", LensOf("schema", driver.InMemory()), nil, nil)
 
-	err1 := l.AddColumn(ColumnId("foo"), "foo")
-	err2 := l.AddColumn(ColumnId("foo"), "foo")
+	err1 := l.AddColumn(ColumnID("foo"), "foo")
+	err2 := l.AddColumn(ColumnID("foo"), "foo")
 
 	assert.NoError(t, err1)
 	assert.Error(t, err2)
@@ -85,7 +85,7 @@ func TestLibrary_AddRow_NewRow_IdsNotEqual(t *testing.T) {
 func TestLibrary_AddRow(t *testing.T) {
 	l, _ := emptyUsersLibrary()
 
-	l.AddRow(RowId("foo"))
+	l.AddRow(RowID("foo"))
 
 	assert.Equal(t, 1, l.Rows())
 }
@@ -93,8 +93,8 @@ func TestLibrary_AddRow(t *testing.T) {
 func TestLibrary_AddRow_errorOnDuplicate(t *testing.T) {
 	l, _ := emptyUsersLibrary()
 
-	l.AddRow(RowId("foo"))
-	err := l.AddRow(RowId("foo"))
+	l.AddRow(RowID("foo"))
+	err := l.AddRow(RowID("foo"))
 
 	assert.Error(t, err)
 	assert.Equal(t, 1, l.Rows())
@@ -111,7 +111,7 @@ func TestLibrary_HasRow(t *testing.T) {
 func TestLibrary_HasRow_notFound(t *testing.T) {
 	l, _ := emptyUsersLibrary()
 
-	assert.False(t, l.HasRow(RowId("foo")))
+	assert.False(t, l.HasRow(RowID("foo")))
 }
 
 func emptyLibrary(libraryName LibraryName) (Library, driver.Driver) {
