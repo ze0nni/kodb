@@ -48,7 +48,10 @@ func newLibraryInst(
 	data Lens,
 	meta Lens,
 ) *libraryImp {
-	schema.Put("root", make(entry.Entry))
+	//TODO: error or panic
+	if root, _ := schema.Get("root"); nil == root {
+		schema.Put("root", make(entry.Entry))
+	}
 	return &libraryImp{
 		name:   name,
 		schema: schema,
