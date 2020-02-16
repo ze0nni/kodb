@@ -11,13 +11,15 @@ import (
 type (
 	LibraryName string
 
+	ColumnId string
 	RowId string
 
 	Library interface {
 		Name() LibraryName
 
 		Columns() int
-		AddColumn(columnName string) error
+		NewColumn(columnName string) (ColumnId, error)
+		AddColumn(id ColumnId, columnName string) error
 		Column(index int) (string, error)
 
 		Rows() int
@@ -29,6 +31,10 @@ type (
 
 func (name LibraryName) ToString() string {
 	return string(name)
+}
+
+func (columnId ColumnId) ToString() string {
+	return string(columnId)
 }
 
 func newLibraryInst(
@@ -67,27 +73,40 @@ func (self *libraryImp) Columns() int {
 	return entry.IntDef("columns", 0, root)
 }
 
-func (self *libraryImp) AddColumn(columnName string) error {
-	root, err := self.getSchemaRoot()
+func (self *libraryImp) NewColumn(columnName string) (ColumnId, error) {
+	columnV4, err := uuid.NewV4()
+	if nil != err {
+		return ColumnId(""), err
+	}
+
+	columnId := ColumnId(columnV4.String())
+	if err := self.AddColumn(columnId, columnName); nil != err {
+		return ColumnId(""), err
+	}
+
+	return columnId, nil
+}
+
+func (lib *libraryImp) AddColumn(id ColumnId, name string) error {
+	root, err := lib.getSchemaRoot()
 	if nil != err {
 		return err
 	}
+
+	if s, _ := lib.schema.Get(id.ToString()); nil != s {
+		return errors.New("duplicate column " + id.ToString())
+	}
+
 	num := entry.IntDef("columns", 0, root)
 	entry.SetInt("columns", num+1, root)
 
-	columnV4, err := uuid.NewV4()
-	if nil != err {
-		return err
-	}
-
-	columnIdentity := columnV4.String()
-	entry.SetString("column_"+strconv.Itoa(num), columnIdentity, root)
+	entry.SetString("column_"+strconv.Itoa(num), id.ToString(), root)
 
 	columnEntry := make(entry.Entry)
-	entry.SetString("name", columnName, columnEntry)
+	entry.SetString("name", name, columnEntry)
 
-	self.schema.Put(columnIdentity, columnEntry)
-	self.schema.Put("root", root)
+	lib.schema.Put(id.ToString(), columnEntry)
+	lib.schema.Put("root", root)
 
 	return nil
 }

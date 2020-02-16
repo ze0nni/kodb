@@ -24,23 +24,19 @@ func TestLibrary_NewColumn(t *testing.T) {
 	d := driver.InMemory()
 	l := newLibraryInst("foo", LensOf("schema", d), nil, nil)
 
-	err := l.AddColumn("bar")
+	_, err := l.NewColumn("bar")
 
 	assert.NoError(t, err)
 
 	assert.Equal(t, 1, l.Columns())
 }
 
-func TestLibrary_NewColumn_duplicate(t *testing.T) {
-	assert.Fail(t, "todo")
-}
-
 func TestLibrary_Column(t *testing.T) {
 	d := driver.InMemory()
 	l := newLibraryInst("foo", LensOf("schema", d), nil, nil)
 
-	l.AddColumn("foo")
-	l.AddColumn("bar")
+	l.NewColumn("foo")
+	l.NewColumn("bar")
 
 	c1, err := l.Column(0)
 	assert.NoError(t, err)
@@ -50,6 +46,16 @@ func TestLibrary_Column(t *testing.T) {
 
 	assert.Equal(t, "foo", c1)
 	assert.Equal(t, "bar", c2)
+}
+
+func TestLibrary_AddCoumn_error_on_duplicate(t *testing.T) {
+	l := newLibraryInst("foo", LensOf("schema", driver.InMemory()), nil, nil)
+
+	err1 := l.AddColumn(ColumnId("foo"), "foo")
+	err2 := l.AddColumn(ColumnId("foo"), "foo")
+
+	assert.NoError(t, err1)
+	assert.Error(t, err2)
 }
 
 func TestLibrary_Rows_empty(t *testing.T) {
@@ -121,8 +127,8 @@ func emptyLibrary(libraryName LibraryName) (Library, driver.Driver) {
 
 func emptyUsersLibrary() (Library, driver.Driver) {
 	l, d := emptyLibrary(LibraryName("users"))
-	l.AddColumn("first_name")
-	l.AddColumn("second_name")
-	l.AddColumn("age")
+	l.NewColumn("first_name")
+	l.NewColumn("second_name")
+	l.NewColumn("age")
 	return l, d
 }
