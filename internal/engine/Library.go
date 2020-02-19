@@ -15,9 +15,6 @@ type (
 	// ColumnID type
 	ColumnID string
 
-	// RowID type
-	RowID string
-
 	// Library type
 	Library interface {
 		Name() LibraryName
@@ -31,6 +28,8 @@ type (
 		NewRow() (RowID, error)
 		AddRow(RowID) error
 		HasRow(RowID) bool
+
+		//Row(RowID) Row
 	}
 )
 
