@@ -16,7 +16,7 @@ func newServer() *server {
 
 	fs := http.FileServer(http.Dir("./public"))
 	http.Handle("/", fs)
-	http.Handle("/ws", websocket.Handler(s.handleWebsocket))
+	http.Handle("/ws/", websocket.Handler(s.handleWebsocket))
 
 	return s
 }
