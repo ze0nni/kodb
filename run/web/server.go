@@ -1,19 +1,34 @@
 package web
 
-import "log"
+import (
+	"log"
 
-func newServer() *serverInstance {
+	"github.com/ze0nni/kodb/run/web/msg"
+
+	"github.com/ze0nni/kodb/internal/engine"
+)
+
+func newServer(engine engine.Engine) *serverInstance {
 	return &serverInstance{
+		engine:               engine,
 		clientConnectedCh:    make(chan *clientConnection),
 		clientDisconnectedCh: make(chan *clientConnection),
-		clients:              make(map[int]*clientConnection),
+		clients:              make(map[ClientID]*clientConnection),
+
+		msgGetSchemaCh: make(chan msgGetSchema),
 	}
 }
 
+type msgGetSchema = struct{ ClientId ClientID }
+
 type serverInstance struct {
+	engine engine.Engine
+
 	clientConnectedCh    chan *clientConnection
 	clientDisconnectedCh chan *clientConnection
-	clients              map[int]*clientConnection
+	clients              map[ClientID]*clientConnection
+
+	msgGetSchemaCh chan msgGetSchema
 }
 
 // ClientConnected
@@ -42,6 +57,18 @@ func (server *serverInstance) clientDisconnected(client *clientConnection) {
 	}
 }
 
+func (server *serverInstance) GetSchema(clientId ClientID) {
+	server.msgGetSchemaCh <- msgGetSchema{clientId}
+}
+
+func (server *serverInstance) getSchema(m msgGetSchema) {
+	if client, ok := server.clients[m.ClientId]; ok {
+		client.SetSchema(msg.SetSchemaMsgFromEngine(server.engine))
+	}
+
+}
+
+//listen
 func (server *serverInstance) listen() {
 	for {
 		select {
@@ -49,6 +76,9 @@ func (server *serverInstance) listen() {
 			server.clientConnected(client)
 		case client := <-server.clientDisconnectedCh:
 			server.clientDisconnected(client)
+
+		case msg := <-server.msgGetSchemaCh:
+			server.getSchema(msg)
 		}
 	}
 }

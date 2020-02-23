@@ -6,11 +6,16 @@ import (
 
 	"github.com/bitly/go-simplejson"
 	"github.com/gorilla/websocket"
+	"github.com/ze0nni/kodb/run/web/msg"
 )
+
+type ClientID int
 
 type serverController interface {
 	ClientConnected(client *clientConnection)
 	ClientDisconnected(client *clientConnection)
+
+	GetSchema(clientId ClientID)
 }
 
 func clientHandle(server serverController) func(http.ResponseWriter, *http.Request) {
@@ -33,9 +38,11 @@ func clientHandle(server serverController) func(http.ResponseWriter, *http.Reque
 		clientIDCounter++
 
 		client := &clientConnection{
-			id:     clientIDCounter,
+			id:     ClientID(clientIDCounter),
 			server: server,
 			ws:     ws,
+
+			responseCh: make(chan interface{}),
 		}
 
 		client.listen()
@@ -44,15 +51,18 @@ func clientHandle(server serverController) func(http.ResponseWriter, *http.Reque
 }
 
 type clientConnection struct {
-	id     int
+	id     ClientID
 	server serverController
 	ws     *websocket.Conn
+
+	responseCh chan interface{}
 }
 
 func (client *clientConnection) listen() {
 	client.server.ClientConnected(client)
 	defer client.server.ClientDisconnected(client)
 
+	go client.write()
 	client.read()
 }
 
@@ -79,5 +89,35 @@ func (client *clientConnection) read() {
 func (client *clientConnection) clientRecieveMessage(
 	msg *simplejson.Json,
 ) {
+	commandRaw, ok := msg.CheckGet("command")
+	if false == ok {
+		log.Printf("[%d] Broken message %s", client.id, msg)
+		return
+	}
+	command, err := commandRaw.String()
+	if nil != err {
+		log.Printf("[%d] Broken message %s", client.id, msg)
+		return
+	}
 
+	switch command {
+	case "getSchema":
+		client.server.GetSchema(client.id)
+	default:
+		log.Printf("[%d] Unknown message %s", client.id, msg)
+	}
+}
+
+func (client *clientConnection) write() {
+	for {
+		select {
+		case msg := <-client.responseCh:
+			log.Printf("%s", msg)
+			client.ws.WriteJSON(msg)
+		}
+	}
+}
+
+func (client *clientConnection) SetSchema(msg *msg.SetSchemaMsg) {
+	client.responseCh <- msg
 }

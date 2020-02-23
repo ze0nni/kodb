@@ -3,10 +3,12 @@ package web
 import (
 	"log"
 	"net/http"
+
+	"github.com/ze0nni/kodb/internal/engine"
 )
 
-func Run() error {
-	server := newServer()
+func Run(engine engine.Engine) error {
+	server := newServer(engine)
 
 	fs := http.FileServer(http.Dir("./public"))
 	http.Handle("/", fs)
