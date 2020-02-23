@@ -14,12 +14,18 @@ func main() {
 	userLib.NewColumn("firstname")
 	userLib.NewColumn("secondName")
 	userLib.NewColumn("age")
+	for i := 0; i < 5; i++ {
+		userLib.NewRow()
+	}
 
 	invLib := eng.GetLibrary(engine.LibraryName("inventory"))
 	invLib.NewColumn("name")
 	invLib.NewColumn("type")
 	invLib.NewColumn("title")
 	invLib.NewColumn("picture")
+	for i := 0; i < 20; i++ {
+		invLib.NewRow()
+	}
 
 	err := web.Run(eng)
 	if nil != err {

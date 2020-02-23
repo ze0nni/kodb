@@ -15,7 +15,8 @@ type serverController interface {
 	ClientConnected(client *clientConnection)
 	ClientDisconnected(client *clientConnection)
 
-	GetSchema(clientId ClientID)
+	GetSchema(ClientID)
+	GetLibraryRows(ClientID, string)
 }
 
 func clientHandle(server serverController) func(http.ResponseWriter, *http.Request) {
@@ -103,6 +104,9 @@ func (client *clientConnection) clientRecieveMessage(
 	switch command {
 	case "getSchema":
 		client.server.GetSchema(client.id)
+	case "getLibraryRows":
+		libraryName := msg.Get("library").MustString()
+		client.server.GetLibraryRows(client.id, libraryName)
 	default:
 		log.Printf("[%d] Unknown message %s", client.id, msg)
 	}
@@ -123,5 +127,9 @@ func (client *clientConnection) write() {
 }
 
 func (client *clientConnection) SetSchema(msg *msg.SetSchemaMsg) {
+	client.responseCh <- msg
+}
+
+func (client *clientConnection) SetLibraryRows(msg *msg.SetLibraryRowsMsg) {
 	client.responseCh <- msg
 }

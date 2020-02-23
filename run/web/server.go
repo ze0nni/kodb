@@ -15,11 +15,16 @@ func newServer(engine engine.Engine) *serverInstance {
 		clientDisconnectedCh: make(chan *clientConnection),
 		clients:              make(map[ClientID]*clientConnection),
 
-		msgGetSchemaCh: make(chan msgGetSchema),
+		msgGetSchemaCh:      make(chan msgGetSchema),
+		msgGetLibraryRowsCh: make(chan msgGetLibraryRows),
 	}
 }
 
 type msgGetSchema = struct{ ClientId ClientID }
+type msgGetLibraryRows = struct {
+	ClientID    ClientID
+	LibraryName engine.LibraryName
+}
 
 type serverInstance struct {
 	engine engine.Engine
@@ -28,7 +33,8 @@ type serverInstance struct {
 	clientDisconnectedCh chan *clientConnection
 	clients              map[ClientID]*clientConnection
 
-	msgGetSchemaCh chan msgGetSchema
+	msgGetSchemaCh      chan msgGetSchema
+	msgGetLibraryRowsCh chan msgGetLibraryRows
 }
 
 // ClientConnected
@@ -68,6 +74,20 @@ func (server *serverInstance) getSchema(m msgGetSchema) {
 
 }
 
+// GetLibraryRows
+func (server *serverInstance) GetLibraryRows(clientID ClientID, libraryName string) {
+	server.msgGetLibraryRowsCh <- msgGetLibraryRows{clientID, engine.LibraryName(libraryName)}
+}
+
+func (server *serverInstance) getLibraryRows(m msgGetLibraryRows) {
+	if client, ok := server.clients[m.ClientID]; ok {
+		client.SetLibraryRows(msg.SetLibraryRowsMsgFromEngine(
+			m.LibraryName,
+			server.engine,
+		))
+	}
+}
+
 //listen
 func (server *serverInstance) listen() {
 	for {
@@ -79,6 +99,8 @@ func (server *serverInstance) listen() {
 
 		case msg := <-server.msgGetSchemaCh:
 			server.getSchema(msg)
+		case msg := <-server.msgGetLibraryRowsCh:
+			server.getLibraryRows(msg)
 		}
 	}
 }

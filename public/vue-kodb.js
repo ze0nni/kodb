@@ -37,7 +37,9 @@ Vue.component("kodb", {
                                 v-for="l in librarys"
                                 :key="l.id"
                         >
-                                <kodb-library/>
+                                <kodb-library
+                                        v-bind:librarySchema="l"
+                                />
                         </v-tab-item>
                 </v-tabs>
         </v-content>
