@@ -80,7 +80,7 @@ func (client *clientConnection) read() {
 			log.Printf("[%d] body: %s", client.id, msgRaw)
 			break
 		}
-		log.Printf("[%d] Recieve: %s", client.id, msg)
+		log.Printf("[%d] Message recieved", client.id)
 		client.clientRecieveMessage(msg)
 	}
 	log.Printf("[%d] Disconnected", client.id)
@@ -112,8 +112,12 @@ func (client *clientConnection) write() {
 	for {
 		select {
 		case msg := <-client.responseCh:
-			log.Printf("%s", msg)
-			client.ws.WriteJSON(msg)
+			err := client.ws.WriteJSON(msg)
+			if err != nil {
+				log.Print("[%d] Message sending error: %s", client.id, err)
+				break
+			}
+			log.Printf("[%d] Message sended", client.id)
 		}
 	}
 }

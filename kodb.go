@@ -15,6 +15,12 @@ func main() {
 	userLib.NewColumn("secondName")
 	userLib.NewColumn("age")
 
+	invLib := eng.GetLibrary(engine.LibraryName("inventory"))
+	invLib.NewColumn("name")
+	invLib.NewColumn("type")
+	invLib.NewColumn("title")
+	invLib.NewColumn("picture")
+
 	err := web.Run(eng)
 	if nil != err {
 		log.Fatal(err)
