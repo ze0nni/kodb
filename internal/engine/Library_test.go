@@ -31,17 +31,17 @@ func TestLibrary_NewColumn(t *testing.T) {
 	assert.Equal(t, 1, l.Columns())
 }
 
-func TestLibrary_Column(t *testing.T) {
+func TestLibrary_ColumnName(t *testing.T) {
 	d := driver.InMemory()
 	l := newLibraryInst("foo", LensOf("schema", d), nil, nil)
 
 	l.NewColumn("foo")
 	l.NewColumn("bar")
 
-	c1, err := l.Column(0)
+	c1, err := l.ColumnName(0)
 	assert.NoError(t, err)
 
-	c2, err := l.Column(1)
+	c2, err := l.ColumnName(1)
 	assert.NoError(t, err)
 
 	assert.Equal(t, "foo", c1)

@@ -22,7 +22,8 @@ type (
 		Columns() int
 		NewColumn(columnName string) (ColumnID, error)
 		AddColumn(id ColumnID, columnName string) error
-		Column(index int) (string, error)
+		Column(index int) (ColumnID, error)
+		ColumnName(index int) (string, error)
 
 		Rows() int
 		NewRow() (RowID, error)
@@ -118,7 +119,19 @@ func (lib *libraryImp) AddColumn(id ColumnID, name string) error {
 	return nil
 }
 
-func (lib *libraryImp) Column(index int) (string, error) {
+func (lib *libraryImp) Column(index int) (ColumnID, error) {
+	root, err := lib.getSchemaRoot()
+	if nil != err {
+		return ColumnID(""), err
+	}
+	if columnIdentity, ok := root["column_"+strconv.Itoa(index)]; ok {
+		return ColumnID(columnIdentity), nil
+	}
+
+	return ColumnID(""), errors.New("not found")
+}
+
+func (lib *libraryImp) ColumnName(index int) (string, error) {
 	root, err := lib.getSchemaRoot()
 	if nil != err {
 		return "", err
