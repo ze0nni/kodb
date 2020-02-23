@@ -3,13 +3,12 @@ package main
 import (
 	"log"
 
-	"github.com/ze0nni/kodb/run"
+	"github.com/ze0nni/kodb/run/web"
 )
 
 func main() {
-	err := run.Web()
+	err := web.Run()
 	if nil != err {
 		log.Fatal(err)
 	}
-	//run.Interact(nil)
 }
