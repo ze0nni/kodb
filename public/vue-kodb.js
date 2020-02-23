@@ -1,24 +1,35 @@
 Vue.component("kodb", {
+        data: function() {
+                return {
+                        selectedLibrary: null,
+                        librarys:[
+                                {id: 1, name:"Users"},
+                                {id: 2, name:"Inventory"},
+                        ]
+                }
+        },
         template:
 `
 <v-app>
         <v-content>
                 <v-tabs
+                        v-model="selectedLibrary"
                         show-arrows
                 >
                         <v-tab
-                                v-for="i in 5"
-                                :key="i"
-                                :href="'#tab-' + i"
+                                v-for="l in librarys"
+                                :key="l.id"
                         >
-                                Item {{ i }}
+                                {{ l.name }}
                         </v-tab>
+
+                        <v-tab-item
+                                v-for="l in librarys"
+                                :key="l.id"
+                        >
+                                <kodb-library/>
+                        </v-tab-item>
                 </v-tabs>
-                <v-toolbar>
-                        <v-btn text>+</v-btn>
-                        <v-btn text>-</v-btn>
-                </v-toolbar>
-                <v-container>Hello world</v-container>
         </v-content>
 </v-app>
 `
