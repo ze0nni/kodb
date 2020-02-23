@@ -8,7 +8,14 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-func clientHandle() func(http.ResponseWriter, *http.Request) {
+type serverController interface {
+	ClientConnected(client *clientConnection)
+	ClientDisconnected(client *clientConnection)
+}
+
+func clientHandle(server serverController) func(http.ResponseWriter, *http.Request) {
+	var clientIDCounter = 0
+
 	return func(w http.ResponseWriter, r *http.Request) {
 		ws, err := websocket.Upgrade(w, r, nil, 1024, 1024)
 
@@ -23,27 +30,54 @@ func clientHandle() func(http.ResponseWriter, *http.Request) {
 			return
 		}
 
-		clientRead(ws)
+		clientIDCounter++
+
+		client := &clientConnection{
+			id:     clientIDCounter,
+			server: server,
+			ws:     ws,
+		}
+
+		client.listen()
 	}
 
 }
 
-func clientRead(
-	ws *websocket.Conn,
-) {
+type clientConnection struct {
+	id     int
+	server serverController
+	ws     *websocket.Conn
+}
+
+func (client *clientConnection) listen() {
+	client.server.ClientConnected(client)
+	defer client.server.ClientDisconnected(client)
+
+	client.read()
+}
+
+func (client *clientConnection) read() {
+	log.Printf("[%d] Connected", client.id)
 	for {
-		msgType, msgRaw, err := ws.ReadMessage()
+		msgType, msgRaw, err := client.ws.ReadMessage()
 		if err != nil {
-			log.Printf("Error read message %d: %s", msgType, err)
+			log.Printf("[%d] Error read message %d: %s", client.id, msgType, err)
 			break
 		}
 		msg, err := simplejson.NewJson(msgRaw)
 		if err != nil {
-			log.Printf("Error decode message: %s", err)
-			log.Printf("body: %s", msgRaw)
+			log.Printf("[%d] Error decode message: %s", client.id, err)
+			log.Printf("[%d] body: %s", client.id, msgRaw)
 			break
 		}
-		log.Printf("recieve: %s", msg)
+		log.Printf("[%d] Recieve: %s", client.id, msg)
+		client.clientRecieveMessage(msg)
 	}
-	log.Print("Disconnected")
+	log.Printf("[%d] Disconnected", client.id)
+}
+
+func (client *clientConnection) clientRecieveMessage(
+	msg *simplejson.Json,
+) {
+
 }
