@@ -10,7 +10,8 @@ type LibrarySchema struct {
 }
 
 type ColumnSchema struct {
-	Name string `json:"name"`
+	ID   engine.ColumnID `json:"id"`
+	Name string          `json:"name"`
 }
 
 func NewLibrarySchemaFromEngine(
@@ -36,9 +37,11 @@ func NewLibrarySchemaFromEngine(
 }
 
 func NewColumnSchemaFromLibrary(index int, library engine.Library) ColumnSchema {
-	columnName, _ := library.Column(index)
+	columnID, _ := library.Column(index)
+	columnName, _ := library.ColumnName(index)
 
 	schema := ColumnSchema{
+		ID:   columnID,
 		Name: columnName,
 	}
 
