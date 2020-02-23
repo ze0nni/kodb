@@ -8,6 +8,11 @@ Vue.component("kodb", {
                         ]
                 }
         },
+        webSockets: {
+                connected() {
+                        console.log(this.$wsocket)
+                }
+        },
         template:
 `
 <v-app>

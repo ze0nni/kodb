@@ -14,9 +14,12 @@
         <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
 
+        <script src="./vue-ws.js"></script>
         <script src="./vue-kodb.js"></script>
         <script src="./vue-kodb-library.js"></script>
         <script>
+                Vue.use(VueWS, "ws://localhost:8000/ws/");
+
                 new Vue({
                         el: '#app',
                         vuetify: new Vuetify(),
