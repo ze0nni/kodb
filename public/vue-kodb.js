@@ -3,14 +3,19 @@ Vue.component("kodb", {
                 return {
                         selectedLibrary: null,
                         librarys:[
-                                {id: 1, name:"Users"},
-                                {id: 2, name:"Inventory"},
                         ]
                 }
         },
         webSockets: {
                 connected() {
-                        console.log(this.$wsocket)
+                        this.$wsocket.send({
+                                "command": "getSchema"
+                        })
+                },
+                command: {
+                        setSchema(msg) {
+                                this.librarys = msg.librarys
+                        }
                 }
         },
         template:

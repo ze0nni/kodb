@@ -44,14 +44,24 @@ function WsConnection(url) {
                 isConnected = false
         }
         ws.onmessage = function(event) {
-
+                const msg = JSON.parse(event.data)
+                const command = msg.command
+                for (component of Object.values(listenedComponents)) {
+                        const wsOptions = component.$options.webSockets
+                        if (wsOptions.command) {
+                                const reciever = wsOptions.command[command]
+                                if (reciever) {
+                                        reciever.call(component, msg)
+                                }
+                        }
+                }
         }
 
         function sendMessage(message) {
                 if (!isConnected) {
                         throw new Error("Ws not ready")
                 }
-                ws.send(message)
+                ws.send(JSON.stringify(message))
         }
 
         const wsocket = {
