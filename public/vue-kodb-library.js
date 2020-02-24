@@ -22,6 +22,12 @@ Vue.component("kodb-library", {
                                 && item.data[colName]
                                 && item.data[colName].exists
                 },
+
+                newRow() {
+                        this.$wsocket.send({
+                                "command": "newRow",
+                                "library": this.librarySchema.name
+                        })
                 }
         },
         webSockets: {
@@ -33,9 +39,19 @@ Vue.component("kodb-library", {
                 },
                 command: {
                         setLibraryRows(msg) {
-                                if (msg.library == this.librarySchema.name) {
-                                        this.rows = msg.rows
+                                if (msg.library != this.librarySchema.name) {
+                                        return
                                 }
+                                this.rows = msg.rows
+                        },
+                        newRow(msg) {
+                                if (msg.library != this.librarySchema.name) {
+                                        return
+                                }
+                                this.rows.push({
+                                        "rowId": msg.rowId,
+                                        "data": {}
+                                })
                         }
                 }
         },
@@ -63,6 +79,13 @@ Vue.component("kodb-library", {
                                 </v-chip>
                         </td>
                 </tr>
+        </template>
+
+        <template v-slot:top>
+                <v-toolbar flat>
+                        <v-spacer></v-spacer>
+                        <v-btn v-on:click="newRow">New row</v-btn>
+                </v-toolbar>
         </template>
 </v-data-table>
 `

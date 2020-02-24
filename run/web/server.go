@@ -17,11 +17,16 @@ func newServer(engine engine.Engine) *serverInstance {
 
 		msgGetSchemaCh:      make(chan msgGetSchema),
 		msgGetLibraryRowsCh: make(chan msgGetLibraryRows),
+		msgNewRowCh:         make(chan msgNewRow),
 	}
 }
 
 type msgGetSchema = struct{ ClientId ClientID }
 type msgGetLibraryRows = struct {
+	ClientID    ClientID
+	LibraryName engine.LibraryName
+}
+type msgNewRow = struct {
 	ClientID    ClientID
 	LibraryName engine.LibraryName
 }
@@ -35,6 +40,7 @@ type serverInstance struct {
 
 	msgGetSchemaCh      chan msgGetSchema
 	msgGetLibraryRowsCh chan msgGetLibraryRows
+	msgNewRowCh         chan msgNewRow
 }
 
 // ClientConnected
@@ -88,6 +94,27 @@ func (server *serverInstance) getLibraryRows(m msgGetLibraryRows) {
 	}
 }
 
+// NewRow
+func (server *serverInstance) NewRow(clientID ClientID, libraryName string) {
+	server.msgNewRowCh <- msgNewRow{clientID, engine.LibraryName(libraryName)}
+}
+
+func (server *serverInstance) newRow(m msgNewRow) {
+	l := server.engine.GetLibrary(m.LibraryName)
+	rowId, err := l.NewRow()
+	if nil != err {
+		log.Printf("Error when <newRow>: %s", err)
+		return
+	}
+	newRowMsg := msg.NewRowMsgOf(
+		m.LibraryName,
+		rowId,
+	)
+	for _, client := range server.clients {
+		client.NewRow(newRowMsg)
+	}
+}
+
 //listen
 func (server *serverInstance) listen() {
 	for {
@@ -101,6 +128,8 @@ func (server *serverInstance) listen() {
 			server.getSchema(msg)
 		case msg := <-server.msgGetLibraryRowsCh:
 			server.getLibraryRows(msg)
+		case msg := <-server.msgNewRowCh:
+			server.newRow(msg)
 		}
 	}
 }
