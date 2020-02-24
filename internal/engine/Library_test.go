@@ -114,6 +114,39 @@ func TestLibrary_HasRow_notFound(t *testing.T) {
 	assert.False(t, l.HasRow(RowID("foo")))
 }
 
+func TestLibrary_Row_out_of_range(t *testing.T) {
+	l, _ := emptyLibrary("foo")
+	_, err := l.Row(0)
+	assert.Error(t, err)
+}
+
+func TestLibrary_Row(t *testing.T) {
+	l, _ := emptyLibrary("foo")
+	id, _ := l.NewRow()
+	r, err := l.Row(0)
+	exists, _ := r.Exists()
+
+	assert.True(t, exists)
+	assert.Equal(t, id, r.ID())
+	assert.NoError(t, err)
+}
+
+func TestLibrary_Row_ref_to_same_data(t *testing.T) {
+	l, _ := emptyLibrary("foo")
+	l.NewRow()
+
+	r1, _ := l.Row(0)
+	r2, _ := l.Row(0)
+
+	assert.NotSame(t, r1, r2)
+
+	key := ColumnID("key")
+	r1.Set(key, "value")
+	v, _, _ := r2.Get(key)
+
+	assert.Equal(t, "value", v)
+}
+
 func emptyLibrary(libraryName LibraryName) (Library, driver.Driver) {
 	d := driver.InMemory()
 	l := newLibraryInst(

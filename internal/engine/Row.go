@@ -10,6 +10,8 @@ type (
 
 	// Row type
 	Row interface {
+		ID() RowID
+
 		Exists() (bool, error)
 
 		Get(ColumnID) (string, bool, error)
@@ -38,6 +40,10 @@ func RowOf(
 type rowImpl struct {
 	data Lens
 	id   RowID
+}
+
+func (r *rowImpl) ID() RowID {
+	return r.id
 }
 
 func (r *rowImpl) Exists() (bool, error) {

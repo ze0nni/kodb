@@ -30,7 +30,7 @@ type (
 		AddRow(RowID) error
 		HasRow(RowID) bool
 
-		//Row(RowID) Row
+		Row(int) (Row, error)
 	}
 )
 
@@ -178,6 +178,10 @@ func (lib *libraryImp) NewRow() (RowID, error) {
 }
 
 func (self *libraryImp) AddRow(rowID RowID) error {
+	err := self.data.Put(rowID.ToString(), make(entry.Entry))
+	if nil != err {
+		return err
+	}
 
 	self.rows = append(self.rows, rowID)
 
@@ -191,4 +195,16 @@ func (self *libraryImp) HasRow(rowID RowID) bool {
 		}
 	}
 	return false
+}
+
+func (lib *libraryImp) Row(index int) (Row, error) {
+	if index < 0 || index >= len(lib.rows) {
+		return nil, errors.New("Row index out of range")
+	}
+
+	id := lib.rows[index]
+	return RowOf(
+		lib.data,
+		id,
+	), nil
 }
