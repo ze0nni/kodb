@@ -7,6 +7,16 @@ Vue.component("kodb-library", {
                         rows:[],
                 }
         },
+        methods: {
+                mapColumns(columns) {
+                        return columns.map(col => {
+                                return {
+                                        text: col.name,
+                                        value: col.id
+                                }
+                        })
+                }
+        },
         webSockets: {
                 connected() {
                         this.$wsocket.send({
@@ -25,9 +35,27 @@ Vue.component("kodb-library", {
         template:
 `
 <v-data-table
-        :headers="librarySchema.columns"
+        :headers="mapColumns(librarySchema.columns)"
         :items="rows"
         :items-per-page="10"
-></v-data-table>
+>
+        <template v-slot:item="{ item,headers }">
+                <tr>
+                        <td v-for="col in headers"
+                        >
+                                <div
+                                        v-if="item.data[col.value].exists"
+                                >
+                                        {{item.data[col.value].value}}
+                                </div>
+                                <v-chip 
+                                        v-else
+                                        color="red">
+                                        NIL
+                                </v-chip>
+                        </td>
+                </tr>
+        </template>
+</v-data-table>
 `
 });
