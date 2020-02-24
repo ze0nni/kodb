@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"strconv"
 
 	"github.com/ze0nni/kodb/internal/driver"
 	"github.com/ze0nni/kodb/internal/engine"
@@ -11,11 +12,15 @@ import (
 func main() {
 	eng := engine.New(driver.InMemory())
 	userLib := eng.GetLibrary(engine.LibraryName("user"))
-	userLib.NewColumn("firstname")
-	userLib.NewColumn("secondName")
-	userLib.NewColumn("age")
+	firstname, _ := userLib.NewColumn("firstname")
+	secondName, _ := userLib.NewColumn("secondName")
+	age, _ := userLib.NewColumn("age")
 	for i := 0; i < 5; i++ {
 		userLib.NewRow()
+		row, _ := userLib.Row(i)
+		row.Set(firstname, "First name")
+		row.Set(secondName, "Second name")
+		row.Set(age, strconv.Itoa(i*5))
 	}
 
 	invLib := eng.GetLibrary(engine.LibraryName("inventory"))
