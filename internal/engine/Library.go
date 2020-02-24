@@ -32,6 +32,8 @@ type (
 
 		Row(int) (Row, error)
 		RowID(int) (RowID, error)
+
+		GetRowColumn(int, ColumnID) (string, bool, error)
 	}
 )
 
@@ -60,6 +62,20 @@ func newLibraryInst(
 		meta:   meta,
 		rows:   []RowID{},
 	}
+}
+
+// ColumnIDs
+func ColumnIDs(library Library) ([]ColumnID, error) {
+	columns := library.Columns()
+	out := make([]ColumnID, columns)
+	for i := 0; i < columns; i++ {
+		c, err := library.Column(i)
+		if nil != err {
+			return nil, err
+		}
+		out = append(out, c)
+	}
+	return out, nil
 }
 
 type libraryImp struct {
@@ -215,4 +231,23 @@ func (lib *libraryImp) RowID(index int) (RowID, error) {
 	}
 
 	return lib.rows[index], nil
+}
+
+func (lib *libraryImp) GetRowColumn(
+	index int,
+	column ColumnID,
+) (string, bool, error) {
+	id, err := lib.RowID(index)
+	if nil != err {
+		return "", false, err
+	}
+	e, err := lib.data.Get(id.ToString())
+	if nil != err {
+		return "", false, err
+	}
+	if nil == e {
+		return "", false, errors.New("Row not exists")
+	}
+	v, ok := e[column.ToString()]
+	return v, ok, nil
 }

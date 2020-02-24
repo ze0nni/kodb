@@ -156,6 +156,40 @@ func TestLibrary_RowID(t *testing.T) {
 	assert.NoError(t, err)
 }
 
+func TestLibrary_GetRowColumn_row_not_exists(t *testing.T) {
+	l, _ := emptyLibrary("foo")
+	key := ColumnID("key")
+
+	v, ok, err := l.GetRowColumn(0, key)
+	assert.Equal(t, "", v)
+	assert.False(t, ok)
+	assert.Error(t, err)
+}
+
+func TestLibrary_GetRowColumn_column_not_exists(t *testing.T) {
+	l, _ := emptyLibrary("foo")
+	l.NewRow()
+	key := ColumnID("key")
+
+	v, ok, err := l.GetRowColumn(0, key)
+	assert.Equal(t, "", v)
+	assert.False(t, ok)
+	assert.NoError(t, err)
+}
+
+func TestLibrary_GetRowColumn(t *testing.T) {
+	l, _ := emptyLibrary("foo")
+	l.NewRow()
+	r, _ := l.Row(0)
+	key := ColumnID("key")
+	r.Set(key, "value")
+
+	v, ok, err := l.GetRowColumn(0, key)
+	assert.Equal(t, "value", v)
+	assert.True(t, ok)
+	assert.NoError(t, err)
+}
+
 func emptyLibrary(libraryName LibraryName) (Library, driver.Driver) {
 	d := driver.InMemory()
 	l := newLibraryInst(
