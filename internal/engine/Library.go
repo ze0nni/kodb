@@ -64,7 +64,7 @@ func newLibraryInst(
 	}
 }
 
-// ColumnIDs
+// ColumnIDs return slice for ColumnID
 func ColumnIDs(library Library) ([]ColumnID, error) {
 	columns := library.Columns()
 	out := make([]ColumnID, columns)
