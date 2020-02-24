@@ -38,6 +38,7 @@ Vue.component("kodb-library", {
         :headers="mapColumns(librarySchema.columns)"
         :items="rows"
         :items-per-page="10"
+        item-key="rowId"
 >
         <template v-slot:item="{ item,headers }">
                 <tr>

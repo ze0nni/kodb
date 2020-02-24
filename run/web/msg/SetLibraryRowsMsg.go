@@ -12,7 +12,8 @@ type SetLibraryRowsMsg struct {
 }
 
 type RowSchema struct {
-	Data *simplejson.Json `json:"data"`
+	RowID engine.RowID     `json:"rowId"`
+	Data  *simplejson.Json `json:"data"`
 }
 
 func SetLibraryRowsMsgFromEngine(
@@ -48,8 +49,14 @@ func RowSchemaFromLibrary(
 	columns []engine.ColumnID,
 	library engine.Library,
 ) (RowSchema, error) {
+	rowId, err := library.RowID(index)
+	if nil != err {
+		return RowSchema{}, err
+	}
+
 	row := RowSchema{
-		Data: simplejson.New(),
+		RowID: rowId,
+		Data:  simplejson.New(),
 	}
 
 	for _, col := range columns {
