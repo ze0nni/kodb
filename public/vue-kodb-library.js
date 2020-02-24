@@ -15,6 +15,13 @@ Vue.component("kodb-library", {
                                         value: col.id
                                 }
                         })
+                },
+                isRowExists(item, colName) {
+                        return item
+                                && item.data
+                                && item.data[colName]
+                                && item.data[colName].exists
+                },
                 }
         },
         webSockets: {
@@ -45,7 +52,7 @@ Vue.component("kodb-library", {
                         <td v-for="col in headers"
                         >
                                 <div
-                                        v-if="item.data[col.value].exists"
+                                        v-if="isRowExists(item, col.value)"
                                 >
                                         {{item.data[col.value].value}}
                                 </div>
