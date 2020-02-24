@@ -31,6 +31,7 @@ type (
 		HasRow(RowID) bool
 
 		Row(int) (Row, error)
+		RowID(int) (RowID, error)
 	}
 )
 
@@ -198,13 +199,20 @@ func (self *libraryImp) HasRow(rowID RowID) bool {
 }
 
 func (lib *libraryImp) Row(index int) (Row, error) {
-	if index < 0 || index >= len(lib.rows) {
-		return nil, errors.New("Row index out of range")
+	id, err := lib.RowID(index)
+	if nil != err {
+		return nil, err
 	}
-
-	id := lib.rows[index]
 	return RowOf(
 		lib.data,
 		id,
 	), nil
+}
+
+func (lib *libraryImp) RowID(index int) (RowID, error) {
+	if index < 0 || index >= len(lib.rows) {
+		return RowID(""), errors.New("Row index out of range")
+	}
+
+	return lib.rows[index], nil
 }

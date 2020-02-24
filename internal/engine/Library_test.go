@@ -147,6 +147,15 @@ func TestLibrary_Row_ref_to_same_data(t *testing.T) {
 	assert.Equal(t, "value", v)
 }
 
+func TestLibrary_RowID(t *testing.T) {
+	l, _ := emptyLibrary("foo")
+	id, _ := l.NewRow()
+	r, err := l.RowID(0)
+
+	assert.Equal(t, id, r)
+	assert.NoError(t, err)
+}
+
 func emptyLibrary(libraryName LibraryName) (Library, driver.Driver) {
 	d := driver.InMemory()
 	l := newLibraryInst(
