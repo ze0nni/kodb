@@ -243,6 +243,8 @@ func (l *libraryImp) DeleteRow(id RowID) error {
 		}
 	}
 
+	l.listener.DeleteRow(l.name, id)
+
 	return nil
 }
 

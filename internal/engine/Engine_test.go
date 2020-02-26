@@ -118,3 +118,20 @@ func TestEngine_Listener_NewRow(t *testing.T) {
 		ll.getLog(),
 	)
 }
+
+func TestEngine_Listener_DeleteRow(t *testing.T) {
+	eng := New(driver.InMemory())
+
+	ll := newLogListener()
+	eng.Listen(ll)
+
+	foo := eng.GetLibrary(LibraryName("foo"))
+	foo.AddRow(RowID("bar"))
+	foo.DeleteRow(RowID("bar"))
+
+	assert.Equal(
+		t,
+		[]string{"newLibrary foo", "newRow foo:bar", "deleteRow foo:bar"},
+		ll.getLog(),
+	)
+}

@@ -21,3 +21,9 @@ func (lm *listenerFromMap) NewRow(name LibraryName, row RowID) {
 		l.NewRow(name, row)
 	}
 }
+
+func (lm *listenerFromMap) DeleteRow(name LibraryName, row RowID) {
+	for l, _ := range lm.listeners {
+		l.DeleteRow(name, row)
+	}
+}

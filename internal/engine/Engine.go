@@ -27,6 +27,7 @@ type Engine interface {
 type Listener interface {
 	NewLibrary(LibraryName)
 	NewRow(LibraryName, RowID)
+	DeleteRow(LibraryName, RowID)
 }
 
 type engine struct {

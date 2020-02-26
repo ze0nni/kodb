@@ -13,3 +13,7 @@ func (lm *listenerNilInst) NewLibrary(name LibraryName) {
 func (lm *listenerNilInst) NewRow(name LibraryName, row RowID) {
 
 }
+
+func (lm *listenerNilInst) DeleteRow(LibraryName, RowID) {
+
+}
