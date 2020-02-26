@@ -2,6 +2,7 @@ package engine
 
 import (
 	"errors"
+	"fmt"
 	"strconv"
 
 	uuid "github.com/nu7hatch/gouuid"
@@ -29,6 +30,7 @@ type (
 		NewRow() (RowID, error)
 		AddRow(RowID) error
 		HasRow(RowID) bool
+		DeleteRow(RowID) error
 
 		Row(int) (Row, error)
 		RowID(int) (RowID, error)
@@ -217,6 +219,31 @@ func (self *libraryImp) HasRow(rowID RowID) bool {
 		}
 	}
 	return false
+}
+
+func (l *libraryImp) DeleteRow(id RowID) error {
+	e, err := l.data.Get(id.ToString())
+	if nil != err {
+		return err
+	}
+	if nil == e {
+		return fmt.Errorf("Row not exists: %s", id.ToString())
+	}
+	err = l.data.Delete(id.ToString())
+	if nil != err {
+		return err
+	}
+
+	rows := l.rows
+	rowsCount := len(rows)
+	for i := 0; i < rowsCount; i++ {
+		if id == rows[i] {
+			l.rows = append(rows[:i], rows[i+1:]...)
+			break
+		}
+	}
+
+	return nil
 }
 
 func (lib *libraryImp) Row(index int) (Row, error) {

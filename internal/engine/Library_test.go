@@ -114,6 +114,26 @@ func TestLibrary_HasRow_notFound(t *testing.T) {
 	assert.False(t, l.HasRow(RowID("foo")))
 }
 
+func TestLibrary_DeleteRow_error_when_row_not_exists(t *testing.T) {
+	l, _ := emptyUsersLibrary()
+
+	err := l.DeleteRow(RowID("foo"))
+
+	assert.Error(t, err)
+}
+
+func TestLibrary_DeleteRow(t *testing.T) {
+	l, _ := emptyUsersLibrary()
+	id, _ := l.NewRow()
+
+	assert.True(t, l.HasRow(id))
+
+	err := l.DeleteRow(id)
+
+	assert.NoError(t, err)
+	assert.False(t, l.HasRow(id))
+}
+
 func TestLibrary_Row_out_of_range(t *testing.T) {
 	l, _ := emptyLibrary("foo")
 	_, err := l.Row(0)
