@@ -1,6 +1,10 @@
 package driver
 
-import "github.com/ze0nni/kodb/internal/entry"
+import (
+	"fmt"
+
+	"github.com/ze0nni/kodb/internal/entry"
+)
 
 func InMemory() Driver {
 	return &inMemory{
@@ -40,5 +44,18 @@ func (d *inMemory) Put(prefix string, id string, e entry.Entry) error {
 
 	entrys[id] = e
 
+	return nil
+}
+
+func (d *inMemory) Delete(prefix string, id string) error {
+	entrys := d.data[prefix]
+	if nil == entrys {
+		return fmt.Errorf("Entry storage not exists: %s/%s", prefix, id)
+	}
+	e := entrys[id]
+	if e == nil {
+		return fmt.Errorf("Entry not exists: %s/%s", prefix, id)
+	}
+	delete(entrys, id)
 	return nil
 }

@@ -8,6 +8,7 @@ type (
 		Prefixes() ([]string, error)
 		Get(prefix string, id string) (entry.Entry, error)
 		Put(prefix string, id string, entry entry.Entry) error
+		Delete(prefix string, id string) error
 	}
 )
 
