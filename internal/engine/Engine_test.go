@@ -63,3 +63,42 @@ func TestEngine_Librarys_onLoad(t *testing.T) {
 
 	assert.ElementsMatch(t, []LibraryName{LibraryName("foo"), LibraryName("bar")}, ls)
 }
+
+func TestEngine_Listener(t *testing.T) {
+	eng := New(driver.InMemory())
+
+	l := eng.Listen(nil)
+
+	assert.NotNil(t, l)
+}
+
+func TestEngine_Listener_NewLibrary(t *testing.T) {
+	eng := New(driver.InMemory())
+
+	ll := newLogListener()
+	eng.Listen(ll)
+
+	eng.GetLibrary(LibraryName("foo"))
+
+	assert.Equal(
+		t,
+		[]string{"newLibrary foo"},
+		ll.getLog(),
+	)
+}
+
+func TestEngine_Listener_StopListen(t *testing.T) {
+	eng := New(driver.InMemory())
+
+	ll := newLogListener()
+	handle := eng.Listen(ll)
+	handle()
+
+	eng.GetLibrary(LibraryName("foo"))
+
+	assert.Equal(
+		t,
+		[]string{},
+		ll.getLog(),
+	)
+}

@@ -8,8 +8,9 @@ import (
 
 func New(driver driver.Driver) Engine {
 	e := &engine{
-		driver:   driver,
-		librarys: make(map[LibraryName]*libraryImp),
+		driver:    driver,
+		librarys:  make(map[LibraryName]*libraryImp),
+		listeners: make(map[Listener]struct{}),
 	}
 
 	loadLibrarys(e)
@@ -20,11 +21,17 @@ func New(driver driver.Driver) Engine {
 type Engine interface {
 	Librarys() []LibraryName
 	GetLibrary(name LibraryName) Library
+	Listen(listener Listener) func()
+}
+
+type Listener interface {
+	NewLibrary(LibraryName)
 }
 
 type engine struct {
-	driver   driver.Driver
-	librarys map[LibraryName]*libraryImp
+	driver    driver.Driver
+	librarys  map[LibraryName]*libraryImp
+	listeners map[Listener]struct{}
 }
 
 func loadLibrarys(e *engine) {
@@ -48,16 +55,28 @@ func (self *engine) Librarys() []LibraryName {
 	return out
 }
 
-func (self *engine) GetLibrary(name LibraryName) Library {
-	if storedLib := self.librarys[name]; nil != storedLib {
+func (e *engine) GetLibrary(name LibraryName) Library {
+	if storedLib := e.librarys[name]; nil != storedLib {
 		return storedLib
 	}
 	newLib := newLibraryInst(
 		name,
-		LensOf(name.ToString()+"$schema", self.driver),
-		LensOf(name.ToString()+"$data", self.driver),
-		LensOf(name.ToString()+"$meta", self.driver),
+		LensOf(name.ToString()+"$schema", e.driver),
+		LensOf(name.ToString()+"$data", e.driver),
+		LensOf(name.ToString()+"$meta", e.driver),
 	)
-	self.librarys[name] = newLib
+	e.librarys[name] = newLib
+
+	for l, _ := range e.listeners {
+		l.NewLibrary(name)
+	}
+
 	return newLib
+}
+
+func (e *engine) Listen(listener Listener) func() {
+	e.listeners[listener] = struct{}{}
+	return func() {
+		delete(e.listeners, listener)
+	}
 }
