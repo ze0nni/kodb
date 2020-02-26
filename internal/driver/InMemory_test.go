@@ -72,3 +72,24 @@ func TestInMemory_Prefixes(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, []string{"foo"}, p)
 }
+
+func TestInMemory_Delete_error_when_not_exists(t *testing.T) {
+	m := InMemory()
+
+	err := m.Delete("foo", "value")
+
+	assert.Error(t, err)
+}
+
+func TestInMemory_Delete(t *testing.T) {
+	m := InMemory()
+	m.Put("foo", "value", make(entry.Entry))
+
+	err := m.Delete("foo", "value")
+
+	assert.NoError(t, err)
+
+	e, err := m.Get("foo", "value")
+	assert.NoError(t, err)
+	assert.Nil(t, e)
+}
