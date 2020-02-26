@@ -47,6 +47,7 @@ func (id ColumnID) ToString() string {
 
 func newLibraryInst(
 	name LibraryName,
+	listener Listener,
 	schema Lens,
 	data Lens,
 	meta Lens,
@@ -56,11 +57,12 @@ func newLibraryInst(
 		schema.Put("root", make(entry.Entry))
 	}
 	return &libraryImp{
-		name:   name,
-		schema: schema,
-		data:   data,
-		meta:   meta,
-		rows:   []RowID{},
+		name:     name,
+		listener: listener,
+		schema:   schema,
+		data:     data,
+		meta:     meta,
+		rows:     []RowID{},
 	}
 }
 
@@ -79,11 +81,12 @@ func ColumnIDs(library Library) ([]ColumnID, error) {
 }
 
 type libraryImp struct {
-	name   LibraryName
-	schema Lens
-	data   Lens
-	meta   Lens
-	rows   []RowID
+	name     LibraryName
+	listener Listener
+	schema   Lens
+	data     Lens
+	meta     Lens
+	rows     []RowID
 }
 
 func (lib *libraryImp) Name() LibraryName {
@@ -194,13 +197,15 @@ func (lib *libraryImp) NewRow() (RowID, error) {
 	return rowId, nil
 }
 
-func (self *libraryImp) AddRow(rowID RowID) error {
-	err := self.data.Put(rowID.ToString(), make(entry.Entry))
+func (l *libraryImp) AddRow(rowID RowID) error {
+	err := l.data.Put(rowID.ToString(), make(entry.Entry))
 	if nil != err {
 		return err
 	}
 
-	self.rows = append(self.rows, rowID)
+	l.rows = append(l.rows, rowID)
+
+	l.listener.NewRow(l.name, rowID)
 
 	return nil
 }

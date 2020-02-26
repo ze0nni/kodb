@@ -102,3 +102,19 @@ func TestEngine_Listener_StopListen(t *testing.T) {
 		ll.getLog(),
 	)
 }
+
+func TestEngine_Listener_NewRow(t *testing.T) {
+	eng := New(driver.InMemory())
+
+	ll := newLogListener()
+	eng.Listen(ll)
+
+	foo := eng.GetLibrary(LibraryName("foo"))
+	foo.AddRow(RowID("bar"))
+
+	assert.Equal(
+		t,
+		[]string{"newLibrary foo", "newRow foo:bar"},
+		ll.getLog(),
+	)
+}

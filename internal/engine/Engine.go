@@ -26,6 +26,7 @@ type Engine interface {
 
 type Listener interface {
 	NewLibrary(LibraryName)
+	NewRow(LibraryName, RowID)
 }
 
 type engine struct {
@@ -61,6 +62,7 @@ func (e *engine) GetLibrary(name LibraryName) Library {
 	}
 	newLib := newLibraryInst(
 		name,
+		newListenerFromMap(e.listeners),
 		LensOf(name.ToString()+"$schema", e.driver),
 		LensOf(name.ToString()+"$data", e.driver),
 		LensOf(name.ToString()+"$meta", e.driver),

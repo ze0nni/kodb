@@ -8,21 +8,21 @@ import (
 )
 
 func TestLibrary_Name(t *testing.T) {
-	l := newLibraryInst("foo", LensOf("schema", driver.InMemory()), nil, nil)
+	l := newLibraryInst("foo", listenerNil(), LensOf("schema", driver.InMemory()), nil, nil)
 
 	assert.Equal(t, LibraryName("foo"), l.Name())
 }
 
 func TestLibrary_Columns(t *testing.T) {
 	d := driver.InMemory()
-	l := newLibraryInst("foo", LensOf("schema", d), nil, nil)
+	l := newLibraryInst("foo", listenerNil(), LensOf("schema", d), nil, nil)
 
 	assert.Equal(t, 0, l.Columns())
 }
 
 func TestLibrary_NewColumn(t *testing.T) {
 	d := driver.InMemory()
-	l := newLibraryInst("foo", LensOf("schema", d), nil, nil)
+	l := newLibraryInst("foo", listenerNil(), LensOf("schema", d), nil, nil)
 
 	_, err := l.NewColumn("bar")
 
@@ -33,7 +33,7 @@ func TestLibrary_NewColumn(t *testing.T) {
 
 func TestLibrary_ColumnName(t *testing.T) {
 	d := driver.InMemory()
-	l := newLibraryInst("foo", LensOf("schema", d), nil, nil)
+	l := newLibraryInst("foo", listenerNil(), LensOf("schema", d), nil, nil)
 
 	l.NewColumn("foo")
 	l.NewColumn("bar")
@@ -49,7 +49,7 @@ func TestLibrary_ColumnName(t *testing.T) {
 }
 
 func TestLibrary_AddCoumn_error_on_duplicate(t *testing.T) {
-	l := newLibraryInst("foo", LensOf("schema", driver.InMemory()), nil, nil)
+	l := newLibraryInst("foo", listenerNil(), LensOf("schema", driver.InMemory()), nil, nil)
 
 	err1 := l.AddColumn(ColumnID("foo"), "foo")
 	err2 := l.AddColumn(ColumnID("foo"), "foo")
@@ -194,6 +194,7 @@ func emptyLibrary(libraryName LibraryName) (Library, driver.Driver) {
 	d := driver.InMemory()
 	l := newLibraryInst(
 		libraryName,
+		listenerNil(),
 		LensOf("schema", d),
 		LensOf("data", d),
 		LensOf("meta", d),
