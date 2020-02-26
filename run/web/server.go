@@ -101,22 +101,18 @@ func (server *serverInstance) NewRow(clientID ClientID, libraryName string) {
 
 func (server *serverInstance) newRow(m msgNewRow) {
 	l := server.engine.GetLibrary(m.LibraryName)
-	rowId, err := l.NewRow()
+	_, err := l.NewRow()
 	if nil != err {
 		log.Printf("Error when <newRow>: %s", err)
 		return
-	}
-	newRowMsg := msg.NewRowMsgOf(
-		m.LibraryName,
-		rowId,
-	)
-	for _, client := range server.clients {
-		client.NewRow(newRowMsg)
 	}
 }
 
 //listen
 func (server *serverInstance) listen() {
+	listenerHandle := server.engine.Listen(&serverListener{server})
+	defer listenerHandle()
+
 	for {
 		select {
 		case client := <-server.clientConnectedCh:
