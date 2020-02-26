@@ -14,7 +14,12 @@ Vue.component("kodb-library", {
                                         text: col.name,
                                         value: col.id
                                 }
-                        })
+                        }).concat([
+                                {
+                                        text: "actions",
+                                        actions: true
+                                }
+                        ])
                 },
                 isRowExists(item, colName) {
                         return item
@@ -27,6 +32,14 @@ Vue.component("kodb-library", {
                         this.$wsocket.send({
                                 "command": "newRow",
                                 "library": this.librarySchema.name
+                        })
+                },
+
+                deleteRow(rowId) {
+                        this.$wsocket.send({
+                                "command": "deleteRow",
+                                "library": this.librarySchema.name,
+                                "rowId": rowId
                         })
                 }
         },
@@ -52,6 +65,16 @@ Vue.component("kodb-library", {
                                         "rowId": msg.rowId,
                                         "data": {}
                                 })
+                        },
+                        deleteRow(msg) {
+                                if (msg.library != this.librarySchema.name) {
+                                        return
+                                }
+                                const rowId = msg.rowId
+                                constRowIndex = this.rows.findIndex(x => x.rowId == rowId)
+                                if (-1 != constRowIndex) {
+                                        this.rows.splice(constRowIndex, 1)
+                                }
                         }
                 }
         },
@@ -67,8 +90,15 @@ Vue.component("kodb-library", {
                 <tr>
                         <td v-for="col in headers"
                         >
+                                <div    v-if="col.actions">
+                                        <v-icon
+                                                v-on:click="deleteRow(item.rowId)"
+                                        >
+                                                mdi-delete
+                                        </v-icon>
+                                </div>
                                 <div
-                                        v-if="isRowExists(item, col.value)"
+                                        v-else-if="isRowExists(item, col.value)"
                                 >
                                         {{item.data[col.value].value}}
                                 </div>

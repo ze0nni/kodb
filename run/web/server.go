@@ -18,6 +18,7 @@ func newServer(engine engine.Engine) *serverInstance {
 		msgGetSchemaCh:      make(chan msgGetSchema),
 		msgGetLibraryRowsCh: make(chan msgGetLibraryRows),
 		msgNewRowCh:         make(chan msgNewRow),
+		msgDeleteRowCh:      make(chan msgDeleteRow),
 	}
 }
 
@@ -30,6 +31,11 @@ type msgNewRow = struct {
 	ClientID    ClientID
 	LibraryName engine.LibraryName
 }
+type msgDeleteRow = struct {
+	ClientID    ClientID
+	LibraryName engine.LibraryName
+	RowID       engine.RowID
+}
 
 type serverInstance struct {
 	engine engine.Engine
@@ -41,6 +47,7 @@ type serverInstance struct {
 	msgGetSchemaCh      chan msgGetSchema
 	msgGetLibraryRowsCh chan msgGetLibraryRows
 	msgNewRowCh         chan msgNewRow
+	msgDeleteRowCh      chan msgDeleteRow
 }
 
 // ClientConnected
@@ -108,6 +115,19 @@ func (server *serverInstance) newRow(m msgNewRow) {
 	}
 }
 
+// DeleteRow
+func (server *serverInstance) DeleteRow(clientID ClientID, libraryName string, rowID string) {
+	server.msgDeleteRowCh <- msgDeleteRow{clientID, engine.LibraryName(libraryName), engine.RowID(rowID)}
+}
+
+func (server *serverInstance) deleteRow(m msgDeleteRow) {
+	l := server.engine.GetLibrary(m.LibraryName)
+	err := l.DeleteRow(m.RowID)
+	if nil != err {
+		log.Printf("Error when <deleteRow>: %s", err)
+	}
+}
+
 //listen
 func (server *serverInstance) listen() {
 	listenerHandle := server.engine.Listen(&serverListener{server})
@@ -126,6 +146,8 @@ func (server *serverInstance) listen() {
 			server.getLibraryRows(msg)
 		case msg := <-server.msgNewRowCh:
 			server.newRow(msg)
+		case msg := <-server.msgDeleteRowCh:
+			server.deleteRow(msg)
 		}
 	}
 }

@@ -18,6 +18,7 @@ type serverController interface {
 	GetSchema(ClientID)
 	GetLibraryRows(ClientID, string)
 	NewRow(ClientID, string)
+	DeleteRow(ClientID, string, string)
 }
 
 func clientHandle(server serverController) func(http.ResponseWriter, *http.Request) {
@@ -111,6 +112,10 @@ func (client *clientConnection) clientRecieveMessage(
 	case "newRow":
 		libraryName := msg.Get("library").MustString()
 		client.server.NewRow(client.id, libraryName)
+	case "deleteRow":
+		libraryName := msg.Get("library").MustString()
+		rowID := msg.Get("rowId").MustString()
+		client.server.DeleteRow(client.id, libraryName, rowID)
 	default:
 		log.Printf("[%d] Unknown message %s", client.id, msg)
 	}
@@ -139,5 +144,9 @@ func (client *clientConnection) SetLibraryRows(msg *msg.SetLibraryRowsMsg) {
 }
 
 func (client *clientConnection) NewRow(msg *msg.NewRowMsg) {
+	client.responseCh <- msg
+}
+
+func (client *clientConnection) DeleteRow(msg *msg.DeleteRowMsg) {
 	client.responseCh <- msg
 }

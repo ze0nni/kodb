@@ -23,3 +23,13 @@ func (l *serverListener) NewRow(name engine.LibraryName, row engine.RowID) {
 		client.NewRow(newRowMsg)
 	}
 }
+
+func (l *serverListener) DeleteRow(name engine.LibraryName, row engine.RowID) {
+	deleteRowMsg := msg.DeleteRowMsgOf(
+		name,
+		row,
+	)
+	for _, client := range l.server.clients {
+		client.DeleteRow(deleteRowMsg)
+	}
+}
