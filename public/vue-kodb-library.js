@@ -4,6 +4,7 @@ Vue.component("kodb-library", {
         ],
         data: function() {
                 return {
+                        editedValue: "",
                         rows:[],
                 }
         },
@@ -40,6 +41,16 @@ Vue.component("kodb-library", {
                                 "command": "deleteRow",
                                 "library": this.librarySchema.name,
                                 "rowId": rowId
+                        })
+                },
+
+                updateValue(rowId, columnId, value) {
+                        this.$wsocket.send({
+                                "command": "updateValue",
+                                "library": this.librarySchema.name,
+                                "rowId": rowId,
+                                "columnId": columnId,
+                                "value": value
                         })
                 }
         },
@@ -100,11 +111,24 @@ Vue.component("kodb-library", {
                                 <div
                                         v-else-if="isRowExists(item, col.value)"
                                 >
-                                        {{item.data[col.value].value}}
+                                        <v-edit-dialog
+                                                @open="editedValue = item.data[col.value].value"
+                                                @save="updateValue(item.rowId, col.value ,editedValue)"
+                                        >
+                                                {{ item.data[col.value].value }}
+                                                <template v-slot:input>
+                                                        <v-text-field
+                                                                v-model="editedValue"
+                                                                label="Edit"
+                                                                single-line
+                                                        ></v-text-field>
+                                                </template>
+                                        </v-edit-dialog>
                                 </div>
                                 <v-chip 
                                         v-else
-                                        color="red">
+                                        color="red"
+                                >
                                         NIL
                                 </v-chip>
                         </td>
