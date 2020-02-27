@@ -3,6 +3,8 @@ package engine
 import (
 	"testing"
 
+	"github.com/ze0nni/kodb/internal/entry"
+
 	"github.com/stretchr/testify/assert"
 	"github.com/ze0nni/kodb/internal/driver"
 )
@@ -208,6 +210,52 @@ func TestLibrary_GetRowColumn(t *testing.T) {
 	assert.Equal(t, "value", v)
 	assert.True(t, ok)
 	assert.NoError(t, err)
+}
+
+func TestLibrary_GetValue_error_when_row_not_exists(t *testing.T) {
+	l, _ := emptyLibrary("foo")
+
+	_, exists, err := l.GetValue(RowID("foo"), ColumnID("bar"))
+
+	assert.False(t, exists)
+	assert.Error(t, err)
+}
+
+func TestLibrary_GetValue(t *testing.T) {
+	l, d := emptyLibrary("foo")
+
+	rowID, _ := l.NewRow()
+
+	e := make(entry.Entry)
+	e["bar"] = "baz"
+	d.Put("data", rowID.ToString(), e)
+
+	value, exists, err := l.GetValue(rowID, ColumnID("bar"))
+
+	assert.NoError(t, err)
+	assert.True(t, exists)
+	assert.Equal(t, "baz", value)
+}
+
+func TestLibrary_UpdateValue_error_when_row_not_exists(t *testing.T) {
+	l, _ := emptyLibrary("foo")
+
+	err := l.UpdateValue(RowID("foo"), ColumnID("bar"), "baz")
+
+	assert.Error(t, err)
+}
+
+func TestLibrary_UpdateValue(t *testing.T) {
+	l, _ := emptyLibrary("foo")
+
+	r, _ := l.NewRow()
+	err := l.UpdateValue(r, ColumnID("bar"), "baz")
+
+	assert.NoError(t, err)
+
+	value, exists, _ := l.GetValue(r, ColumnID("bar"))
+	assert.True(t, exists)
+	assert.Equal(t, "baz", value)
 }
 
 func emptyLibrary(libraryName LibraryName) (Library, driver.Driver) {

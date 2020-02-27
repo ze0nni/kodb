@@ -36,6 +36,8 @@ type (
 		RowID(int) (RowID, error)
 
 		GetRowColumn(int, ColumnID) (string, bool, error)
+		GetValue(RowID, ColumnID) (string, bool, error)
+		UpdateValue(RowID, ColumnID, string) error
 	}
 )
 
@@ -284,4 +286,40 @@ func (lib *libraryImp) GetRowColumn(
 	}
 	v, ok := e[column.ToString()]
 	return v, ok, nil
+}
+
+func (lib *libraryImp) GetValue(
+	id RowID,
+	col ColumnID,
+) (string, bool, error) {
+	e, err := lib.data.Get(id.ToString())
+	if nil != err {
+		return "", false, err
+	}
+	if nil == e {
+		return "", false, errors.New("Row not exists")
+	}
+
+	v, exists := e[col.ToString()]
+	if false == exists {
+		return "", false, nil
+	}
+	return v, true, nil
+}
+
+func (lib *libraryImp) UpdateValue(
+	id RowID,
+	col ColumnID,
+	value string,
+) error {
+	e, err := lib.data.Get(id.ToString())
+	if nil != err {
+		return err
+	}
+	if nil == e {
+		return errors.New("Row not exists")
+	}
+	e[col.ToString()] = value
+
+	return lib.data.Put(id.ToString(), e)
 }
