@@ -19,6 +19,7 @@ type serverController interface {
 	GetLibraryRows(ClientID, string)
 	NewRow(ClientID, string)
 	DeleteRow(ClientID, string, string)
+	UpdateValue(ClientID, string, string, string, string)
 }
 
 func clientHandle(server serverController) func(http.ResponseWriter, *http.Request) {
@@ -116,6 +117,12 @@ func (client *clientConnection) clientRecieveMessage(
 		libraryName := msg.Get("library").MustString()
 		rowID := msg.Get("rowId").MustString()
 		client.server.DeleteRow(client.id, libraryName, rowID)
+	case "updateValue":
+		libraryName := msg.Get("library").MustString()
+		rowID := msg.Get("rowId").MustString()
+		columnId := msg.Get("columnId").MustString()
+		value := msg.Get("value").MustString()
+		client.server.UpdateValue(client.id, libraryName, rowID, columnId, value)
 	default:
 		log.Printf("[%d] Unknown message %s", client.id, msg)
 	}

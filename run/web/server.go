@@ -19,6 +19,7 @@ func newServer(engine engine.Engine) *serverInstance {
 		msgGetLibraryRowsCh: make(chan msgGetLibraryRows),
 		msgNewRowCh:         make(chan msgNewRow),
 		msgDeleteRowCh:      make(chan msgDeleteRow),
+		msgUpdateValueCh:    make(chan msgUpdateValue),
 	}
 }
 
@@ -36,6 +37,13 @@ type msgDeleteRow = struct {
 	LibraryName engine.LibraryName
 	RowID       engine.RowID
 }
+type msgUpdateValue = struct {
+	ClientID    ClientID
+	LibraryName engine.LibraryName
+	RowID       engine.RowID
+	ColumnID    engine.ColumnID
+	value       string
+}
 
 type serverInstance struct {
 	engine engine.Engine
@@ -48,6 +56,7 @@ type serverInstance struct {
 	msgGetLibraryRowsCh chan msgGetLibraryRows
 	msgNewRowCh         chan msgNewRow
 	msgDeleteRowCh      chan msgDeleteRow
+	msgUpdateValueCh    chan msgUpdateValue
 }
 
 // ClientConnected
@@ -128,6 +137,24 @@ func (server *serverInstance) deleteRow(m msgDeleteRow) {
 	}
 }
 
+func (server *serverInstance) UpdateValue(clientID ClientID, libraryName, rowID, columnID, value string) {
+	server.msgUpdateValueCh <- msgUpdateValue{
+		clientID,
+		engine.LibraryName(libraryName),
+		engine.RowID(rowID),
+		engine.ColumnID(columnID),
+		value,
+	}
+}
+
+func (server *serverInstance) updateValue(m msgUpdateValue) {
+	l := server.engine.GetLibrary(m.LibraryName)
+	err := l.UpdateValue(m.RowID, m.ColumnID, m.value)
+	if nil != err {
+		log.Printf("Error when <updateValue>: %s", err)
+	}
+}
+
 //listen
 func (server *serverInstance) listen() {
 	listenerHandle := server.engine.Listen(&serverListener{server})
@@ -148,6 +175,8 @@ func (server *serverInstance) listen() {
 			server.newRow(msg)
 		case msg := <-server.msgDeleteRowCh:
 			server.deleteRow(msg)
+		case msg := <-server.msgUpdateValueCh:
+			server.updateValue(msg)
 		}
 	}
 }
