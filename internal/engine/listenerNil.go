@@ -17,3 +17,7 @@ func (lm *listenerNilInst) NewRow(name LibraryName, row RowID) {
 func (lm *listenerNilInst) DeleteRow(LibraryName, RowID) {
 
 }
+
+func (lm *listenerNilInst) UpdateValue(LibraryName, RowID, ColumnID, bool, string) {
+
+}

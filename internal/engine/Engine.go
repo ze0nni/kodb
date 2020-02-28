@@ -28,6 +28,7 @@ type Listener interface {
 	NewLibrary(LibraryName)
 	NewRow(LibraryName, RowID)
 	DeleteRow(LibraryName, RowID)
+	UpdateValue(LibraryName, RowID, ColumnID, bool, string)
 }
 
 type engine struct {

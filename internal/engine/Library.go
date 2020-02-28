@@ -321,5 +321,13 @@ func (lib *libraryImp) UpdateValue(
 	}
 	e[col.ToString()] = value
 
-	return lib.data.Put(id.ToString(), e)
+	err = lib.data.Put(id.ToString(), e)
+
+	if nil != err {
+		return err
+	}
+
+	lib.listener.UpdateValue(lib.name, id, col, true, value)
+
+	return nil
 }

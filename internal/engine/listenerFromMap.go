@@ -27,3 +27,9 @@ func (lm *listenerFromMap) DeleteRow(name LibraryName, row RowID) {
 		l.DeleteRow(name, row)
 	}
 }
+
+func (lm *listenerFromMap) UpdateValue(name LibraryName, row RowID, col ColumnID, exixts bool, value string) {
+	for l, _ := range lm.listeners {
+		l.UpdateValue(name, row, col, exixts, value)
+	}
+}
