@@ -101,13 +101,16 @@ Vue.component("kodb-library", {
 
         show-select
         :single-select="!multiSelect"
->
-        <template v-slot:item="{ item,headers }">
-                <tr>
+>       
+        <template v-slot:item="{ item,headers,select,isSelected }">
+                <tr v-on:click="select(!isSelected)">
                         <td v-for="col in headers"
                         >
+                                <div    v-if="col.value == 'data-table-select'">
+                                        <v-checkbox v-bind:value="isSelected"/>
+                                </div>
                                 <div
-                                        v-if="isRowExists(item, col.value)"
+                                        v-else-if="isRowExists(item, col.value)"
                                 >
                                         <v-edit-dialog
                                                 @open="editedValue = item.data[col.value].value"
