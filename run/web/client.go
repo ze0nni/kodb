@@ -157,3 +157,7 @@ func (client *clientConnection) NewRow(msg *msg.NewRowMsg) {
 func (client *clientConnection) DeleteRow(msg *msg.DeleteRowMsg) {
 	client.responseCh <- msg
 }
+
+func (client *clientConnection) UpdateValue(msg *msg.UpdateValueMsg) {
+	client.responseCh <- msg
+}

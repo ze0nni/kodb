@@ -33,3 +33,23 @@ func (l *serverListener) DeleteRow(name engine.LibraryName, row engine.RowID) {
 		client.DeleteRow(deleteRowMsg)
 	}
 }
+
+func (l *serverListener) UpdateValue(
+	name engine.LibraryName,
+	row engine.RowID,
+	col engine.ColumnID,
+	exists bool,
+	value string,
+) {
+	updateValueMsg := msg.UpdateValueMsgOf(
+		name,
+		row,
+		col,
+		exists,
+		value,
+	)
+
+	for _, client := range l.server.clients {
+		client.UpdateValue(updateValueMsg)
+	}
+}
