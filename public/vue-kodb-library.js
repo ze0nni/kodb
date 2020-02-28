@@ -4,8 +4,10 @@ Vue.component("kodb-library", {
         ],
         data: function() {
                 return {
+                        multiSelect: false,
                         editedValue: "",
                         rows:[],
+                        selectedRows:[],
                 }
         },
         methods: {
@@ -15,12 +17,7 @@ Vue.component("kodb-library", {
                                         text: col.name,
                                         value: col.id
                                 }
-                        }).concat([
-                                {
-                                        text: "actions",
-                                        actions: true
-                                }
-                        ])
+                        })
                 },
                 isRowExists(item, colName) {
                         return item
@@ -36,12 +33,15 @@ Vue.component("kodb-library", {
                         })
                 },
 
-                deleteRow(rowId) {
-                        this.$wsocket.send({
-                                "command": "deleteRow",
-                                "library": this.librarySchema.name,
-                                "rowId": rowId
-                        })
+                deleteSelectedRows() {
+                        for (let row of this.selectedRows) {
+                                this.$wsocket.send({
+                                        "command": "deleteRow",
+                                        "library": this.librarySchema.name,
+                                        "rowId": row.rowId
+                                })
+                        }
+                        this.selectedRows = []
                 },
 
                 updateValue(rowId, columnId, value) {
@@ -96,20 +96,18 @@ Vue.component("kodb-library", {
         :items="rows"
         :items-per-page="10"
         item-key="rowId"
+
+        v-model="selectedRows"
+
+        show-select
+        :single-select="!multiSelect"
 >
         <template v-slot:item="{ item,headers }">
                 <tr>
                         <td v-for="col in headers"
                         >
-                                <div    v-if="col.actions">
-                                        <v-icon
-                                                v-on:click="deleteRow(item.rowId)"
-                                        >
-                                                mdi-delete
-                                        </v-icon>
-                                </div>
                                 <div
-                                        v-else-if="isRowExists(item, col.value)"
+                                        v-if="isRowExists(item, col.value)"
                                 >
                                         <v-edit-dialog
                                                 @open="editedValue = item.data[col.value].value"
@@ -137,8 +135,32 @@ Vue.component("kodb-library", {
 
         <template v-slot:top>
                 <v-toolbar flat>
+                        <v-switch v-model="multiSelect" label="Multi select" />
+
                         <v-spacer></v-spacer>
-                        <v-btn v-on:click="newRow">New row</v-btn>
+
+                        <v-btn v-on:click="newRow"
+                                icon color="primary"
+                        >
+                                <v-icon>mdi-plus</v-icon>
+                        </v-btn>
+                        <v-btn v-on:click="deleteSelectedRows"
+                                :disabled="selectedRows.length == 0"
+                                icon color="error"
+                        >
+                                <v-icon>mdi-delete</v-icon>
+                        </v-btn>
+
+                        <v-btn :disabled="selectedRows.length == 0"
+                                icon color="primary"
+                        >
+                                <v-icon>mdi-arrow-up</v-icon>
+                        </v-btn>
+                        <v-btn :disabled="selectedRows.length == 0"
+                                icon color="primary"
+                        >
+                                <v-icon>mdi-arrow-down</v-icon>
+                        </v-btn>
                 </v-toolbar>
         </template>
 </v-data-table>
