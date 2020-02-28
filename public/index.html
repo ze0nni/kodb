@@ -18,7 +18,7 @@
         <script src="./vue-kodb.js"></script>
         <script src="./vue-kodb-library.js"></script>
         <script>
-                Vue.use(VueWS, "ws://localhost:8000/ws/");
+                Vue.use(VueWS, `ws://${location.host}/ws/`);
 
                 new Vue({
                         el: '#app',
