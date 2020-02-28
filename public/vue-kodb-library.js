@@ -82,10 +82,32 @@ Vue.component("kodb-library", {
                                         return
                                 }
                                 const rowId = msg.rowId
-                                constRowIndex = this.rows.findIndex(x => x.rowId == rowId)
-                                if (-1 != constRowIndex) {
-                                        this.rows.splice(constRowIndex, 1)
+                                const rowIndex = this.rows.findIndex(x => x.rowId == rowId)
+                                if (-1 != rowIndex) {
+                                        this.rows.splice(rowIndex, 1)
                                 }
+                        },
+                        updateValue(msg) {
+                                if (msg.library != this.librarySchema.name) {
+                                        return
+                                }
+                                const rowId = msg.rowId
+                                const columnId = msg.columnId
+                                const rowIndex = this.rows.findIndex(x => x.rowId == rowId)
+                                if (-1 == rowIndex) {
+                                        return;
+                                }
+                                const row = this.rows[rowIndex]
+                                const columnData = row.data[columnId]
+                                if (null == columnData) {
+                                        columnData[columnId] = {
+                                                exists: msg.exists,
+                                                value: msg.value
+                                        }
+                                        return
+                                }
+                                columnData.exists = msg.exists
+                                columnData.value = msg.value
                         }
                 }
         },
