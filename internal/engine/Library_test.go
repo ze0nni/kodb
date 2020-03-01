@@ -50,6 +50,27 @@ func TestLibrary_ColumnName(t *testing.T) {
 	assert.Equal(t, "bar", c2)
 }
 
+func TestLibrary_ColumnData_error_if_not_exists(t *testing.T) {
+	l, _ := emptyLibrary("foo")
+
+	e, err := l.ColumnData(0)
+
+	assert.Nil(t, e)
+	assert.Error(t, err)
+}
+
+func TestLibrary_ColumnData(t *testing.T) {
+	l, _ := emptyLibrary("foo")
+	l.NewColumn("hello")
+
+	e, err := l.ColumnData(0)
+
+	assert.NotNil(t, e)
+	assert.NoError(t, err)
+	assert.Equal(t, "hello", e["name"])
+	assert.Equal(t, Literal.ToString(), e["type"])
+}
+
 func TestLibrary_AddCoumn_error_on_duplicate(t *testing.T) {
 	l := newLibraryInst("foo", listenerNil(), LensOf("schema", driver.InMemory()), nil, nil)
 

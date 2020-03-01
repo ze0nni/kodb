@@ -21,11 +21,16 @@ type (
 		Name() LibraryName
 
 		Columns() int
+
 		NewColumn(columnName string) (ColumnID, error)
 		AddColumn(id ColumnID, columnName string) error
 
+		NewRefColumn(columnName string, ref LibraryName) (ColumnID, error)
+		AddRefColumn(id ColumnID, columnName string, ref LibraryName) error
+
 		Column(index int) (ColumnID, error)
 		ColumnName(index int) (string, error)
+		ColumnData(int) (entry.Entry, error)
 
 		Rows() int
 		NewRow() (RowID, error)
@@ -108,6 +113,7 @@ func (lib *libraryImp) Columns() int {
 
 func (lib *libraryImp) newColumn(
 	columnName string,
+	columnType ColumnType,
 	consumer func(entry.Entry),
 ) (ColumnID, error) {
 	columnV4, err := uuid.NewV4()
@@ -116,7 +122,7 @@ func (lib *libraryImp) newColumn(
 	}
 
 	columnID := ColumnID(columnV4.String())
-	if err := lib.addColumn(columnID, columnName, consumer); nil != err {
+	if err := lib.addColumn(columnID, columnName, columnType, consumer); nil != err {
 		return ColumnID(""), err
 	}
 
@@ -126,6 +132,7 @@ func (lib *libraryImp) newColumn(
 func (lib *libraryImp) addColumn(
 	id ColumnID,
 	name string,
+	columnType ColumnType,
 	consumer func(entry.Entry),
 ) error {
 	root, err := lib.getSchemaRoot()
@@ -144,6 +151,7 @@ func (lib *libraryImp) addColumn(
 
 	columnEntry := make(entry.Entry)
 	entry.SetString("name", name, columnEntry)
+	entry.SetString("type", columnType.ToString(), columnEntry)
 	consumer(columnEntry)
 
 	lib.schema.Put(id.ToString(), columnEntry)
@@ -153,14 +161,26 @@ func (lib *libraryImp) addColumn(
 }
 
 func (lib *libraryImp) NewColumn(name string) (ColumnID, error) {
-	return lib.newColumn(name, func(e entry.Entry) {
+	return lib.newColumn(name, Literal, func(e entry.Entry) {
 
 	})
 }
 
 func (lib *libraryImp) AddColumn(id ColumnID, name string) error {
-	return lib.addColumn(id, name, func(e entry.Entry) {
+	return lib.addColumn(id, name, Literal, func(e entry.Entry) {
 
+	})
+}
+
+func (lib *libraryImp) NewRefColumn(name string, ref LibraryName) (ColumnID, error) {
+	return lib.newColumn(name, Reference, func(e entry.Entry) {
+		entry.SetString("ref", ref.ToString(), e)
+	})
+}
+
+func (lib *libraryImp) AddRefColumn(id ColumnID, name string, ref LibraryName) error {
+	return lib.addColumn(id, name, Reference, func(e entry.Entry) {
+		entry.SetString("ref", ref.ToString(), e)
 	})
 }
 
@@ -177,19 +197,27 @@ func (lib *libraryImp) Column(index int) (ColumnID, error) {
 }
 
 func (lib *libraryImp) ColumnName(index int) (string, error) {
-	root, err := lib.getSchemaRoot()
+	data, err := lib.ColumnData(index)
 	if nil != err {
 		return "", err
+	}
+	return data["name"], nil
+}
+
+func (lib *libraryImp) ColumnData(index int) (entry.Entry, error) {
+	root, err := lib.getSchemaRoot()
+	if nil != err {
+		return nil, err
 	}
 	if columnIdentity, ok := root["column_"+strconv.Itoa(index)]; ok {
 		columnEntry, err := lib.schema.Get(columnIdentity)
 		if nil != err {
-			return "", err
+			return nil, err
 		}
-		return columnEntry["name"], nil
+		return columnEntry, nil
 	}
 
-	return "", errors.New("not found")
+	return nil, fmt.Errorf("Column <%d> not exists", index)
 }
 
 func (lib *libraryImp) getSchemaRoot() (entry.Entry, error) {
