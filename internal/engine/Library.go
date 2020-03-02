@@ -16,6 +16,9 @@ type (
 	// ColumnID type
 	ColumnID string
 
+	// RowID type
+	RowID string
+
 	// Library type
 	Library interface {
 		Name() LibraryName
@@ -38,7 +41,6 @@ type (
 		HasRow(RowID) bool
 		DeleteRow(RowID) error
 
-		Row(int) (Row, error)
 		RowID(int) (RowID, error)
 
 		GetRowColumn(int, ColumnID) (string, bool, error)
@@ -52,6 +54,10 @@ func (name LibraryName) ToString() string {
 }
 
 func (id ColumnID) ToString() string {
+	return string(id)
+}
+
+func (id RowID) ToString() string {
 	return string(id)
 }
 
@@ -297,17 +303,6 @@ func (l *libraryImp) DeleteRow(id RowID) error {
 	l.listener.DeleteRow(l.name, id)
 
 	return nil
-}
-
-func (lib *libraryImp) Row(index int) (Row, error) {
-	id, err := lib.RowID(index)
-	if nil != err {
-		return nil, err
-	}
-	return RowOf(
-		lib.data,
-		id,
-	), nil
 }
 
 func (lib *libraryImp) RowID(index int) (RowID, error) {
