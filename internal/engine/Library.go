@@ -43,7 +43,7 @@ type (
 
 		RowID(int) (RowID, error)
 
-		GetRowColumn(int, ColumnID) (string, bool, error)
+		GetValueAt(int, ColumnID) (string, bool, error)
 		GetValue(RowID, ColumnID) (string, bool, error)
 		UpdateValue(RowID, ColumnID, string) error
 	}
@@ -313,7 +313,7 @@ func (lib *libraryImp) RowID(index int) (RowID, error) {
 	return lib.rows[index], nil
 }
 
-func (lib *libraryImp) GetRowColumn(
+func (lib *libraryImp) GetValueAt(
 	index int,
 	column ColumnID,
 ) (string, bool, error) {

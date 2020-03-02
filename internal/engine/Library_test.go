@@ -170,7 +170,7 @@ func TestLibrary_GetRowColumn_row_not_exists(t *testing.T) {
 	l, _ := emptyLibrary("foo")
 	key := ColumnID("key")
 
-	v, ok, err := l.GetRowColumn(0, key)
+	v, ok, err := l.GetValueAt(0, key)
 	assert.Equal(t, "", v)
 	assert.False(t, ok)
 	assert.Error(t, err)
@@ -181,13 +181,13 @@ func TestLibrary_GetRowColumn_column_not_exists(t *testing.T) {
 	l.NewRow()
 	key := ColumnID("key")
 
-	v, ok, err := l.GetRowColumn(0, key)
+	v, ok, err := l.GetValueAt(0, key)
 	assert.Equal(t, "", v)
 	assert.False(t, ok)
 	assert.NoError(t, err)
 }
 
-func TestLibrary_GetRowColumn(t *testing.T) {
+func TestLibrary_GetValueAt(t *testing.T) {
 	l, d := emptyLibrary("foo")
 	r, _ := l.NewRow()
 	key := ColumnID("key")
@@ -196,7 +196,7 @@ func TestLibrary_GetRowColumn(t *testing.T) {
 	e[key.ToString()] = "value"
 	d.Put("data", r.ToString(), e)
 
-	v, ok, err := l.GetRowColumn(0, key)
+	v, ok, err := l.GetValueAt(0, key)
 	assert.Equal(t, "value", v)
 	assert.True(t, ok)
 	assert.NoError(t, err)
