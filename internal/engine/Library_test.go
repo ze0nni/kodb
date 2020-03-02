@@ -72,6 +72,19 @@ func TestLibrary_ColumnData(t *testing.T) {
 	assert.Equal(t, Literal, e.Type())
 }
 
+func TestLibrary_ColumnDataOf(t *testing.T) {
+	l, _ := emptyLibrary("foo")
+	id, _ := l.NewColumn("hello")
+
+	e, err := l.ColumnDataOf(id)
+
+	assert.NotNil(t, e)
+	assert.NoError(t, err)
+	assert.Equal(t, "hello", e.Name())
+	assert.Equal(t, id, e.ID())
+	assert.Equal(t, Literal, e.Type())
+}
+
 func TestLibrary_AddCoumn_error_on_duplicate(t *testing.T) {
 	l := newLibraryInst("foo", listenerNil(), LensOf("schema", driver.InMemory()), nil, nil)
 

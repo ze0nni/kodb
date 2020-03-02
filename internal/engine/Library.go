@@ -34,6 +34,7 @@ type (
 		Column(index int) (ColumnID, error)
 		ColumnName(index int) (string, error)
 		ColumnData(int) (ColumnData, error)
+		ColumnDataOf(id ColumnID) (ColumnData, error)
 
 		Rows() int
 		NewRow() (RowID, error)
@@ -82,12 +83,12 @@ func newLibraryInst(
 	}
 }
 
-// ColumnIDs return slice for ColumnID
-func ColumnIDs(library Library) ([]ColumnID, error) {
+// Columns return slice for ColumnData
+func Columns(library Library) ([]ColumnData, error) {
 	columns := library.Columns()
-	out := make([]ColumnID, columns)
+	out := make([]ColumnData, columns)
 	for i := 0; i < columns; i++ {
-		c, err := library.Column(i)
+		c, err := library.ColumnData(i)
 		if nil != err {
 			return nil, err
 		}
@@ -217,14 +218,18 @@ func (lib *libraryImp) ColumnData(index int) (ColumnData, error) {
 		return ColumnData{nil}, err
 	}
 	if columnIdentity, ok := root["column_"+strconv.Itoa(index)]; ok {
-		columnEntry, err := lib.schema.Get(columnIdentity)
-		if nil != err {
-			return ColumnData{nil}, err
-		}
-		return ColumnData{columnEntry}, nil
+		return lib.ColumnDataOf(ColumnID(columnIdentity))
 	}
 
 	return ColumnData{nil}, fmt.Errorf("Column <%d> not exists", index)
+}
+
+func (lib *libraryImp) ColumnDataOf(id ColumnID) (ColumnData, error) {
+	columnEntry, err := lib.schema.Get(id.ToString())
+	if nil != err {
+		return ColumnData{nil}, err
+	}
+	return ColumnData{columnEntry}, nil
 }
 
 func (lib *libraryImp) getSchemaRoot() (entry.Entry, error) {
@@ -364,6 +369,12 @@ func (lib *libraryImp) UpdateValue(
 	if nil == e {
 		return errors.New("Row not exists")
 	}
+
+	colData, err := lib.ColumnDataOf(col)
+	if nil != err {
+		return err
+	}
+
 	e[col.ToString()] = value
 
 	err = lib.data.Put(id.ToString(), e)
@@ -372,7 +383,9 @@ func (lib *libraryImp) UpdateValue(
 		return err
 	}
 
-	lib.listener.UpdateValue(lib.name, id, col, true, value)
+	cellErr := colData.Test(value)
+
+	lib.listener.UpdateValue(lib.name, id, col, true, value, cellErr)
 
 	return nil
 }
