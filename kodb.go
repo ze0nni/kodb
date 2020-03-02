@@ -29,10 +29,11 @@ func main() {
 	invLib.NewColumn("type")
 	invLib.NewColumn("title")
 	invLib.NewColumn("picture")
-	//invLib.NewRefColumn("owner", userLib.Name())
+	owner, _ := invLib.NewRefColumn("owner", userLib.Name())
 	for i := 0; i < 20; i++ {
 		row, _ := invLib.NewRow()
 		invLib.UpdateValue(row, name, randomdata.Adjective())
+		invLib.UpdateValue(row, owner, randomdata.Alphanumeric(32))
 	}
 
 	err := web.Run(eng)

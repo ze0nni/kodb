@@ -69,7 +69,7 @@ func RowSchemaFromLibrary(
 			colData.Set("value", v)
 			cellErr := col.Validate(v)
 			if nil != cellErr {
-				colData.Set("error", cellErr)
+				colData.Set("error", cellErr.Error())
 			}
 		}
 		if nil != err {
