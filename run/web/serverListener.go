@@ -40,6 +40,7 @@ func (l *serverListener) UpdateValue(
 	col engine.ColumnID,
 	exists bool,
 	value string,
+	cellErr error,
 ) {
 	updateValueMsg := msg.UpdateValueMsgOf(
 		name,
@@ -47,6 +48,7 @@ func (l *serverListener) UpdateValue(
 		col,
 		exists,
 		value,
+		cellErr,
 	)
 
 	for _, client := range l.server.clients {

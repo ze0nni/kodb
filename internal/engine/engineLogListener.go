@@ -28,7 +28,17 @@ func (l *logListener) DeleteRow(name LibraryName, row RowID) {
 	l.log = append(l.log, fmt.Sprintf("deleteRow %s:%s", name.ToString(), row.ToString()))
 }
 
-func (l *logListener) UpdateValue(name LibraryName, row RowID, col ColumnID, exists bool, value string) {
+func (l *logListener) UpdateValue(name LibraryName, row RowID, col ColumnID, exists bool, value string, cellErr error) {
+	if nil != cellErr {
+		l.log = append(l.log, fmt.Sprintf("updateRow %s:%s:%s error %s",
+			name.ToString(),
+			row.ToString(),
+			col.ToString(),
+			cellErr,
+		))
+		return
+	}
+
 	l.log = append(l.log, fmt.Sprintf("updateRow %s:%s:%s %t %s",
 		name.ToString(),
 		row.ToString(),

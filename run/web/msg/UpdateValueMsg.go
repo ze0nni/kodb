@@ -10,6 +10,7 @@ func UpdateValueMsgOf(
 	columnId engine.ColumnID,
 	exists bool,
 	value string,
+	cellErr error,
 ) *UpdateValueMsg {
 	return &UpdateValueMsg{
 		Command:  "updateValue",
@@ -18,6 +19,7 @@ func UpdateValueMsgOf(
 		ColumnID: columnId,
 		Exists:   exists,
 		Value:    value,
+		Error:    cellErr,
 	}
 }
 
@@ -28,4 +30,5 @@ type UpdateValueMsg struct {
 	ColumnID engine.ColumnID    `json:"columnId"`
 	Exists   bool               `json:"exists"`
 	Value    string             `json:"value"`
+	Error    error              `json:"error"`
 }

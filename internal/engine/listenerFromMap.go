@@ -28,8 +28,8 @@ func (lm *listenerFromMap) DeleteRow(name LibraryName, row RowID) {
 	}
 }
 
-func (lm *listenerFromMap) UpdateValue(name LibraryName, row RowID, col ColumnID, exixts bool, value string) {
+func (lm *listenerFromMap) UpdateValue(name LibraryName, row RowID, col ColumnID, exixts bool, value string, cellErr error) {
 	for l, _ := range lm.listeners {
-		l.UpdateValue(name, row, col, exixts, value)
+		l.UpdateValue(name, row, col, exixts, value, cellErr)
 	}
 }

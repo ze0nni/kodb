@@ -28,7 +28,7 @@ func SetLibraryRowsMsgFromEngine(
 		Rows:    []RowSchema{},
 	}
 
-	columns, err := engine.ColumnIDs(l)
+	columns, err := engine.Columns(l)
 	if nil != err {
 		return msg
 	}
@@ -46,7 +46,7 @@ func SetLibraryRowsMsgFromEngine(
 
 func RowSchemaFromLibrary(
 	index int,
-	columns []engine.ColumnID,
+	columns []engine.ColumnData,
 	library engine.Library,
 ) (RowSchema, error) {
 	rowId, err := library.RowID(index)
@@ -60,19 +60,23 @@ func RowSchemaFromLibrary(
 	}
 
 	for _, col := range columns {
-		v, ok, err := library.GetRowColumn(index, col)
+		colID := col.ID() // TODO: cache id's
 		v, ok, err := library.GetValueAt(index, colID)
 
 		colData := simplejson.New()
 		colData.Set("exists", ok)
 		if ok {
 			colData.Set("value", v)
+			cellErr := col.Validate(v)
+			if nil != cellErr {
+				colData.Set("error", cellErr)
+			}
 		}
 		if nil != err {
 			colData.Set("error", err)
 		}
 
-		row.Data.Set(col.ToString(), colData)
+		row.Data.Set(colID.ToString(), colData)
 	}
 
 	return row, nil

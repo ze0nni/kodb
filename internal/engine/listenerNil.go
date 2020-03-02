@@ -18,6 +18,6 @@ func (lm *listenerNilInst) DeleteRow(LibraryName, RowID) {
 
 }
 
-func (lm *listenerNilInst) UpdateValue(LibraryName, RowID, ColumnID, bool, string) {
+func (lm *listenerNilInst) UpdateValue(LibraryName, RowID, ColumnID, bool, string, error) {
 
 }

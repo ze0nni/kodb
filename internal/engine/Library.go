@@ -383,7 +383,7 @@ func (lib *libraryImp) UpdateValue(
 		return err
 	}
 
-	cellErr := colData.Test(value)
+	cellErr := colData.Validate(value)
 
 	lib.listener.UpdateValue(lib.name, id, col, true, value, cellErr)
 
