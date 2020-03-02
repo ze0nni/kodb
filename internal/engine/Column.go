@@ -1,6 +1,10 @@
 package engine
 
-import "github.com/ze0nni/kodb/internal/entry"
+import (
+	"fmt"
+
+	"github.com/ze0nni/kodb/internal/entry"
+)
 
 type ColumnType string
 
@@ -9,6 +13,10 @@ const Literal = ColumnType("literal")
 const Reference = ColumnType("reference")
 
 const Unknown = ColumnType("unknown")
+
+type ColumnContext interface {
+	GetValue(library, row, col string) (string, bool, error)
+}
 
 func (t ColumnType) ToString() string {
 	return string(t)
@@ -35,5 +43,20 @@ func (d ColumnData) Type() ColumnType {
 		return Reference
 	default:
 		return Unknown
+	}
+}
+
+func (d ColumnData) Validate(
+	//context ColumnContext,
+	value string,
+) error {
+	t := d.Type()
+	switch t {
+	case Literal:
+		return nil
+	case Reference:
+		return fmt.Errorf("Unknown refer: %s", value)
+	default:
+		return fmt.Errorf("Unknown type: %s", t)
 	}
 }
