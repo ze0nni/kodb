@@ -30,7 +30,7 @@ type (
 
 		Column(index int) (ColumnID, error)
 		ColumnName(index int) (string, error)
-		ColumnData(int) (entry.Entry, error)
+		ColumnData(int) (ColumnData, error)
 
 		Rows() int
 		NewRow() (RowID, error)
@@ -201,10 +201,10 @@ func (lib *libraryImp) ColumnName(index int) (string, error) {
 	if nil != err {
 		return "", err
 	}
-	return data["name"], nil
+	return data.Name(), nil
 }
 
-func (lib *libraryImp) ColumnData(index int) (entry.Entry, error) {
+func (lib *libraryImp) ColumnData(index int) (ColumnData, error) {
 	root, err := lib.getSchemaRoot()
 	if nil != err {
 		return nil, err

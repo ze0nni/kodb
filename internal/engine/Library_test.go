@@ -67,8 +67,8 @@ func TestLibrary_ColumnData(t *testing.T) {
 
 	assert.NotNil(t, e)
 	assert.NoError(t, err)
-	assert.Equal(t, "hello", e["name"])
-	assert.Equal(t, Literal.ToString(), e["type"])
+	assert.Equal(t, "hello", e.Name())
+	assert.Equal(t, Literal, e.Type())
 }
 
 func TestLibrary_AddCoumn_error_on_duplicate(t *testing.T) {
