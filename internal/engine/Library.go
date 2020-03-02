@@ -207,17 +207,17 @@ func (lib *libraryImp) ColumnName(index int) (string, error) {
 func (lib *libraryImp) ColumnData(index int) (ColumnData, error) {
 	root, err := lib.getSchemaRoot()
 	if nil != err {
-		return nil, err
+		return ColumnData{nil}, err
 	}
 	if columnIdentity, ok := root["column_"+strconv.Itoa(index)]; ok {
 		columnEntry, err := lib.schema.Get(columnIdentity)
 		if nil != err {
-			return nil, err
+			return ColumnData{nil}, err
 		}
-		return columnEntry, nil
+		return ColumnData{columnEntry}, nil
 	}
 
-	return nil, fmt.Errorf("Column <%d> not exists", index)
+	return ColumnData{nil}, fmt.Errorf("Column <%d> not exists", index)
 }
 
 func (lib *libraryImp) getSchemaRoot() (entry.Entry, error) {

@@ -14,16 +14,16 @@ func (t ColumnType) ToString() string {
 	return string(t)
 }
 
-type ColumnData entry.Entry
+type ColumnData struct {
+	entry entry.Entry
+}
 
 func (d ColumnData) Name() string {
-	e := entry.Entry(d)
-	return e["name"]
+	return d.entry["name"]
 }
 
 func (d ColumnData) Type() ColumnType {
-	e := entry.Entry(d)
-	t := e["type"]
+	t := d.entry["type"]
 	switch t {
 	case "literal":
 		return Literal
