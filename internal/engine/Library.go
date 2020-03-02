@@ -156,9 +156,10 @@ func (lib *libraryImp) addColumn(
 	entry.SetString("column_"+strconv.Itoa(num), id.ToString(), root)
 
 	columnEntry := make(entry.Entry)
-	entry.SetString("name", name, columnEntry)
-	entry.SetString("type", columnType.ToString(), columnEntry)
 	consumer(columnEntry)
+	entry.SetString("name", name, columnEntry)
+	entry.SetString("id", id.ToString(), columnEntry)
+	entry.SetString("type", columnType.ToString(), columnEntry)
 
 	lib.schema.Put(id.ToString(), columnEntry)
 	lib.schema.Put("root", root)

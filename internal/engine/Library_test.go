@@ -61,13 +61,14 @@ func TestLibrary_ColumnData_error_if_not_exists(t *testing.T) {
 
 func TestLibrary_ColumnData(t *testing.T) {
 	l, _ := emptyLibrary("foo")
-	l.NewColumn("hello")
+	id, _ := l.NewColumn("hello")
 
 	e, err := l.ColumnData(0)
 
 	assert.NotNil(t, e)
 	assert.NoError(t, err)
 	assert.Equal(t, "hello", e.Name())
+	assert.Equal(t, id, e.ID())
 	assert.Equal(t, Literal, e.Type())
 }
 

@@ -22,6 +22,10 @@ func (d ColumnData) Name() string {
 	return d.entry["name"]
 }
 
+func (d ColumnData) ID() ColumnID {
+	return ColumnID(d.entry["id"])
+}
+
 func (d ColumnData) Type() ColumnType {
 	t := d.entry["type"]
 	switch t {
