@@ -18,11 +18,10 @@ func main() {
 	secondName, _ := userLib.NewColumn("secondName")
 	age, _ := userLib.NewColumn("age")
 	for i := 0; i < 10; i++ {
-		userLib.NewRow()
-		row, _ := userLib.Row(i)
-		row.Set(firstname, randomdata.FirstName(0))
-		row.Set(secondName, randomdata.LastName())
-		row.Set(age, strconv.Itoa(randomdata.Number(16, 40)))
+		row, _ := userLib.NewRow()
+		userLib.UpdateValue(row, firstname, randomdata.FirstName(0))
+		userLib.UpdateValue(row, secondName, randomdata.LastName())
+		userLib.UpdateValue(row, age, strconv.Itoa(randomdata.Number(16, 40)))
 	}
 
 	invLib := eng.GetLibrary(engine.LibraryName("location"))
@@ -30,6 +29,7 @@ func main() {
 	invLib.NewColumn("type")
 	invLib.NewColumn("title")
 	invLib.NewColumn("picture")
+	//invLib.NewRefColumn("owner", userLib.Name())
 	for i := 0; i < 20; i++ {
 		row, _ := invLib.NewRow()
 		invLib.UpdateValue(row, name, randomdata.Adjective())

@@ -61,6 +61,7 @@ func RowSchemaFromLibrary(
 
 	for _, col := range columns {
 		v, ok, err := library.GetRowColumn(index, col)
+		v, ok, err := library.GetValueAt(index, colID)
 
 		colData := simplejson.New()
 		colData.Set("exists", ok)
