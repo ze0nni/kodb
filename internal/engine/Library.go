@@ -64,6 +64,7 @@ func (id RowID) ToString() string {
 
 func newLibraryInst(
 	name LibraryName,
+	context ColumnContext,
 	listener Listener,
 	schema Lens,
 	data Lens,
@@ -75,6 +76,7 @@ func newLibraryInst(
 	}
 	return &libraryImp{
 		name:     name,
+		context:  context,
 		listener: listener,
 		schema:   schema,
 		data:     data,
@@ -99,6 +101,7 @@ func Columns(library Library) ([]ColumnData, error) {
 
 type libraryImp struct {
 	name     LibraryName
+	context  ColumnContext
 	listener Listener
 	schema   Lens
 	data     Lens
@@ -383,7 +386,7 @@ func (lib *libraryImp) UpdateValue(
 		return err
 	}
 
-	cellErr := colData.Validate(value)
+	cellErr := colData.Validate(lib.context, value)
 
 	lib.listener.UpdateValue(lib.name, id, col, true, value, cellErr)
 

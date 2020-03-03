@@ -19,6 +19,7 @@ func New(driver driver.Driver) Engine {
 }
 
 type Engine interface {
+	Context() ColumnContext
 	Librarys() []LibraryName
 	GetLibrary(name LibraryName) Library
 	Listen(listener Listener) func()
@@ -32,6 +33,7 @@ type Listener interface {
 }
 
 type engine struct {
+	context   *engineColumnContext
 	driver    driver.Driver
 	librarys  map[LibraryName]*libraryImp
 	listeners map[Listener]struct{}
@@ -46,6 +48,10 @@ func loadLibrarys(e *engine) {
 			}
 		}
 	}
+}
+
+func (e *engine) Context() ColumnContext {
+	return e.context
 }
 
 func (self *engine) Librarys() []LibraryName {
@@ -64,6 +70,7 @@ func (e *engine) GetLibrary(name LibraryName) Library {
 	}
 	newLib := newLibraryInst(
 		name,
+		e.context,
 		newListenerFromMap(e.listeners),
 		LensOf(name.ToString()+"$schema", e.driver),
 		LensOf(name.ToString()+"$data", e.driver),

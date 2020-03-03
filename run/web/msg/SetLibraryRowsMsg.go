@@ -35,7 +35,7 @@ func SetLibraryRowsMsgFromEngine(
 
 	rows := l.Rows()
 	for i := 0; i < rows; i++ {
-		r, err := RowSchemaFromLibrary(i, columns, l)
+		r, err := RowSchemaFromLibrary(i, columns, eng.Context(), l)
 		if nil == err {
 			msg.Rows = append(msg.Rows, r)
 		}
@@ -47,6 +47,7 @@ func SetLibraryRowsMsgFromEngine(
 func RowSchemaFromLibrary(
 	index int,
 	columns []engine.ColumnData,
+	context engine.ColumnContext,
 	library engine.Library,
 ) (RowSchema, error) {
 	rowId, err := library.RowID(index)
@@ -67,7 +68,7 @@ func RowSchemaFromLibrary(
 		colData.Set("exists", ok)
 		if ok {
 			colData.Set("value", v)
-			cellErr := col.Validate(v)
+			cellErr := col.Validate(context, v)
 			if nil != cellErr {
 				colData.Set("error", cellErr.Error())
 			}

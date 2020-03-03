@@ -15,7 +15,7 @@ const Reference = ColumnType("reference")
 const Unknown = ColumnType("unknown")
 
 type ColumnContext interface {
-	GetValue(library, row, col string) (string, bool, error)
+	//GetValue(library, row, col string) (string, bool, error)
 }
 
 func (t ColumnType) ToString() string {
@@ -47,7 +47,7 @@ func (d ColumnData) Type() ColumnType {
 }
 
 func (d ColumnData) Validate(
-	//context ColumnContext,
+	context ColumnContext,
 	value string,
 ) error {
 	t := d.Type()
