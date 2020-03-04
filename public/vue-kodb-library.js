@@ -6,7 +6,6 @@ Vue.component("kodb-library", {
         data: function() {
                 return {
                         multiSelect: false,
-                        editedValue: "",
                         selectedRows:[],
                 }
         },
@@ -18,12 +17,6 @@ Vue.component("kodb-library", {
                                         value: col.id
                                 }
                         })
-                },
-                isRowExists(item, colName) {
-                        return item
-                                && item.data
-                                && item.data[colName]
-                                && item.data[colName].exists
                 },
 
                 newRow() {
@@ -43,16 +36,6 @@ Vue.component("kodb-library", {
                         }
                         this.selectedRows = []
                 },
-
-                updateValue(rowId, columnId, value) {
-                        this.$wsocket.send({
-                                "command": "updateValue",
-                                "library": this.librarySchema.name,
-                                "rowId": rowId,
-                                "columnId": columnId,
-                                "value": value
-                        })
-                }
         },
         template:
 `
@@ -68,35 +51,23 @@ Vue.component("kodb-library", {
         :single-select="!multiSelect"
 >       
         <template v-slot:item="{ item,headers,select,isSelected }">
+        
                 <tr v-on:click="select(!isSelected)">
                         <td v-for="col in headers"
                         >
-                                <div    v-if="col.value == 'data-table-select'">
-                                        <v-checkbox v-bind:value="isSelected"/>
-                                </div>
-                                <div
-                                        v-else-if="isRowExists(item, col.value)"
-                                >
-                                        <v-edit-dialog
-                                                @open="editedValue = item.data[col.value].value"
-                                                @save="updateValue(item.rowId, col.value ,editedValue)"
-                                        >
-                                                {{ item.data[col.value].value }}
-                                                <template v-slot:input>
-                                                        <v-text-field
-                                                                v-model="editedValue"
-                                                                label="Edit"
-                                                                single-line
-                                                        ></v-text-field>
-                                                </template>
-                                        </v-edit-dialog>
-                                </div>
-                                <v-chip 
+                                <v-checkbox
+                                        v-if="col.value == 'data-table-select'"
+                                        v-bind:value="isSelected">
+                                </v-checkbox>
+
+                                <kodb-library-cell
                                         v-else
-                                        color="red"
+                                        :libraryName="librarySchema.name"
+                                        :rowId="item.rowId"
+                                        :column="col"
+                                        :data="item.data"
                                 >
-                                        NIL
-                                </v-chip>
+                                </kodb-library-cell>
                         </td>
                 </tr>
         </template>
