@@ -12,7 +12,8 @@ Vue.component("kodb-library-cell", {
         },
         methods: {
                 isRowExists(item, colName) {
-                        return true
+                        return item[colName]
+                                && item[colName].exists
                 },
                 
                 updateValue(rowId, columnId, value) {
