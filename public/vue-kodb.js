@@ -3,7 +3,9 @@ Vue.component("kodb", {
                 return {
                         selectedLibrary: null,
                         librarys:[
-                        ]
+                        ],
+                        librarisData:{
+                        },
                 }
         },
         webSockets: {
@@ -14,7 +16,64 @@ Vue.component("kodb", {
                 },
                 command: {
                         setSchema(msg) {
+                                for (let l of msg.librarys) {
+                                        if (null == this.librarisData[l.name]) {
+                                                Vue.set(this.librarisData, l.name, [])
+
+                                                this.$wsocket.send({
+                                                        "command": "getLibraryRows",
+                                                        "library": l.name
+                                                })
+                                        }
+                                }
+
                                 this.librarys = msg.librarys
+                        },
+                        setLibraryRows(msg) {
+                                const rows = this.librarisData[msg.library]
+                                if (null == rows) {
+                                        return
+                                }
+                                rows.splice(0, rows.length)
+                                rows.push(...msg.rows)
+                        },
+                        newRow(msg) {
+                                const rows = this.librarisData[msg.library]
+                                if (null == rows) {
+                                        return
+                                }
+                                rows.push({
+                                        "rowId": msg.rowId,
+                                        "data": {}
+                                })
+                        },
+                        deleteRow(msg) {
+                                const rows = this.librarisData[msg.library]
+                                if (null == rows) {
+                                        return
+                                }
+                                const rowId = msg.rowId
+                                const rowIndex = rows.findIndex(x => x.rowId == rowId)
+                                if (-1 != rowIndex) {
+                                        rows.splice(rowIndex, 1)
+                                }
+                        },
+                        updateValue(msg) {
+                                const rows = this.librarisData[msg.library]
+                                if (null == rows) {
+                                        return
+                                }
+                                const rowId = msg.rowId
+                                const columnId = msg.columnId
+                                const rowIndex = rows.findIndex(x => x.rowId == rowId)
+                                if (-1 == rowIndex) {
+                                        return;
+                                }
+                                const row = rows[rowIndex]
+                                const columnData = row.data[columnId]
+                                
+                                Vue.set(columnData, "exists", msg.exists)
+                                Vue.set(columnData, "value", msg.value)
                         }
                 }
         },
@@ -67,7 +126,9 @@ Vue.component("kodb", {
                                 >
                                         <kodb-library
                                                 v-bind:librarySchema="l"
-                                        />
+                                                v-bind:rows="librarisData[l.name]"
+                                        >
+                                        </kodb-library>
                                 </v-tab-item>
                         </v-tabs-items>
                 </v-container>

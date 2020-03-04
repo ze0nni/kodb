@@ -1,12 +1,12 @@
 Vue.component("kodb-library", {
         props: [
-                "librarySchema"
+                "librarySchema",
+                "rows"
         ],
         data: function() {
                 return {
                         multiSelect: false,
                         editedValue: "",
-                        rows:[],
                         selectedRows:[],
                 }
         },
@@ -52,63 +52,6 @@ Vue.component("kodb-library", {
                                 "columnId": columnId,
                                 "value": value
                         })
-                }
-        },
-        webSockets: {
-                connected() {
-                        this.$wsocket.send({
-                                "command": "getLibraryRows",
-                                "library": this.librarySchema.name
-                        })
-                },
-                command: {
-                        setLibraryRows(msg) {
-                                if (msg.library != this.librarySchema.name) {
-                                        return
-                                }
-                                this.rows = msg.rows
-                        },
-                        newRow(msg) {
-                                if (msg.library != this.librarySchema.name) {
-                                        return
-                                }
-                                this.rows.push({
-                                        "rowId": msg.rowId,
-                                        "data": {}
-                                })
-                        },
-                        deleteRow(msg) {
-                                if (msg.library != this.librarySchema.name) {
-                                        return
-                                }
-                                const rowId = msg.rowId
-                                const rowIndex = this.rows.findIndex(x => x.rowId == rowId)
-                                if (-1 != rowIndex) {
-                                        this.rows.splice(rowIndex, 1)
-                                }
-                        },
-                        updateValue(msg) {
-                                if (msg.library != this.librarySchema.name) {
-                                        return
-                                }
-                                const rowId = msg.rowId
-                                const columnId = msg.columnId
-                                const rowIndex = this.rows.findIndex(x => x.rowId == rowId)
-                                if (-1 == rowIndex) {
-                                        return;
-                                }
-                                const row = this.rows[rowIndex]
-                                const columnData = row.data[columnId]
-                                if (null == columnData) {
-                                        columnData[columnId] = {
-                                                exists: msg.exists,
-                                                value: msg.value
-                                        }
-                                        return
-                                }
-                                columnData.exists = msg.exists
-                                columnData.value = msg.value
-                        }
                 }
         },
         template:
