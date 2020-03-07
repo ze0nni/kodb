@@ -76,8 +76,20 @@ func (d ColumnData) Validate(
 	case Literal:
 		return nil
 	case Reference:
-		return fmt.Errorf("Unknown refer: %s", value)
+		ref, err := d.ToRef()
+		if nil != err {
+			return err
+		}
+		return ref.Validate(context, value)
 	default:
 		return fmt.Errorf("Unknown type: %s", t)
 	}
+}
+
+// ToRef convert column to ColumnRef type
+func (d ColumnData) ToRef() (ColumnRef, error) {
+	if Reference == d.Type() {
+		return ColumnRef{d}, nil
+	}
+	return ColumnRef{ColumnData{nil}}, fmt.Errorf("%s is not Ref", d.Name())
 }
