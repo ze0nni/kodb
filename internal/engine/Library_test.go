@@ -85,6 +85,35 @@ func TestLibrary_ColumnDataOf(t *testing.T) {
 	assert.Equal(t, Literal, e.Type())
 }
 
+func TestLibrary_UpdateColumnData_error_when_column_not_exists(t *testing.T) {
+	l, _ := emptyLibrary("foo")
+
+	e := make(entry.Entry)
+	e["name"] = "columnFoo"
+	c := ColumnData{e}
+
+	_, err := l.UpdateColumnData(c)
+
+	assert.Error(t, err)
+}
+
+func TestLibrary_UpdateColumnData(t *testing.T) {
+	l, _ := emptyLibrary("foo")
+	id, _ := l.NewColumn("columnFoo")
+
+	e := make(entry.Entry)
+	e["id"] = id.ToString()
+	e["name"] = "newColumnFoo"
+	c := ColumnData{e}
+
+	c1ret, err := l.UpdateColumnData(c)
+	c1, _ := l.ColumnDataOf(id)
+
+	assert.NoError(t, err)
+	assert.Equal(t, "newColumnFoo", c1ret.Name())
+	assert.Equal(t, "newColumnFoo", c1.Name())
+}
+
 func TestLibrary_AddCoumn_error_on_duplicate(t *testing.T) {
 	l := newLibraryInst("foo", newNilColumnContext(), listenerNil(), LensOf("schema", driver.InMemory()), nil, nil)
 

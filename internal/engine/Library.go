@@ -35,6 +35,7 @@ type (
 		ColumnName(index int) (string, error)
 		ColumnData(int) (ColumnData, error)
 		ColumnDataOf(id ColumnID) (ColumnData, error)
+		UpdateColumnData(data ColumnData) (ColumnData, error)
 
 		Rows() int
 		NewRow() (RowID, error)
@@ -233,6 +234,20 @@ func (lib *libraryImp) ColumnDataOf(id ColumnID) (ColumnData, error) {
 		return ColumnData{nil}, err
 	}
 	return ColumnData{columnEntry}, nil
+}
+
+func (lib *libraryImp) UpdateColumnData(data ColumnData) (ColumnData, error) {
+	columnEntry, err := lib.schema.Get(data.ID().ToString())
+	if nil != err {
+		return ColumnData{nil}, err
+	}
+	if nil == columnEntry {
+		return ColumnData{nil}, fmt.Errorf("column %s not exists", data.Name())
+	}
+
+	lib.schema.Put(data.ID().ToString(), data.entry)
+
+	return lib.ColumnDataOf(data.ID())
 }
 
 func (lib *libraryImp) getSchemaRoot() (entry.Entry, error) {
