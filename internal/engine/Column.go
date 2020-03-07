@@ -60,6 +60,13 @@ func (d ColumnData) Type() ColumnType {
 	}
 }
 
+func (d ColumnData) FillJson(json *simplejson.Json) {
+	json.Set("id", d.ID().ToString())
+	json.Set("name", d.Name())
+	json.Set("type", d.Type().ToString())
+}
+
+// Validate cell
 func (d ColumnData) Validate(
 	context ColumnContext,
 	value string,

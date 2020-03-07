@@ -1,17 +1,13 @@
 package msg
 
 import (
+	"github.com/bitly/go-simplejson"
 	"github.com/ze0nni/kodb/internal/engine"
 )
 
 type LibrarySchema struct {
 	Name    engine.LibraryName `json:"name"`
-	Columns []ColumnSchema     `json:"columns"`
-}
-
-type ColumnSchema struct {
-	ID   engine.ColumnID `json:"id"`
-	Name string          `json:"name"`
+	Columns []*simplejson.Json `json:"columns"`
 }
 
 func NewLibrarySchemaFromEngine(
@@ -22,7 +18,7 @@ func NewLibrarySchemaFromEngine(
 
 	schema := &LibrarySchema{
 		Name:    name,
-		Columns: []ColumnSchema{},
+		Columns: []*simplejson.Json{},
 	}
 
 	columnds := l.Columns()
@@ -36,13 +32,12 @@ func NewLibrarySchemaFromEngine(
 	return schema
 }
 
-func NewColumnSchemaFromLibrary(index int, library engine.Library) ColumnSchema {
-	columnID, _ := library.Column(index)
-	columnName, _ := library.ColumnName(index)
+func NewColumnSchemaFromLibrary(index int, library engine.Library) *simplejson.Json {
+	schema := simplejson.New()
 
-	schema := ColumnSchema{
-		ID:   columnID,
-		Name: columnName,
+	col, err := library.ColumnData(index)
+	if nil == err {
+		col.FillJson(schema)
 	}
 
 	return schema
