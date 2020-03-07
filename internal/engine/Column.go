@@ -6,30 +6,44 @@ import (
 	"github.com/ze0nni/kodb/internal/entry"
 )
 
+// ColumnType type
 type ColumnType string
 
+// Literal value
 const Literal = ColumnType("literal")
 
+// Reference to library row or rows
 const Reference = ColumnType("reference")
 
+// Unknown column type
 const Unknown = ColumnType("unknown")
 
+// ColumnContext type
 type ColumnContext interface {
 	//GetValue(library, row, col string) (string, bool, error)
 }
 
+// ToString func
 func (t ColumnType) ToString() string {
 	return string(t)
 }
 
+// ColumnData type
 type ColumnData struct {
 	entry entry.Entry
 }
 
+// Name of column
 func (d ColumnData) Name() string {
 	return d.entry["name"]
 }
 
+// Rename column
+func (d ColumnData) Rename(value string) {
+	d.entry["name"] = value
+}
+
+// ID of column
 func (d ColumnData) ID() ColumnID {
 	return ColumnID(d.entry["id"])
 }
