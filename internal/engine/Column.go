@@ -50,6 +50,12 @@ func (d ColumnData) ID() ColumnID {
 	return ColumnID(d.entry["id"])
 }
 
+//NewID copy ColumnData with new ID
+func (d ColumnData) NewID(id ColumnID) ColumnData {
+	e := d.entry.Copy()
+	e["id"] = id.ToString()
+	return ColumnData{e}
+}
 
 // Type of column
 func (d ColumnData) Type() ColumnType {
