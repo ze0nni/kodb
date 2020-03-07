@@ -74,6 +74,7 @@ Vue.component("kodb", {
                                 
                                 Vue.set(columnData, "exists", msg.exists)
                                 Vue.set(columnData, "value", msg.value)
+                                Vue.set(columnData, "error", msg.error)
                         }
                 }
         },
@@ -127,6 +128,7 @@ Vue.component("kodb", {
                                         <kodb-library
                                                 v-bind:librarySchema="l"
                                                 v-bind:rows="librarisData[l.name]"
+                                                v-bind:librarisData="librarisData"
                                         >
                                         </kodb-library>
                                 </v-tab-item>

@@ -1,7 +1,8 @@
 Vue.component("kodb-library", {
         props: [
                 "librarySchema",
-                "rows"
+                "rows",
+                "librarisData"
         ],
         data: function() {
                 return {
@@ -12,10 +13,14 @@ Vue.component("kodb-library", {
         methods: {
                 mapColumns(columns) {
                         return columns.map(col => {
-                                return {
-                                        text: col.name,
-                                        value: col.id
-                                }
+                                return Object.assign(
+                                        {},
+                                        col,
+                                        {
+                                                text: col.name,
+                                                value: col.id
+                                        }
+                                )
                         })
                 },
 
@@ -66,6 +71,7 @@ Vue.component("kodb-library", {
                                         :rowId="item.rowId"
                                         :column="col"
                                         :data="item.data"
+                                        :librarisData="librarisData"
                                 >
                                 </kodb-library-cell>
                         </td>
