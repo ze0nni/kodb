@@ -31,7 +31,13 @@ func (d *inMemory) Get(prefix string, id string) (entry.Entry, error) {
 		return nil, nil
 	}
 
-	return entrys[id], nil
+	e := entrys[id]
+
+	if nil == e {
+		return nil, nil
+	}
+
+	return e.Copy(), nil
 }
 
 func (d *inMemory) Put(prefix string, id string, e entry.Entry) error {
@@ -42,7 +48,7 @@ func (d *inMemory) Put(prefix string, id string, e entry.Entry) error {
 		d.data[prefix] = entrys
 	}
 
-	entrys[id] = e
+	entrys[id] = e.Copy()
 
 	return nil
 }
