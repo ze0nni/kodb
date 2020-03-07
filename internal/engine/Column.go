@@ -3,6 +3,8 @@ package engine
 import (
 	"fmt"
 
+	"github.com/bitly/go-simplejson"
+
 	"github.com/ze0nni/kodb/internal/entry"
 )
 
@@ -48,6 +50,8 @@ func (d ColumnData) ID() ColumnID {
 	return ColumnID(d.entry["id"])
 }
 
+
+// Type of column
 func (d ColumnData) Type() ColumnType {
 	t := d.entry["type"]
 	switch t {
@@ -60,7 +64,39 @@ func (d ColumnData) Type() ColumnType {
 	}
 }
 
+// Match column type
+func (d ColumnData) Match(
+	consumeLiteral func(),
+	consumeReference func(ColumnRef),
+	consumeUnknown func(),
+) {
+	switch d.Type() {
+	case Literal:
+		consumeLiteral()
+	case Reference:
+		ref, err := d.ToRef()
+		if nil != err {
+			panic(err)
+		}
+		consumeReference(ref)
+	default:
+		consumeUnknown()
+	}
+}
+
 func (d ColumnData) FillJson(json *simplejson.Json) {
+	d.Match(
+		func() {
+
+		},
+		func(ref ColumnRef) {
+			ref.FillJson(json)
+		},
+		func() {
+
+		},
+	)
+
 	json.Set("id", d.ID().ToString())
 	json.Set("name", d.Name())
 	json.Set("type", d.Type().ToString())
