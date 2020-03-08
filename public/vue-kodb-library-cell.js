@@ -24,7 +24,14 @@ Vue.component("kodb-library-cell", {
         },
         template:
 `
-<div>
+<v-row>
+        <v-avatar v-if="data[column.value].error"
+                color="red"
+                size="14"
+        >
+                !
+        </v-avatar>
+
         <kodb-library-literal-cell 
                 v-if="'literal' == column.type"
 
@@ -51,7 +58,7 @@ Vue.component("kodb-library-cell", {
         >
                 Unknown type: {{ column.type }}
         </v-chip>
-</div>
+</v-row>
 `
 });
 
