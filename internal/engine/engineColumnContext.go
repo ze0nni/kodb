@@ -1,9 +1,19 @@
 package engine
 
-func newEngineColumnContext(engine Engine) ColumnContext {
-	return &engineColumnContext{}
+import "fmt"
+
+func newEngineColumnContext(eng *engine) *engineColumnContext {
+	return &engineColumnContext{eng}
 }
 
 type engineColumnContext struct {
-	engine Engine
+	eng *engine
+}
+
+func (c *engineColumnContext) HasRow(library, row string) (bool, error) {
+	lib, exists := c.eng.librarys[LibraryName(library)]
+	if false == exists {
+		return false, fmt.Errorf("Library <%s> not exists", library)
+	}
+	return lib.HasRow(RowID(row)), nil
 }

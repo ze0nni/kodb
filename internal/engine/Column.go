@@ -22,6 +22,7 @@ const Unknown = ColumnType("unknown")
 
 // ColumnContext type
 type ColumnContext interface {
+	HasRow(library, row string) (bool, error)
 	//GetValue(library, row, col string) (string, bool, error)
 }
 

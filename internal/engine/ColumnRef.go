@@ -1,7 +1,7 @@
 package engine
 
 import (
-	"errors"
+	"fmt"
 
 	"github.com/bitly/go-simplejson"
 )
@@ -30,5 +30,12 @@ func (r ColumnRef) Validate(
 	context ColumnContext,
 	value string,
 ) error {
-	return errors.New("Not implements")
+	exists, err := context.HasRow(r.Ref().ToString(), value)
+	if nil != err {
+		return err
+	}
+	if false == exists {
+		return fmt.Errorf("Row <%s> not exists in <%s>", value, r.Ref().ToString())
+	}
+	return nil
 }

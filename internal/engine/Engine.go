@@ -51,13 +51,16 @@ func loadLibrarys(e *engine) {
 }
 
 func (e *engine) Context() ColumnContext {
+	if nil == e.context {
+		e.context = newEngineColumnContext(e)
+	}
 	return e.context
 }
 
 func (self *engine) Librarys() []LibraryName {
 	out := []LibraryName{}
 
-	for k, _ := range self.librarys {
+	for k := range self.librarys {
 		out = append(out, k)
 	}
 
@@ -70,7 +73,7 @@ func (e *engine) GetLibrary(name LibraryName) Library {
 	}
 	newLib := newLibraryInst(
 		name,
-		e.context,
+		e.Context(),
 		newListenerFromMap(e.listeners),
 		LensOf(name.ToString()+"$schema", e.driver),
 		LensOf(name.ToString()+"$data", e.driver),

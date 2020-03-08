@@ -5,3 +5,7 @@ func newNilColumnContext() ColumnContext {
 }
 
 type nilColumnContext struct{}
+
+func (c *nilColumnContext) HasRow(library, row string) (bool, error) {
+	return false, nil
+}
