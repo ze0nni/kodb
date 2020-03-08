@@ -66,11 +66,12 @@ func (client *clientConnection) listen() {
 	client.server.ClientConnected(client)
 	defer client.server.ClientDisconnected(client)
 
-	go client.write()
-	client.read()
+	done := make(chan struct{})
+	go client.write(done)
+	client.read(done)
 }
 
-func (client *clientConnection) read() {
+func (client *clientConnection) read(done chan struct{}) {
 	log.Printf("[%d] Connected", client.id)
 	for {
 		msgType, msgRaw, err := client.ws.ReadMessage()
@@ -87,6 +88,7 @@ func (client *clientConnection) read() {
 		log.Printf("[%d] Message recieved", client.id)
 		client.clientRecieveMessage(msg)
 	}
+	done <- struct{}{}
 	log.Printf("[%d] Disconnected", client.id)
 }
 
@@ -128,14 +130,17 @@ func (client *clientConnection) clientRecieveMessage(
 	}
 }
 
-func (client *clientConnection) write() {
+func (client *clientConnection) write(done chan struct{}) {
+WriteLoop:
 	for {
 		select {
+		case <-done:
+			break WriteLoop
 		case msg := <-client.responseCh:
 			err := client.ws.WriteJSON(msg)
 			if err != nil {
-				log.Print("[%d] Message sending error: %s", client.id, err)
-				break
+				log.Print("[%d] Message sending error: %s", client.id, err.Error())
+				break WriteLoop
 			}
 			log.Printf("[%d] Message sended", client.id)
 		}
