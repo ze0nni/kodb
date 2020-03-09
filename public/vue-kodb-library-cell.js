@@ -25,19 +25,13 @@ Vue.component("kodb-library-cell", {
         template:
 `
 <v-row>
-        <v-avatar v-if="data[column.value].error"
-                color="red"
-                size="14"
-        >
-                !
-        </v-avatar>
-
         <kodb-library-literal-cell 
                 v-if="'literal' == column.type"
 
                 v-on:update="updateValue"
                 :column="column"
                 :data="data"
+                :cellData="data[column.value]"
         ></kodb-library-literal-cell>
 
         <kodb-library-reference-cell 
@@ -48,6 +42,7 @@ Vue.component("kodb-library-cell", {
                 :rowId="rowId"
                 :column="column"
                 :data="data"
+                :cellData="data[column.value]"
                 :librarisData="librarisData"
 
         ></kodb-library-reference-cell>
@@ -65,7 +60,8 @@ Vue.component("kodb-library-cell", {
 Vue.component("kodb-library-literal-cell", {
         props: [
                 "column",
-                "data"
+                "data",
+                "cellData"
         ],
         data() {
                 return {
@@ -83,10 +79,10 @@ Vue.component("kodb-library-literal-cell", {
 <div
         <div v-if="isRowExists(data, column.value)">
                 <v-edit-dialog
-                        @open="editedValue = data[column.value].value"
+                        @open="editedValue = cellData.value"
                         @save="$emit('update', editedValue)"
                 >
-                        {{ data[column.value].value }}
+                        {{ cellData.value }}
                         <template v-slot:input>
                                 <v-text-field
                                         v-model="editedValue"
@@ -109,6 +105,7 @@ Vue.component("kodb-library-reference-cell", {
                 "rowId",
                 "column",
                 "data",
+                "cellData",
                 "librarisData"
         ],
         methods: {
@@ -125,6 +122,7 @@ Vue.component("kodb-library-reference-cell", {
         template:
 `
 <v-select
+        :error-messages="cellData.error"
         :items="mapItems(librarisData[column.reference], column)"
 >
 </v-select>
