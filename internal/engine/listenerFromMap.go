@@ -1,13 +1,20 @@
 package engine
 
-func newListenerFromMap(listeners map[Listener]struct{}) Listener {
+func newListenerFromMap() *listenerFromMap {
 	return &listenerFromMap{
-		listeners: listeners,
+		listeners: make(map[Listener]struct{}),
 	}
 }
 
 type listenerFromMap struct {
 	listeners map[Listener]struct{}
+}
+
+func (e *listenerFromMap) listen(listener Listener) func() {
+	e.listeners[listener] = struct{}{}
+	return func() {
+		delete(e.listeners, listener)
+	}
 }
 
 func (lm *listenerFromMap) NewLibrary(name LibraryName) {
