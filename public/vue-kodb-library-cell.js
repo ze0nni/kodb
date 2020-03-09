@@ -108,6 +108,11 @@ Vue.component("kodb-library-reference-cell", {
                 "cellData",
                 "librarisData"
         ],
+        data: function() {
+                return {
+                        selectedItem: this.cellData.value
+                }
+        },
         methods: {
                 mapItems(items, column) {
                         return (items || [])
@@ -119,9 +124,16 @@ Vue.component("kodb-library-reference-cell", {
                         })
                 }
         },
+        watch: {
+                selectedItem(value) {
+                        this.$emit('update', value)
+                }
+        },
         template:
 `
 <v-select
+        v-model="selectedItem"
+
         :error-messages="cellData.error"
         :items="mapItems(librarisData[column.reference], column)"
 >
