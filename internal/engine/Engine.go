@@ -27,17 +27,18 @@ type Engine interface {
 }
 
 type Listener interface {
-	NewLibrary(LibraryName)
-	NewRow(LibraryName, RowID)
-	DeleteRow(LibraryName, RowID)
-	UpdateValue(LibraryName, RowID, ColumnID, bool, string, error)
+	OnNewLibrary(LibraryName)
+	OnNewRow(LibraryName, RowID)
+	OnDeleteRow(LibraryName, RowID)
+	OnUpdateValue(LibraryName, RowID, ColumnID, bool, string, error)
 }
 
 type engine struct {
-	context   *engineColumnContext
-	driver    driver.Driver
-	librarys  map[LibraryName]*libraryImp
-	listeners *listenerFromMap
+	context         *engineColumnContext
+	driver          driver.Driver
+	librarys        map[LibraryName]*libraryImp
+	listeners       *listenerFromMap
+	currentListener func()
 }
 
 func loadLibrarys(e *engine) {
@@ -82,7 +83,7 @@ func (e *engine) GetLibrary(name LibraryName) Library {
 	)
 	e.librarys[name] = newLib
 
-	e.listeners.NewLibrary(name)
+	e.listeners.OnNewLibrary(name)
 
 	return newLib
 }

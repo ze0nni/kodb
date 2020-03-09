@@ -43,38 +43,38 @@ func (e *listenerFromMap) forLibrary(
 	}
 }
 
-func (lm *listenerFromMap) NewLibrary(name LibraryName) {
+func (lm *listenerFromMap) OnNewLibrary(name LibraryName) {
 	for l, _ := range lm.listeners {
-		l.NewLibrary(name)
+		l.OnNewLibrary(name)
 	}
 	lm.forLibrary(name, func(l Listener) {
-		l.NewLibrary(name)
+		l.OnNewLibrary(name)
 	})
 }
 
-func (lm *listenerFromMap) NewRow(name LibraryName, row RowID) {
+func (lm *listenerFromMap) OnNewRow(name LibraryName, row RowID) {
 	for l, _ := range lm.listeners {
-		l.NewRow(name, row)
+		l.OnNewRow(name, row)
 	}
 	lm.forLibrary(name, func(l Listener) {
-		l.NewRow(name, row)
+		l.OnNewRow(name, row)
 	})
 }
 
-func (lm *listenerFromMap) DeleteRow(name LibraryName, row RowID) {
+func (lm *listenerFromMap) OnDeleteRow(name LibraryName, row RowID) {
 	for l, _ := range lm.listeners {
-		l.DeleteRow(name, row)
+		l.OnDeleteRow(name, row)
 	}
 	lm.forLibrary(name, func(l Listener) {
-		l.DeleteRow(name, row)
+		l.OnDeleteRow(name, row)
 	})
 }
 
-func (lm *listenerFromMap) UpdateValue(name LibraryName, row RowID, col ColumnID, exixts bool, value string, cellErr error) {
+func (lm *listenerFromMap) OnUpdateValue(name LibraryName, row RowID, col ColumnID, exixts bool, value string, cellErr error) {
 	for l, _ := range lm.listeners {
-		l.UpdateValue(name, row, col, exixts, value, cellErr)
+		l.OnUpdateValue(name, row, col, exixts, value, cellErr)
 	}
 	lm.forLibrary(name, func(l Listener) {
-		l.UpdateValue(name, row, col, exixts, value, cellErr)
+		l.OnUpdateValue(name, row, col, exixts, value, cellErr)
 	})
 }

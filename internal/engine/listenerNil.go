@@ -6,18 +6,18 @@ func listenerNil() Listener {
 
 type listenerNilInst struct{}
 
-func (lm *listenerNilInst) NewLibrary(name LibraryName) {
+func (lm *listenerNilInst) OnNewLibrary(name LibraryName) {
 
 }
 
-func (lm *listenerNilInst) NewRow(name LibraryName, row RowID) {
+func (lm *listenerNilInst) OnNewRow(name LibraryName, row RowID) {
 
 }
 
-func (lm *listenerNilInst) DeleteRow(LibraryName, RowID) {
+func (lm *listenerNilInst) OnDeleteRow(LibraryName, RowID) {
 
 }
 
-func (lm *listenerNilInst) UpdateValue(LibraryName, RowID, ColumnID, bool, string, error) {
+func (lm *listenerNilInst) OnUpdateValue(LibraryName, RowID, ColumnID, bool, string, error) {
 
 }

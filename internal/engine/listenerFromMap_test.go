@@ -15,14 +15,14 @@ func TestListenerFromMap_ListenLibrary(t *testing.T) {
 	bar := LibraryName("bar")
 	l.listenLibrary(foo, ll)
 
-	l.NewLibrary(foo)
-	l.NewLibrary(bar)
-	l.NewRow(foo, RowID("row"))
-	l.NewRow(bar, RowID("row"))
-	l.UpdateValue(foo, RowID("row"), ColumnID("col"), true, "value", nil)
-	l.UpdateValue(bar, RowID("row"), ColumnID("col"), true, "value", nil)
-	l.DeleteRow(foo, RowID("row"))
-	l.DeleteRow(bar, RowID("row"))
+	l.OnNewLibrary(foo)
+	l.OnNewLibrary(bar)
+	l.OnNewRow(foo, RowID("row"))
+	l.OnNewRow(bar, RowID("row"))
+	l.OnUpdateValue(foo, RowID("row"), ColumnID("col"), true, "value", nil)
+	l.OnUpdateValue(bar, RowID("row"), ColumnID("col"), true, "value", nil)
+	l.OnDeleteRow(foo, RowID("row"))
+	l.OnDeleteRow(bar, RowID("row"))
 
 	assert.Equal(
 		t,

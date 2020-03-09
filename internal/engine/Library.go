@@ -288,7 +288,7 @@ func (l *libraryImp) AddRow(rowID RowID) error {
 
 	l.rows = append(l.rows, rowID)
 
-	l.listener.NewRow(l.name, rowID)
+	l.listener.OnNewRow(l.name, rowID)
 
 	return nil
 }
@@ -324,7 +324,7 @@ func (l *libraryImp) DeleteRow(id RowID) error {
 		}
 	}
 
-	l.listener.DeleteRow(l.name, id)
+	l.listener.OnDeleteRow(l.name, id)
 
 	return nil
 }
@@ -403,7 +403,7 @@ func (lib *libraryImp) UpdateValue(
 
 	cellErr := colData.Validate(lib.context, value)
 
-	lib.listener.UpdateValue(lib.name, id, col, true, value, cellErr)
+	lib.listener.OnUpdateValue(lib.name, id, col, true, value, cellErr)
 
 	return nil
 }

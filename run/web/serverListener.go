@@ -9,11 +9,11 @@ type serverListener struct {
 	server *serverInstance
 }
 
-func (l *serverListener) NewLibrary(engine.LibraryName) {
+func (l *serverListener) OnNewLibrary(engine.LibraryName) {
 	panic("not implements")
 }
 
-func (l *serverListener) NewRow(name engine.LibraryName, row engine.RowID) {
+func (l *serverListener) OnNewRow(name engine.LibraryName, row engine.RowID) {
 	newRowMsg := msg.NewRowMsgOf(
 		name,
 		row,
@@ -24,7 +24,7 @@ func (l *serverListener) NewRow(name engine.LibraryName, row engine.RowID) {
 	}
 }
 
-func (l *serverListener) DeleteRow(name engine.LibraryName, row engine.RowID) {
+func (l *serverListener) OnDeleteRow(name engine.LibraryName, row engine.RowID) {
 	deleteRowMsg := msg.DeleteRowMsgOf(
 		name,
 		row,
@@ -34,7 +34,7 @@ func (l *serverListener) DeleteRow(name engine.LibraryName, row engine.RowID) {
 	}
 }
 
-func (l *serverListener) UpdateValue(
+func (l *serverListener) OnUpdateValue(
 	name engine.LibraryName,
 	row engine.RowID,
 	col engine.ColumnID,

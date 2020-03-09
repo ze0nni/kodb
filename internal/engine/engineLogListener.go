@@ -16,19 +16,19 @@ func (l *logListener) getLog() []string {
 	return l.log
 }
 
-func (l *logListener) NewLibrary(name LibraryName) {
+func (l *logListener) OnNewLibrary(name LibraryName) {
 	l.log = append(l.log, "newLibrary "+name.ToString())
 }
 
-func (l *logListener) NewRow(name LibraryName, row RowID) {
+func (l *logListener) OnNewRow(name LibraryName, row RowID) {
 	l.log = append(l.log, fmt.Sprintf("newRow %s:%s", name.ToString(), row.ToString()))
 }
 
-func (l *logListener) DeleteRow(name LibraryName, row RowID) {
+func (l *logListener) OnDeleteRow(name LibraryName, row RowID) {
 	l.log = append(l.log, fmt.Sprintf("deleteRow %s:%s", name.ToString(), row.ToString()))
 }
 
-func (l *logListener) UpdateValue(name LibraryName, row RowID, col ColumnID, exists bool, value string, cellErr error) {
+func (l *logListener) OnUpdateValue(name LibraryName, row RowID, col ColumnID, exists bool, value string, cellErr error) {
 	if nil != cellErr {
 		l.log = append(l.log, fmt.Sprintf("updateRow %s:%s:%s error %s",
 			name.ToString(),
