@@ -23,6 +23,7 @@ type Engine interface {
 	Librarys() []LibraryName
 	GetLibrary(LibraryName) Library
 	Listen(Listener) func()
+	ListenLibrary(LibraryName, Listener) func()
 }
 
 type Listener interface {
@@ -88,4 +89,8 @@ func (e *engine) GetLibrary(name LibraryName) Library {
 
 func (e *engine) Listen(listener Listener) func() {
 	return e.listeners.listen(listener)
+}
+
+func (e *engine) ListenLibrary(library LibraryName, listener Listener) func() {
+	return e.listeners.listenLibrary(library, listener)
 }
