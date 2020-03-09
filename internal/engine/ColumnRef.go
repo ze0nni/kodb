@@ -25,6 +25,12 @@ func (r ColumnRef) FillJson(json *simplejson.Json) {
 	json.Set("reference", r.Ref().ToString())
 }
 
+func (r ColumnRef) IsDependent(
+	library LibraryName,
+) bool {
+	return library == r.Ref()
+}
+
 // Validate cell
 func (r ColumnRef) Validate(
 	context ColumnContext,

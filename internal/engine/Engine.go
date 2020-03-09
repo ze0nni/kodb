@@ -24,6 +24,12 @@ type Engine interface {
 	GetLibrary(LibraryName) Library
 	Listen(Listener) func()
 	ListenLibrary(LibraryName, Listener) func()
+
+	// Validate returns cells with errors
+	Validate(errorConsumer func(LibraryName, RowID, ColumnID, error)) error
+
+	// Dependency returns list of columns who dependency from LibraryName and ColumnID
+	Dependency(LibraryName, ColumnID, func(LibraryName, ColumnID)) error
 }
 
 type Listener interface {
@@ -94,4 +100,30 @@ func (e *engine) Listen(listener Listener) func() {
 
 func (e *engine) ListenLibrary(library LibraryName, listener Listener) func() {
 	return e.listeners.listenLibrary(library, listener)
+}
+
+func (e *engine) Validate(consumer func(LibraryName, RowID, ColumnID, error)) error {
+	for _, lib := range e.librarys {
+		libraryName := lib.name
+		err := libraryValidate(lib, func(row RowID, col ColumnID, err error) {
+			consumer(libraryName, row, col, err)
+		})
+		if nil != err {
+			return err
+		}
+	}
+	return nil
+}
+
+func (e *engine) Dependency(masterLibrary LibraryName, masterCol ColumnID, consumer func(LibraryName, ColumnID)) error {
+	for _, lib := range e.librarys {
+		libraryName := lib.name
+		err := libraryDependency(masterLibrary, masterCol, lib, func(col ColumnID) {
+			consumer(libraryName, col)
+		})
+		if nil != err {
+			return err
+		}
+	}
+	return nil
 }

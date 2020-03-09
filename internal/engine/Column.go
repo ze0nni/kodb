@@ -109,6 +109,24 @@ func (d ColumnData) FillJson(json *simplejson.Json) {
 	json.Set("type", d.Type().ToString())
 }
 
+func (d ColumnData) IsDependent(
+	library LibraryName,
+	column ColumnID,
+) (out bool) {
+	d.Match(
+		func() {
+
+		},
+		func(ref ColumnRef) {
+			out = ref.IsDependent(library)
+		},
+		func() {
+
+		},
+	)
+	return
+}
+
 // Validate cell
 func (d ColumnData) Validate(
 	context ColumnContext,
