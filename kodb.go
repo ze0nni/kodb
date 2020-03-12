@@ -1,11 +1,13 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"strconv"
 
 	"github.com/ze0nni/kodb/internal/driver"
 	"github.com/ze0nni/kodb/internal/engine"
+	"github.com/ze0nni/kodb/internal/validate"
 	"github.com/ze0nni/kodb/run/web"
 
 	"github.com/Pallinder/go-randomdata"
@@ -35,6 +37,32 @@ func main() {
 		invLib.UpdateValue(row, name, randomdata.Adjective())
 		invLib.UpdateValue(row, owner, randomdata.Alphanumeric(32))
 	}
+
+	questLib := eng.GetLibrary("quest")
+	questName, _ := questLib.NewColumn("name")
+	questLib.NewListColumn(eng, "tasks", engine.LibraryName("tasks"))
+
+	tasksLib := eng.GetLibrary(engine.LibraryName("tasks"))
+
+	for i := 1; i <= 3; i++ {
+		questRow, _ := questLib.NewRow()
+		questLib.UpdateValue(questRow, questName, "quest_00"+strconv.Itoa(i))
+
+		for j := 1; j <= 1+i; j++ {
+			taskRow, _ := tasksLib.NewRow()
+			tasksLib.UpdateValue(
+				taskRow,
+				engine.ColumnID("parent"),
+				questRow.ToString(),
+			)
+		}
+	}
+
+	validate.Validate(eng, func(
+		l engine.LibraryName, r engine.RowID, c engine.ColumnID, err error,
+	) {
+		fmt.Printf("Error in %s:%s%s: %s\n", l, r, c, err)
+	})
 
 	err := web.Run(eng)
 	if nil != err {
