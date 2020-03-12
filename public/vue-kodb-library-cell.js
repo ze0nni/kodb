@@ -47,6 +47,19 @@ Vue.component("kodb-library-cell", {
 
         ></kodb-library-reference-cell>
 
+        <kodb-library-list-cell 
+                v-else-if="'list' == column.type"
+
+                v-on:update="updateValue"
+                :libraryName="libraryName"
+                :rowId="rowId"
+                :column="column"
+                :data="data"
+                :cellData="data[column.value]"
+                :librarisData="librarisData"
+
+        ></kodb-library-list-cell>
+
         <v-chip
                 v-else
                 color="error"
@@ -138,5 +151,46 @@ Vue.component("kodb-library-reference-cell", {
         :items="mapItems(librarisData[column.reference], column)"
 >
 </v-select>
+`
+})
+
+Vue.component("kodb-library-list-cell", {
+        props: [
+                "libraryName",
+                "rowId",
+                "column",
+                "data",
+                "cellData",
+                "librarisData"
+        ],
+        data: function() {
+                return {
+                        selectedItem: this.cellData.value
+                }
+        },
+        methods: {
+                filterItems(items) {
+                        return (items || [])
+                                .filter(r => {
+                                        const parent = r.data.parent
+                                        return parent && parent.value == this.rowId
+                                })
+                }
+        },
+        watch: {
+                selectedItem(value) {
+                        this.$emit('update', value)
+                }
+        },
+        template:
+`
+<div>
+        <table>
+                <tr v-for="r in filterItems(librarisData[column.reference])"
+                >
+                        <td>{{ r.rowId }}</td>
+                </tr>
+        </table>
+</div>
 `
 })
