@@ -17,6 +17,8 @@ const Literal = ColumnType("literal")
 // Reference to library row or rows
 const Reference = ColumnType("reference")
 
+const List = ColumnType("list")
+
 // Unknown column type
 const Unknown = ColumnType("unknown")
 
@@ -75,6 +77,7 @@ func (d ColumnData) Type() ColumnType {
 func (d ColumnData) Match(
 	consumeLiteral func(),
 	consumeReference func(ColumnRef),
+	consumeList func(ColumnList),
 	consumeUnknown func(),
 ) {
 	switch d.Type() {
@@ -86,6 +89,12 @@ func (d ColumnData) Match(
 			panic(err)
 		}
 		consumeReference(ref)
+	case List:
+		list, err := d.ToList()
+		if nil != err {
+			panic(err)
+		}
+		consumeList(list)
 	default:
 		consumeUnknown()
 	}
@@ -98,6 +107,9 @@ func (d ColumnData) FillJson(json *simplejson.Json) {
 		},
 		func(ref ColumnRef) {
 			ref.FillJson(json)
+		},
+		func(list ColumnList) {
+			list.FillJson(json)
 		},
 		func() {
 
@@ -119,6 +131,9 @@ func (d ColumnData) IsDependent(
 		},
 		func(ref ColumnRef) {
 			out = ref.IsDependent(library)
+		},
+		func(list ColumnList) {
+			out = list.IsDependent(library)
 		},
 		func() {
 
@@ -153,4 +168,12 @@ func (d ColumnData) ToRef() (ColumnRef, error) {
 		return ColumnRef{d}, nil
 	}
 	return ColumnRef{ColumnData{nil}}, fmt.Errorf("%s is not Ref", d.Name())
+}
+
+// ToList convert column to ColumnList type
+func (d ColumnData) ToList() (ColumnList, error) {
+	if Reference == d.Type() {
+		return ColumnList{d}, nil
+	}
+	return ColumnList{ColumnData{nil}}, fmt.Errorf("%s is not List", d.Name())
 }

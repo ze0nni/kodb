@@ -21,6 +21,11 @@ func (r ColumnRef) Ref() LibraryName {
 	return LibraryName(r.data.entry["ref"])
 }
 
+// UpdateRef change ref library name
+func (r ColumnRef) UpdateRef(name LibraryName) {
+	r.data.entry["ref"] = name.ToString()
+}
+
 func (r ColumnRef) FillJson(json *simplejson.Json) {
 	json.Set("reference", r.Ref().ToString())
 }
