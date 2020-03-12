@@ -8,6 +8,7 @@ Vue.component("kodb-library", {
                 return {
                         multiSelect: false,
                         selectedRows:[],
+                        expandedLibraryName: null
                 }
         },
         methods: {
@@ -55,7 +56,7 @@ Vue.component("kodb-library", {
         show-select
         :single-select="!multiSelect"
 >       
-        <template v-slot:item="{ item,headers,select,isSelected }">
+        <template v-slot:item="{ item,headers,select,isSelected,expand,isExpanded }">
         
                 <tr v-on:click="select(!isSelected)">
                         <td v-for="col in headers"
@@ -72,10 +73,31 @@ Vue.component("kodb-library", {
                                         :column="col"
                                         :data="item.data"
                                         :librarisData="librarisData"
+                                        
+                                        :expandRow="() => {
+                                                if (expandedLibraryName != col.reference) {
+                                                        expandedLibraryName = col.reference
+                                                        expand(true);
+                                                } else {
+                                                        expand(!isExpanded);
+                                                }
+                                        }"
+                                        :isExpanded="expandedLibraryName == col.reference && isExpanded"
                                 >
                                 </kodb-library-cell>
                         </td>
                 </tr>
+        </template>
+
+        <template v-slot:expanded-item="{ item, headers }">
+                <td :colspan="headers.length"
+                >
+                        <kodb-sub-library
+                                :parentRow="item"
+                                :rows="librarisData[expandedLibraryName]"
+                        >
+                        </kodb-sub-library>
+                </td>
         </template>
 
         <template v-slot:top>
@@ -109,5 +131,30 @@ Vue.component("kodb-library", {
                 </v-toolbar>
         </template>
 </v-data-table>
+`
+});
+
+Vue.component("kodb-sub-library", {
+        props: [
+                "parentRow",
+                "rows"
+        ],
+        methods: {
+                filterItems(rows) {
+                        const parentId = this.parentRow.rowId
+                        return (rows||[])
+                                .filter(r => r.data.parent.value == parentId)
+                }
+        },
+        template:
+`
+<div>
+        <table>
+                <tr v-for="r in filterItems(rows)"
+                >
+                        <td>{{ r.rowId }}</td>
+                </tr>
+        </table>
+</div>
 `
 });

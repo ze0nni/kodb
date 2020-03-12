@@ -4,7 +4,10 @@ Vue.component("kodb-library-cell", {
                 "rowId",
                 "column",
                 "data",
-                "librarisData"
+                "librarisData",
+
+                "expandRow",
+                "isExpanded"
         ],
         data: function() {
                 return {
@@ -57,6 +60,9 @@ Vue.component("kodb-library-cell", {
                 :data="data"
                 :cellData="data[column.value]"
                 :librarisData="librarisData"
+
+                :expandRow="expandRow"
+                :isExpanded="isExpanded"
 
         ></kodb-library-list-cell>
 
@@ -161,7 +167,10 @@ Vue.component("kodb-library-list-cell", {
                 "column",
                 "data",
                 "cellData",
-                "librarisData"
+                "librarisData",
+
+                "expandRow",
+                "isExpanded"
         ],
         data: function() {
                 return {
@@ -185,12 +194,14 @@ Vue.component("kodb-library-list-cell", {
         template:
 `
 <div>
-        <table>
-                <tr v-for="r in filterItems(librarisData[column.reference])"
-                >
-                        <td>{{ r.rowId }}</td>
-                </tr>
-        </table>
+        <v-chip
+                v-on:click="expandRow"
+        >
+                <v-icon left v-if="!isExpanded">mdi-plus</v-icon>
+                <v-icon left v-if="isExpanded">mdi-minus</v-icon>
+                
+                [ {{ filterItems(librarisData[column.reference]).length }} ]
+        </v-chip>
 </div>
 `
 })
