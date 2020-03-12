@@ -169,7 +169,7 @@ func (lib *libraryImp) addColumn(
 	entry.SetString("id", id.ToString(), columnEntry)
 	entry.SetString("type", columnType.ToString(), columnEntry)
 
-	data, err := lib.ColumnDataOf(id)
+	data := ColumnData{columnEntry}
 	if nil != err {
 		return err
 	}

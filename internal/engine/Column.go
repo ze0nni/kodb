@@ -68,6 +68,8 @@ func (d ColumnData) Type() ColumnType {
 		return Literal
 	case "reference":
 		return Reference
+	case "list":
+		return List
 	default:
 		return Unknown
 	}
@@ -167,13 +169,13 @@ func (d ColumnData) ToRef() (ColumnRef, error) {
 	if Reference == d.Type() {
 		return ColumnRef{d}, nil
 	}
-	return ColumnRef{ColumnData{nil}}, fmt.Errorf("%s is not Ref", d.Name())
+	return ColumnRef{ColumnData{nil}}, fmt.Errorf("%s is not Ref %d but", d.Name(), d.Type())
 }
 
 // ToList convert column to ColumnList type
 func (d ColumnData) ToList() (ColumnList, error) {
-	if Reference == d.Type() {
+	if List == d.Type() {
 		return ColumnList{d}, nil
 	}
-	return ColumnList{ColumnData{nil}}, fmt.Errorf("%s is not List", d.Name())
+	return ColumnList{ColumnData{nil}}, fmt.Errorf("%s is not List but %s", d.Name(), d.Type())
 }
