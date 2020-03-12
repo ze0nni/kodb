@@ -128,7 +128,7 @@ func (lib *libraryImp) Columns() int {
 func (lib *libraryImp) newColumn(
 	columnName string,
 	columnType ColumnType,
-	consumer func(ColumnData),
+	consumer func(ColumnData) error,
 ) (ColumnID, error) {
 	columnV4, err := uuid.NewV4()
 	if nil != err {
@@ -147,7 +147,7 @@ func (lib *libraryImp) addColumn(
 	id ColumnID,
 	name string,
 	columnType ColumnType,
-	consumer func(ColumnData),
+	consumer func(ColumnData) error,
 ) error {
 	root, err := lib.getSchemaRoot()
 	if nil != err {
@@ -174,7 +174,10 @@ func (lib *libraryImp) addColumn(
 		return err
 	}
 
-	consumer(data)
+	err = consumer(data)
+	if nil != err {
+		return err
+	}
 
 	lib.schema.Put(id.ToString(), columnEntry)
 	lib.schema.Put("root", root)
@@ -183,54 +186,60 @@ func (lib *libraryImp) addColumn(
 }
 
 func (lib *libraryImp) NewColumn(name string) (ColumnID, error) {
-	return lib.newColumn(name, Literal, func(ColumnData) {
-
+	return lib.newColumn(name, Literal, func(ColumnData) error {
+		return nil
 	})
 }
 
 func (lib *libraryImp) AddColumn(id ColumnID, name string) error {
-	return lib.addColumn(id, name, Literal, func(ColumnData) {
-
+	return lib.addColumn(id, name, Literal, func(ColumnData) error {
+		return nil
 	})
 }
 
 func (lib *libraryImp) NewRefColumn(name string, ref LibraryName) (ColumnID, error) {
-	return lib.newColumn(name, Reference, func(data ColumnData) {
+	return lib.newColumn(name, Reference, func(data ColumnData) error {
 		refData, err := data.ToRef()
 		if nil != err {
 			panic(err)
 		}
 		refData.UpdateRef(ref)
+		return nil
 	})
 }
 
 func (lib *libraryImp) AddRefColumn(id ColumnID, name string, ref LibraryName) error {
-	return lib.addColumn(id, name, Reference, func(data ColumnData) {
+	return lib.addColumn(id, name, Reference, func(data ColumnData) error {
 		refData, err := data.ToRef()
 		if nil != err {
 			panic(err)
 		}
 		refData.UpdateRef(ref)
+		return nil
 	})
 }
 
 func (lib *libraryImp) NewListColumn(eng Engine, name string, ref LibraryName) (ColumnID, error) {
-	return lib.newColumn(name, List, func(data ColumnData) {
+	return lib.newColumn(name, List, func(data ColumnData) error {
 		listData, err := data.ToList()
 		if nil != err {
 			panic(err)
 		}
 		listData.UpdateRef(ref)
+
+		return data.Initilize(eng)
 	})
 }
 
 func (lib *libraryImp) AddListColumn(eng Engine, id ColumnID, name string, ref LibraryName) error {
-	return lib.addColumn(id, name, List, func(data ColumnData) {
+	return lib.addColumn(id, name, List, func(data ColumnData) error {
 		listData, err := data.ToList()
 		if nil != err {
 			panic(err)
 		}
 		listData.UpdateRef(ref)
+
+		return data.Initilize(eng)
 	})
 }
 

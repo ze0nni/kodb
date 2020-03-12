@@ -144,12 +144,33 @@ func (d ColumnData) IsDependent(
 	return
 }
 
+// Initilize column for first time
+func (d ColumnData) Initilize(
+	eng Engine,
+) (err error) {
+	d.Match(
+		func() {
+
+		},
+		func(ref ColumnRef) {
+
+		},
+		func(list ColumnList) {
+			err = list.Initilize(eng)
+		},
+		func() {
+
+		},
+	)
+	return
+}
+
 // Validate cell
 func (d ColumnData) Validate(
 	context ColumnContext,
 	value string,
 ) error {
-	t := d.Type()
+	t := d.Type() //TODO: match
 	switch t {
 	case Literal:
 		return nil
