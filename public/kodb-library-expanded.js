@@ -12,6 +12,14 @@ Vue.component("kodb-library-expanded", {
                     const parentId = this.parentRow.rowId
                     return (rows||[])
                             .filter(r => r.data.parent.value == parentId)
+                            .map(r => [
+                                    {extendedRow: false, row: r, columns: this.librarySchema.columns },
+                                    {extendedRow: true, columns:[] }
+                                ])
+                            .reduce((a, b) => a.concat(b), [])
+            },
+            expandRow() {
+                    console.log(123)
             }
     },
     template:
@@ -29,19 +37,23 @@ Vue.component("kodb-library-expanded", {
                 <tbody>
                         <tr v-for="r in filterItems(rows)"
                         >
-                                <td v-for="col in librarySchema.columns"
+                                <td v-for="col in r.columns"
                                 >
                                         <kodb-library-cell
                                                 :libraryName="librarySchema.name"
-                                                :rowId="r.rowId"
+                                                :rowId="r.row.rowId"
                                                 :column="col"
-                                                :data="r.data"
+                                                :data="r.row.data"
                                                 :librarisData="librarisData"
 
                                                 :expandRow="function() {}"
                                                 :isExpanded="false"
                                         >
                                         </kodb-library-cell>
+                                </td>
+
+                                <td v-if="r.extendedRow" :colspan="librarySchema.columns.length">
+                                        expanded!
                                 </td>
                         </tr>
                 </tbody>
