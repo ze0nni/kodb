@@ -1,6 +1,7 @@
 package engine
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/ze0nni/kodb/internal/driver"
@@ -21,7 +22,10 @@ func New(driver driver.Driver) Engine {
 type Engine interface {
 	Context() ColumnContext
 	Librarys() []LibraryName
-	GetLibrary(LibraryName) Library
+	Library(LibraryName) (Library, error)
+
+	AddLibrary(LibraryName) (Library, error)
+
 	Listen(Listener) func()
 	ListenLibrary(LibraryName, Listener) func()
 }
@@ -46,7 +50,7 @@ func loadLibrarys(e *engine) {
 		for _, p := range ps {
 			if strings.HasSuffix(p, "$schema") {
 				libraryName := LibraryName(p[:len(p)-7])
-				e.GetLibrary(libraryName)
+				e.AddLibrary(libraryName) //TODO: e.recoveryLibrary
 			}
 		}
 	}
@@ -69,10 +73,18 @@ func (self *engine) Librarys() []LibraryName {
 	return out
 }
 
-func (e *engine) GetLibrary(name LibraryName) Library {
+func (e *engine) Library(name LibraryName) (Library, error) {
 	if storedLib := e.librarys[name]; nil != storedLib {
-		return storedLib
+		return storedLib, nil
 	}
+	return nil, fmt.Errorf("Library <%s> not exits", name)
+}
+
+func (e *engine) AddLibrary(name LibraryName) (Library, error) {
+	if _, exists := e.librarys[name]; exists {
+		return nil, fmt.Errorf("Library <%s> already exits", name)
+	}
+
 	newLib := newLibraryInst(
 		name,
 		e.Context(),
@@ -85,7 +97,7 @@ func (e *engine) GetLibrary(name LibraryName) Library {
 
 	e.listeners.OnNewLibrary(name)
 
-	return newLib
+	return newLib, nil
 }
 
 func (e *engine) Listen(listener Listener) func() {

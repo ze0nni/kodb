@@ -25,7 +25,10 @@ func (cl ColumnList) FillJson(json *simplejson.Json) {
 func (cl ColumnList) Initilize(
 	eng Engine,
 ) error {
-	refLib := eng.GetLibrary(cl.Ref())
+	refLib, err := eng.AddLibrary(cl.Ref())
+	if nil != err {
+		return err
+	}
 
 	parentCol := ColumnID("parent")
 	return refLib.AddColumn(parentCol, "parent") //TODO validate

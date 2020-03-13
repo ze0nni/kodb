@@ -116,8 +116,13 @@ func (server *serverInstance) NewRow(clientID ClientID, libraryName string) {
 }
 
 func (server *serverInstance) newRow(m msgNewRow) {
-	l := server.engine.GetLibrary(m.LibraryName)
-	_, err := l.NewRow()
+	l, err := server.engine.Library(m.LibraryName)
+	if nil != err {
+		log.Printf("Error when <newRow>: %s", err)
+		return
+	}
+
+	_, err = l.NewRow()
 	if nil != err {
 		log.Printf("Error when <newRow>: %s", err)
 		return
@@ -130,8 +135,11 @@ func (server *serverInstance) DeleteRow(clientID ClientID, libraryName string, r
 }
 
 func (server *serverInstance) deleteRow(m msgDeleteRow) {
-	l := server.engine.GetLibrary(m.LibraryName)
-	err := l.DeleteRow(m.RowID)
+	l, err := server.engine.Library(m.LibraryName)
+	if nil != err {
+		log.Printf("Error when <deleteRow>: %s", err)
+	}
+	err = l.DeleteRow(m.RowID)
 	if nil != err {
 		log.Printf("Error when <deleteRow>: %s", err)
 	}
@@ -148,8 +156,11 @@ func (server *serverInstance) UpdateValue(clientID ClientID, libraryName, rowID,
 }
 
 func (server *serverInstance) updateValue(m msgUpdateValue) {
-	l := server.engine.GetLibrary(m.LibraryName)
-	err := l.UpdateValue(m.RowID, m.ColumnID, m.value)
+	l, err := server.engine.Library(m.LibraryName)
+	if nil != err {
+		log.Printf("Error when <updateValue>: %s", err)
+	}
+	err = l.UpdateValue(m.RowID, m.ColumnID, m.value)
 	if nil != err {
 		log.Printf("Error when <updateValue>: %s", err)
 	}

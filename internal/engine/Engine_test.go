@@ -11,7 +11,7 @@ import (
 func TestEngine_GetLibrary(t *testing.T) {
 	eng := New(driver.InMemory())
 
-	lib := eng.GetLibrary("foo")
+	lib, _ := eng.AddLibrary("foo")
 
 	assert.NotNil(t, lib)
 }
@@ -19,8 +19,8 @@ func TestEngine_GetLibrary(t *testing.T) {
 func TestEngine_GetSameLibrarys(t *testing.T) {
 	eng := New(driver.InMemory())
 
-	lib1 := eng.GetLibrary("foo")
-	lib2 := eng.GetLibrary("foo")
+	lib1, _ := eng.AddLibrary("foo")
+	lib2, _ := eng.AddLibrary("foo")
 
 	assert.Same(t, lib1, lib2)
 }
@@ -28,7 +28,7 @@ func TestEngine_GetSameLibrarys(t *testing.T) {
 func TestEngine_Library_Name(t *testing.T) {
 	eng := New(driver.InMemory())
 
-	foo := eng.GetLibrary("foo")
+	foo, _ := eng.AddLibrary("foo")
 
 	assert.Equal(t, LibraryName("foo"), foo.Name())
 }
@@ -44,8 +44,8 @@ func TestEngine_Librarys_empty(t *testing.T) {
 func TestEngine_Librarys(t *testing.T) {
 	eng := New(driver.InMemory())
 
-	eng.GetLibrary("foo")
-	eng.GetLibrary("bar")
+	eng.AddLibrary("foo")
+	eng.AddLibrary("bar")
 	ls := eng.Librarys()
 
 	assert.ElementsMatch(t, []LibraryName{LibraryName("foo"), LibraryName("bar")}, ls)
@@ -55,8 +55,8 @@ func TestEngine_Librarys_onLoad(t *testing.T) {
 	m := driver.InMemory()
 	eng1 := New(m)
 
-	eng1.GetLibrary("foo")
-	eng1.GetLibrary("bar")
+	eng1.AddLibrary("foo")
+	eng1.AddLibrary("bar")
 
 	eng2 := New(m)
 	ls := eng2.Librarys()
@@ -78,7 +78,7 @@ func TestEngine_Listener_NewLibrary(t *testing.T) {
 	ll := newLogListener()
 	eng.Listen(ll)
 
-	eng.GetLibrary(LibraryName("foo"))
+	eng.AddLibrary(LibraryName("foo"))
 
 	assert.Equal(
 		t,
@@ -94,7 +94,7 @@ func TestEngine_Listener_StopListen(t *testing.T) {
 	handle := eng.Listen(ll)
 	handle()
 
-	eng.GetLibrary(LibraryName("foo"))
+	eng.AddLibrary(LibraryName("foo"))
 
 	assert.Equal(
 		t,
@@ -109,7 +109,7 @@ func TestEngine_Listener_NewRow(t *testing.T) {
 	ll := newLogListener()
 	eng.Listen(ll)
 
-	foo := eng.GetLibrary(LibraryName("foo"))
+	foo, _ := eng.AddLibrary(LibraryName("foo"))
 	foo.AddRow(RowID("bar"))
 
 	assert.Equal(
@@ -125,7 +125,7 @@ func TestEngine_Listener_DeleteRow(t *testing.T) {
 	ll := newLogListener()
 	eng.Listen(ll)
 
-	foo := eng.GetLibrary(LibraryName("foo"))
+	foo, _ := eng.AddLibrary(LibraryName("foo"))
 	foo.AddRow(RowID("bar"))
 	foo.DeleteRow(RowID("bar"))
 
@@ -141,7 +141,7 @@ func TestEngine_Listener_UpdateValue(t *testing.T) {
 
 	colID := ColumnID("name")
 
-	foo := eng.GetLibrary(LibraryName("foo"))
+	foo, _ := eng.AddLibrary(LibraryName("foo"))
 	foo.AddColumn(colID, "no name")
 	foo.AddRow(RowID("bar"))
 

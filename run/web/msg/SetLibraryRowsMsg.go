@@ -20,7 +20,10 @@ func SetLibraryRowsMsgFromEngine(
 	name engine.LibraryName,
 	eng engine.Engine,
 ) *SetLibraryRowsMsg {
-	l := eng.GetLibrary(name)
+	l, err := eng.Library(name)
+	if nil != err {
+		panic(err)
+	}
 
 	msg := &SetLibraryRowsMsg{
 		Command: "setLibraryRows",

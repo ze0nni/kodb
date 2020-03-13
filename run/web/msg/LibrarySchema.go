@@ -14,7 +14,10 @@ func NewLibrarySchemaFromEngine(
 	name engine.LibraryName,
 	engine engine.Engine,
 ) *LibrarySchema {
-	l := engine.GetLibrary(name)
+	l, err := engine.Library(name)
+	if nil != err {
+		panic(err)
+	}
 
 	schema := &LibrarySchema{
 		Name:    name,

@@ -8,8 +8,12 @@ func Validate(
 	consumer func(engine.LibraryName, engine.RowID, engine.ColumnID, error),
 ) error {
 	for _, libraryName := range eng.Librarys() {
-		library := eng.GetLibrary(libraryName)
-		err := libraryValidate(
+		library, err := eng.Library(libraryName)
+		if nil != err {
+			return err
+		}
+
+		err = libraryValidate(
 			eng,
 			library,
 			func(row engine.RowID, col engine.ColumnID, err error) {

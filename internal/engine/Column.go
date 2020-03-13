@@ -190,7 +190,7 @@ func (d ColumnData) ToRef() (ColumnRef, error) {
 	if Reference == d.Type() {
 		return ColumnRef{d}, nil
 	}
-	return ColumnRef{ColumnData{nil}}, fmt.Errorf("%s is not Ref %d but", d.Name(), d.Type())
+	return ColumnRef{ColumnData{nil}}, fmt.Errorf("%s is not Ref %s but", d.Name(), d.Type().ToString())
 }
 
 // ToList convert column to ColumnList type

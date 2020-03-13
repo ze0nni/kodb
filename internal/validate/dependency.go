@@ -10,8 +10,12 @@ func Dependency(
 	consumer func(engine.LibraryName, engine.ColumnID),
 ) error {
 	for _, libraryName := range eng.Librarys() {
-		library := eng.GetLibrary(libraryName)
-		err := libraryDependency(masterLibrary, masterCol, library, func(col engine.ColumnID) {
+		library, err := eng.Library(libraryName)
+		if nil != err {
+			return err
+		}
+
+		err = libraryDependency(masterLibrary, masterCol, library, func(col engine.ColumnID) {
 			consumer(libraryName, col)
 		})
 		if nil != err {

@@ -15,7 +15,7 @@ import (
 
 func main() {
 	eng := engine.New(driver.InMemory())
-	userLib := eng.GetLibrary(engine.LibraryName("user"))
+	userLib, _ := eng.AddLibrary(engine.LibraryName("user"))
 	firstname, _ := userLib.NewColumn("firstName")
 	secondName, _ := userLib.NewColumn("secondName")
 	age, _ := userLib.NewColumn("age")
@@ -26,7 +26,7 @@ func main() {
 		userLib.UpdateValue(row, age, strconv.Itoa(randomdata.Number(16, 40)))
 	}
 
-	invLib := eng.GetLibrary(engine.LibraryName("location"))
+	invLib, _ := eng.AddLibrary(engine.LibraryName("location"))
 	name, _ := invLib.NewColumn("name")
 	invLib.NewColumn("type")
 	invLib.NewColumn("title")
@@ -38,11 +38,11 @@ func main() {
 		invLib.UpdateValue(row, owner, randomdata.Alphanumeric(32))
 	}
 
-	questLib := eng.GetLibrary("quest")
+	questLib, _ := eng.AddLibrary("quest")
 	questName, _ := questLib.NewColumn("name")
 	questLib.NewListColumn(eng, "tasks", engine.LibraryName("tasks"))
 
-	tasksLib := eng.GetLibrary(engine.LibraryName("tasks"))
+	tasksLib, _ := eng.Library(engine.LibraryName("tasks"))
 
 	for i := 1; i <= 3; i++ {
 		questRow, _ := questLib.NewRow()
