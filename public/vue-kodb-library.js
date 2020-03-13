@@ -92,11 +92,11 @@ Vue.component("kodb-library", {
         <template v-slot:expanded-item="{ item, headers }">
                 <td :colspan="headers.length"
                 >
-                        <kodb-sub-library
+                        <kodb-library-expanded
                                 :parentRow="item"
                                 :rows="librarisData[expandedLibraryName]"
                         >
-                        </kodb-sub-library>
+                        </kodb-library-expanded>
                 </td>
         </template>
 
@@ -131,30 +131,5 @@ Vue.component("kodb-library", {
                 </v-toolbar>
         </template>
 </v-data-table>
-`
-});
-
-Vue.component("kodb-sub-library", {
-        props: [
-                "parentRow",
-                "rows"
-        ],
-        methods: {
-                filterItems(rows) {
-                        const parentId = this.parentRow.rowId
-                        return (rows||[])
-                                .filter(r => r.data.parent.value == parentId)
-                }
-        },
-        template:
-`
-<div>
-        <table>
-                <tr v-for="r in filterItems(rows)"
-                >
-                        <td>{{ r.rowId }}</td>
-                </tr>
-        </table>
-</div>
 `
 });
