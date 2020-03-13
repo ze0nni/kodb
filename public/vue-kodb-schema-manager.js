@@ -31,6 +31,7 @@ Vue.component("kodb-schema-manager", {
             >
                 <kodb-current-schema-manager
                     :table="t"
+                    :schema="schema"
                 >
                 </kodb-current-schema-manager>
             </v-tab-item>
@@ -57,7 +58,8 @@ Vue.component("kodb-schema-manager", {
 
 Vue.component("kodb-current-schema-manager", {
     props: [
-        "table"
+        "table",
+        "schema"
     ],
     methods: {
         iconOfType(type) {
@@ -121,10 +123,10 @@ Vue.component("kodb-current-schema-manager", {
 
             <tr>
                 <td colspan="3">
-                    <v-btn text block>
-                        <v-icon left>mdi-plus</v-icon>
-                        New
-                    </v-btn>
+                    <kodb-new-column-manager
+                        :schema="schema"
+                    >
+                    </kodb-new-column-manager>
                 </td>
             </tr>
         </tbody>
@@ -181,6 +183,100 @@ Vue.component("kodb-list-column-schema", {
 `
 })
 
+Vue.component("kodb-new-column-manager", {
+    props: [
+        "schema"
+    ],
+    template:
+`
+<v-dialog>
+    <template v-slot:activator="{ on }">
+        <v-btn text block  v-on="on">
+            <v-icon left>mdi-plus</v-icon>
+            New
+        </v-btn>
+    </template>
+
+    <v-card>
+        <v-toolbar flat dark>
+            <v-toolbar-title>New column</v-toolbar-title>
+        </v-toolbar>
+        <v-tabs vertical>
+            <v-tab>
+                Literal
+            </v-tab>
+            <v-tab-item>
+                <v-card>
+                <v-col>
+                    <v-text-field
+                    >
+                    </v-text-field>    
+
+                    <v-radio-group>
+                        <v-radio
+                            label="String"
+                        ></v-radio>
+                        <v-radio
+                            label="Text"
+                        ></v-radio>
+                        <v-radio
+                            label="Int"
+                        ></v-radio>
+                        <v-radio
+                            label="Float"
+                        ></v-radio>
+                        <v-radio
+                            label="Option"
+                        ></v-radio>
+                        <v-radio
+                            label="Set"
+                        ></v-radio>
+                    </v-radio-group>
+                    </v-col>
+                </v-card>
+            </v-tab-item>
+
+            <v-tab>
+                Reference
+            </v-tab>
+            <v-tab-item>
+                <v-card>
+                    <v-col>
+                        <v-text-field
+                        >
+                        </v-text-field>
+
+                        <v-select
+                            :items="schema"
+                        >
+                        </v-select>
+                    </v-col>
+                </v-card>
+            </v-tab-item>
+
+            <v-tab>
+                List
+            </v-tab>
+            <v-tab-item>
+                <v-card>
+                    <v-text-field
+                    >
+                    </v-text-field>
+
+                    <v-col>
+                        <v-select
+                            :items="schema"
+                        >
+                        </v-select>
+                    </v-col>
+                </v-card>
+            </v-tab-item>
+        </v-tabs>
+    </v-card>
+</v-dialog>
+`
+})
+
 Vue.component("kodb-new-table-manager", {
     props: [
         "schema"
@@ -188,63 +284,7 @@ Vue.component("kodb-new-table-manager", {
     template:
 `
 <v-card>
-    <v-tabs>
-        <v-tab>
-            Literal
-        </v-tab>
-        <v-tab-item>
-            <v-card flat>
-                <v-text-field
-                >
-                </v-text-field>
-
-                <v-radio-group>
-                    <v-radio
-                        label="String"
-                    ></v-radio>
-                    <v-radio
-                        label="Text"
-                    ></v-radio>
-                    <v-radio
-                        label="Int"
-                    ></v-radio>
-                    <v-radio
-                        label="Float"
-                    ></v-radio>
-                    <v-radio
-                        label="Option"
-                    ></v-radio>
-                    <v-radio
-                        label="Set"
-                    ></v-radio>
-                </v-radio-group>
-            </v-card>
-        </v-tab-item>
-
-        <v-tab>
-            Reference
-        </v-tab>
-        <v-tab-item>
-            <v-card>
-                <v-select
-                    :items="schema"
-                >
-                </v-select>
-            </v-card>
-        </v-tab-item>
-
-        <v-tab>
-            List
-        </v-tab>
-        <v-tab-item>
-            <v-card>
-                <v-select
-                    :items="schema"
-                >
-                </v-select>
-            </v-card>
-        </v-tab-item>
-    </v-tabs>
+    
 </v-card>
 `
 })
