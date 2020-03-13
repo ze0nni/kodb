@@ -7,6 +7,11 @@ Vue.component("kodb-library-expanded", {
             "librarySchema",
             "rows"
     ],
+    data() {
+        return {
+                expandedLibraryName: null
+        }
+    },
     methods: {
             filterItems(rows) {
                     const parentId = this.parentRow.rowId
@@ -14,12 +19,18 @@ Vue.component("kodb-library-expanded", {
                             .filter(r => r.data.parent.value == parentId)
                             .map(r => [
                                     {extendedRow: false, row: r, columns: this.librarySchema.columns },
-                                    {extendedRow: true, columns:[] }
+                                    {extendedRow: true, row: r, rcolumns:[] }
                                 ])
                             .reduce((a, b) => a.concat(b), [])
             },
-            expandRow() {
-                    console.log(123)
+            expandRow(library) {
+                    return () => {
+                        if (this.expandedLibraryName == library) {
+                                this.expandedLibraryName = null
+                        } else {
+                                this.expandedLibraryName = library
+                        }
+                    }
             }
     },
     template:
@@ -46,14 +57,25 @@ Vue.component("kodb-library-expanded", {
                                                 :data="r.row.data"
                                                 :librarisData="librarisData"
 
-                                                :expandRow="function() {}"
+                                                :expandRow="expandRow(col.reference)"
                                                 :isExpanded="false"
                                         >
                                         </kodb-library-cell>
                                 </td>
 
                                 <td v-if="r.extendedRow" :colspan="librarySchema.columns.length">
-                                        expanded!
+                                        <kodb-library-expanded
+                                                v-if="expandedLibraryName"
+
+                                                :schema="schema"
+                                                :librarisData="librarisData"
+                                                :parentRow="r.row"
+                                                :librarySchema="schema[expandedLibraryName]"
+                                                :columns="librarySchema"
+                                                :rows="librarisData[expandedLibraryName]"
+                                        >
+                                        </kodb-library-expanded>
+                        </kodb-library-expanded>
                                 </td>
                         </tr>
                 </tbody>
