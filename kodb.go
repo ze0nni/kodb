@@ -43,6 +43,9 @@ func main() {
 	questLib.NewListColumn(eng, "tasks", engine.LibraryName("tasks"))
 
 	tasksLib, _ := eng.Library(engine.LibraryName("tasks"))
+	tasksLib.NewListColumn(eng, "rewards", engine.LibraryName("rewards"))
+
+	rewardsLib, _ := eng.Library(engine.LibraryName("rewards"))
 
 	for i := 1; i <= 3; i++ {
 		questRow, _ := questLib.NewRow()
@@ -55,6 +58,15 @@ func main() {
 				engine.ColumnID("parent"),
 				questRow.ToString(),
 			)
+
+			for k := 1; k < i*j; k++ {
+				rewardRow, _ := rewardsLib.NewRow()
+				rewardsLib.UpdateValue(
+					rewardRow,
+					engine.ColumnID("parent"),
+					taskRow.ToString(),
+				)
+			}
 		}
 	}
 
