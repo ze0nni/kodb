@@ -1,9 +1,32 @@
+Vue.mixin({
+        methods: {
+                getRowData(row, col) {
+                        const data = row.data
+                        if (null == data) return undefined
+                        return data[col]
+                },
+
+                getRowValue(row, col) {
+                        const data = this.getRowData(row, col)
+                        if (null == data) return undefined
+                        if (data.exists) {
+                                return data.value
+                        }
+
+                        return undefined
+                }
+        }
+})
+
 Vue.component("kodb", {
         data: function() {
                 return {
                         selectedLibrary: null,
                         librarys:[
                         ],
+                        schema: {
+
+                        },
                         librarisData:{
                         },
                 }
@@ -18,6 +41,8 @@ Vue.component("kodb", {
                         setSchema(msg) {
                                 for (let l of msg.librarys) {
                                         if (null == this.librarisData[l.name]) {
+                                                Vue.set(this.schema, l.name, l)
+
                                                 Vue.set(this.librarisData, l.name, [])
 
                                                 this.$wsocket.send({
@@ -25,9 +50,16 @@ Vue.component("kodb", {
                                                         "library": l.name
                                                 })
                                         }
+
+                                        // HACK!!!
+                                        l.value = l.id
+
+                                        for (let c of l.columns) {
+                                                c.value = c.id
+                                        }
                                 }
 
-                                this.librarys = msg.librarys
+                                this.librarys = msg.librarys;
                         },
                         setLibraryRows(msg) {
                                 const rows = this.librarisData[msg.library]
@@ -139,6 +171,7 @@ Vue.component("kodb", {
                                         :key="l.id"
                                 >
                                         <kodb-library
+                                                v-bind:schema="schema"
                                                 v-bind:librarySchema="l"
                                                 v-bind:rows="librarisData[l.name]"
                                                 v-bind:librarisData="librarisData"

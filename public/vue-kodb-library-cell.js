@@ -180,10 +180,7 @@ Vue.component("kodb-library-list-cell", {
         methods: {
                 filterItems(items) {
                         return (items || [])
-                                .filter(r => {
-                                        const parent = r.data.parent
-                                        return parent && parent.value == this.rowId
-                                })
+                                .filter(r => this.getRowValue(r, "parent") == this.rowId)
                 }
         },
         watch: {

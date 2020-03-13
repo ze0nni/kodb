@@ -1,5 +1,6 @@
 Vue.component("kodb-library", {
         props: [
+                "schema",
                 "librarySchema",
                 "rows",
                 "librarisData"
@@ -93,7 +94,11 @@ Vue.component("kodb-library", {
                 <td :colspan="headers.length"
                 >
                         <kodb-library-expanded
+                                :schema="schema"
+                                :librarisData="librarisData"
                                 :parentRow="item"
+                                :librarySchema="schema[expandedLibraryName]"
+                                :columns="librarySchema"
                                 :rows="librarisData[expandedLibraryName]"
                         >
                         </kodb-library-expanded>
