@@ -84,53 +84,62 @@ Vue.component("kodb-current-schema-manager", {
         </v-btn>
 
     </v-toolbar>
-    <v-simple-table>
-        <thead>
-            <tr>
-                <th class="text-left">Column</th>
-                <th class="text-left">Type</th>
-                <th class="text-left">Options</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr v-for="col in table.columns">
-                <td>
-                    <v-icon left>{{ iconOfType(col.type) }}</v-icon>
-                    {{ col.name }}
-                </td>
-                <td>{{ col.type }}</td>
 
-                <!-- options -->
+    <v-col>
+    
+        <v-switch
+            label="Hidden"
+        ></v-switch>
 
-                <kodb-literal-column-schema
-                        v-if="'literal' == col.type"
-                ></kodb-literal-column-schema>
+        <v-simple-table>
+            <thead>
+                <tr>
+                    <th class="text-left">Column</th>
+                    <th class="text-left">Type</th>
+                    <th class="text-left">Options</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="col in table.columns">
+                    <td>
+                        <v-icon left>{{ iconOfType(col.type) }}</v-icon>
+                        {{ col.name }}
+                    </td>
+                    <td>{{ col.type }}</td>
 
-                <kodb-ref-column-schema
-                        v-else-if="'reference' == col.type"
-                ></kodb-ref-column-schema>
+                    <!-- options -->
 
-                <kodb-list-column-schema
-                        v-else-if="'list' == col.type"
-                ></kodb-list-column-schema>
+                    <kodb-literal-column-schema
+                            v-if="'literal' == col.type"
+                    ></kodb-literal-column-schema>
 
-                <td  v-else>
-                    <v-chip>Unknow type: {{ col.type }}</v-chip>
-                </td>
+                    <kodb-ref-column-schema
+                            v-else-if="'reference' == col.type"
+                    ></kodb-ref-column-schema>
 
-                <!-- /options -->
-            </tr>
+                    <kodb-list-column-schema
+                            v-else-if="'list' == col.type"
+                    ></kodb-list-column-schema>
 
-            <tr>
-                <td colspan="3">
-                    <kodb-new-column-manager
-                        :schema="schema"
-                    >
-                    </kodb-new-column-manager>
-                </td>
-            </tr>
-        </tbody>
-    </v-simple-table>
+                    <td  v-else>
+                        <v-chip>Unknow type: {{ col.type }}</v-chip>
+                    </td>
+
+                    <!-- /options -->
+                </tr>
+
+                <tr>
+                    <td colspan="3">
+                        <kodb-new-column-manager
+                            :schema="schema"
+                        >
+                        </kodb-new-column-manager>
+                    </td>
+                </tr>
+            </tbody>
+        </v-simple-table>
+
+    <v-col>
 </v-card>
 `
 })
