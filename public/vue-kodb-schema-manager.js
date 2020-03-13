@@ -46,7 +46,14 @@ Vue.component("kodb-current-schema-manager", {
         "table"
     ],
     methods: {
-            
+        iconOfType(type) {
+            switch (type) {
+                case "literal": return "mdi-textbox";
+                case "reference": return "mdi-link";
+                case "list": return "mdi-view-list";
+            }
+            return "mdi-help-circle-outline"
+        }
     },
     template:
 `
@@ -60,29 +67,31 @@ Vue.component("kodb-current-schema-manager", {
     </thead>
     <tbody>
         <tr v-for="col in table.columns">
-          <td>{{ col.name }}</td>
-          <td>{{ col.type }}</td>
+            <td>
+                <v-icon left>{{ iconOfType(col.type) }}</v-icon>
+                {{ col.name }}
+            </td>
+            <td>{{ col.type }}</td>
 
-          <!-- options -->
+            <!-- options -->
 
-          <kodb-literal-column-schema
-                v-if="'literal' == col.type"
-          ></kodb-literal-column-schema>
+            <kodb-literal-column-schema
+                    v-if="'literal' == col.type"
+            ></kodb-literal-column-schema>
 
-          <kodb-ref-column-schema
-                v-else-if="'reference' == col.type"
-          ></kodb-ref-column-schema>
+            <kodb-ref-column-schema
+                    v-else-if="'reference' == col.type"
+            ></kodb-ref-column-schema>
 
-          <kodb-list-column-schema
-                v-else-if="'list' == col.type"
-          ></kodb-list-column-schema>
+            <kodb-list-column-schema
+                    v-else-if="'list' == col.type"
+            ></kodb-list-column-schema>
 
-          <td  v-else>
-            <v-chip>Unknow type: {{ col.type }}</v-chip>
-          </td>
+            <td  v-else>
+                <v-chip>Unknow type: {{ col.type }}</v-chip>
+            </td>
 
-          <!-- /options -->
-
+            <!-- /options -->
         </tr>
       </tbody>
 </v-simple-table>
