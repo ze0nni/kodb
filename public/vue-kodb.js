@@ -96,9 +96,22 @@ Vue.component("kodb", {
                         <v-icon>mdi-magnify</v-icon>
                 </v-btn>
 
-                <v-btn icon>
-                        <v-icon>mdi-dots-vertical</v-icon>
-                </v-btn>
+                <v-menu offset-y left>
+                        <template v-slot:activator="{ on }">
+                                <v-btn icon v-on="on">
+                                        <v-icon>mdi-dots-vertical</v-icon>
+                                </v-btn>
+                        </template>
+
+                        <v-list>
+                                <v-list-item>
+                                        <kodb-schema-manager
+                                                :schema="librarys"
+                                        >
+                                        </kodb-schema-manager>
+                                </v-list-item>
+                      </v-list>
+                </v-menu>
         
 
                 <template v-slot:extension>
