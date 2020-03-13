@@ -55,14 +55,84 @@ Vue.component("kodb-current-schema-manager", {
         <tr>
             <th class="text-left">Column</th>
             <th class="text-left">Type</th>
+            <th class="text-left">Options</th>
         </tr>
     </thead>
     <tbody>
         <tr v-for="col in table.columns">
           <td>{{ col.name }}</td>
           <td>{{ col.type }}</td>
+
+          <!-- options -->
+
+          <kodb-literal-column-schema
+                v-if="'literal' == col.type"
+          ></kodb-literal-column-schema>
+
+          <kodb-ref-column-schema
+                v-else-if="'reference' == col.type"
+          ></kodb-ref-column-schema>
+
+          <kodb-list-column-schema
+                v-else-if="'list' == col.type"
+          ></kodb-list-column-schema>
+
+          <td  v-else>
+            <v-chip>Unknow type: {{ col.type }}</v-chip>
+          </td>
+
+          <!-- /options -->
+
         </tr>
       </tbody>
 </v-simple-table>
+`
+})
+
+Vue.component("kodb-literal-column-schema", {
+    props: [
+        "col",
+        "table"
+    ],
+    methods: {
+            
+    },
+    template:
+`
+<td>
+    literal
+</td>
+`
+})
+
+Vue.component("kodb-ref-column-schema", {
+    props: [
+        "col",
+        "table"
+    ],
+    methods: {
+            
+    },
+    template:
+`
+<td>
+    ref
+</td>
+`
+})
+
+Vue.component("kodb-list-column-schema", {
+    props: [
+        "col",
+        "table"
+    ],
+    methods: {
+            
+    },
+    template:
+`
+<td>
+    list
+</td>
 `
 })
