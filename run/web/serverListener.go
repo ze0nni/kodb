@@ -10,7 +10,12 @@ type serverListener struct {
 }
 
 func (l *serverListener) OnNewLibrary(engine.LibraryName) {
-	panic("not implements")
+	// TODO: send only new schema
+	setSchemaMsg := msg.SetSchemaMsgFromEngine(l.server.engine)
+
+	for _, client := range l.server.clients {
+		client.SetSchema(setSchemaMsg)
+	}
 }
 
 func (l *serverListener) OnNewRow(name engine.LibraryName, row engine.RowID) {
