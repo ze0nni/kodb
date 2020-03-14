@@ -21,70 +21,29 @@ Vue.component("vue-kodb-schema-new-column", {
                 Literal
             </v-tab>
             <v-tab-item>
-                <v-card>
-                <v-col>
-                    <v-text-field
-                    >
-                    </v-text-field>    
-
-                    <v-radio-group>
-                        <v-radio
-                            label="String"
-                        ></v-radio>
-                        <v-radio
-                            label="Text"
-                        ></v-radio>
-                        <v-radio
-                            label="Int"
-                        ></v-radio>
-                        <v-radio
-                            label="Float"
-                        ></v-radio>
-                        <v-radio
-                            label="Option"
-                        ></v-radio>
-                        <v-radio
-                            label="Set"
-                        ></v-radio>
-                    </v-radio-group>
-                    </v-col>
-                </v-card>
+                <vue-kodb-schema-literal-column
+                >
+                </vue-kodb-schema-literal-column>
             </v-tab-item>
 
             <v-tab>
                 Reference
             </v-tab>
             <v-tab-item>
-                <v-card>
-                    <v-col>
-                        <v-text-field
-                        >
-                        </v-text-field>
-
-                        <v-select
-                            :items="schema"
-                        >
-                        </v-select>
-                    </v-col>
-                </v-card>
+                <vue-kodb-schema-ref-column
+                    :schema="schema"
+                >
+                </vue-kodb-schema-ref-column>
             </v-tab-item>
 
             <v-tab>
                 List
             </v-tab>
             <v-tab-item>
-                <v-card>
-                    <v-text-field
-                    >
-                    </v-text-field>
-
-                    <v-col>
-                        <v-select
-                            :items="schema"
-                        >
-                        </v-select>
-                    </v-col>
-                </v-card>
+                <vue-kodb-schema-list-column
+                    :schema="schema"
+                >
+                </vue-kodb-schema-list-column>
             </v-tab-item>
         </v-tabs>
     </v-card>
