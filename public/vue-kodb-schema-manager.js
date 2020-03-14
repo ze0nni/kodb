@@ -130,16 +130,16 @@ Vue.component("kodb-current-schema-manager", {
 
                 <tr>
                     <td colspan="3">
-                        <kodb-new-column-manager
+                        <vue-kodb-schema-new-column
                             :schema="schema"
                         >
-                        </kodb-new-column-manager>
+                        </vue-kodb-schema-new-column>
                     </td>
                 </tr>
             </tbody>
         </v-simple-table>
 
-    <v-col>
+    </v-col>
 </v-card>
 `
 })
@@ -192,108 +192,40 @@ Vue.component("kodb-list-column-schema", {
 `
 })
 
-Vue.component("kodb-new-column-manager", {
-    props: [
-        "schema"
-    ],
-    template:
-`
-<v-dialog>
-    <template v-slot:activator="{ on }">
-        <v-btn text block  v-on="on">
-            <v-icon left>mdi-plus</v-icon>
-            New
-        </v-btn>
-    </template>
-
-    <v-card>
-        <v-toolbar flat dark>
-            <v-toolbar-title>New column</v-toolbar-title>
-        </v-toolbar>
-        <v-tabs vertical>
-            <v-tab>
-                Literal
-            </v-tab>
-            <v-tab-item>
-                <v-card>
-                <v-col>
-                    <v-text-field
-                    >
-                    </v-text-field>    
-
-                    <v-radio-group>
-                        <v-radio
-                            label="String"
-                        ></v-radio>
-                        <v-radio
-                            label="Text"
-                        ></v-radio>
-                        <v-radio
-                            label="Int"
-                        ></v-radio>
-                        <v-radio
-                            label="Float"
-                        ></v-radio>
-                        <v-radio
-                            label="Option"
-                        ></v-radio>
-                        <v-radio
-                            label="Set"
-                        ></v-radio>
-                    </v-radio-group>
-                    </v-col>
-                </v-card>
-            </v-tab-item>
-
-            <v-tab>
-                Reference
-            </v-tab>
-            <v-tab-item>
-                <v-card>
-                    <v-col>
-                        <v-text-field
-                        >
-                        </v-text-field>
-
-                        <v-select
-                            :items="schema"
-                        >
-                        </v-select>
-                    </v-col>
-                </v-card>
-            </v-tab-item>
-
-            <v-tab>
-                List
-            </v-tab>
-            <v-tab-item>
-                <v-card>
-                    <v-text-field
-                    >
-                    </v-text-field>
-
-                    <v-col>
-                        <v-select
-                            :items="schema"
-                        >
-                        </v-select>
-                    </v-col>
-                </v-card>
-            </v-tab-item>
-        </v-tabs>
-    </v-card>
-</v-dialog>
-`
-})
 
 Vue.component("kodb-new-table-manager", {
     props: [
         "schema"
     ],
+    data() {
+        return {
+            libraryName: ""
+        }
+    },
+    methods: {
+        submit() {
+            this.$wsocket.send({
+                "command": "addLibrary",
+                "library": this.libraryName
+            })
+        }
+    },
     template:
 `
 <v-card>
-    
+    <v-col>
+        <v-text-field
+            v-model="libraryName"
+            label="New library name"
+        ></v-text-field>
+    </v-col>
+    <v-card-actions>
+        <v-btn text block
+            v-on:click="submit"
+        >
+            Ok
+        </v-btn>
+    </v-card-actions>
 </v-card>
 `
 })
