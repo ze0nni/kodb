@@ -20,14 +20,14 @@ Vue.component("kodb-schema-manager", {
         </v-toolbar>
         <v-tabs vertical>
             <v-tab v-for="t in schema"
-                :v-key="t.name"
+                :key="t.name"
             >
                 <v-icon left>table-large</v-icon>
                 {{ t.name }}
             </v-tab>
 
             <v-tab-item v-for="t in schema"
-                :v-key="t.name"
+                :key="t.name"
             >
                 <kodb-current-schema-manager
                     :table="t"
