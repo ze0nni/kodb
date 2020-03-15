@@ -16,11 +16,6 @@ Vue.mixin({
                         return undefined
                 },
 
-                getColumnsOf(libraryName) {
-                        console.log(schema)
-                        return []
-                },
-
                 getColumnData(libraryName, columnId) {
                         const library = this.schema.map[libraryName]
                         if (null == library) {

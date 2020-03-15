@@ -96,11 +96,10 @@ Vue.component("kodb-library", {
                 >
                         <kodb-library-expanded
                                 :schema="schema"
-                                :librarisData="librarisData"
-                                :parentRow="item"
-                                :librarySchema="schema[expandedLibraryName]"
-                                :columns="librarySchema"
-                                :rows="librarisData[expandedLibraryName]"
+                                :libraryName="expandedLibraryName"
+                                
+                                :parentLibraryName="libraryName"
+                                :parentRowId="item.rowId"
                         >
                         </kodb-library-expanded>
                 </td>

@@ -176,7 +176,6 @@ Vue.component("kodb-library-list-cell", {
         },
         methods: {
                 filterItems(items) {
-                        console.log(items)
                         return (items || [])
                                 .filter(r => this.getRowValue(r, "parent") == this.rowData.rowId)
                 }
