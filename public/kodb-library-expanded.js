@@ -73,7 +73,7 @@ Vue.component("kodb-library-expanded", {
                                         </kodb-library-cell>
                                 </td>
 
-                                <td v-if="r.extendedRow" :colspan="schema.map[libraryName].columns.length">
+                                <td v-if="r.extendedRow && expandedLibraryName" :colspan="schema.map[libraryName].columns.length">
                                         <kodb-library-expanded
                                                 v-if="expandedLibraryName"
 

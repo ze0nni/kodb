@@ -99,7 +99,7 @@ Vue.component("kodb-current-schema-manager", {
                 <tr>
                     <th class="text-left">Column</th>
                     <th class="text-left">Type</th>
-                    <th class="text-left">Options</th>
+                    <th class="text-left"></th>
                 </tr>
             </thead>
             <tbody>
