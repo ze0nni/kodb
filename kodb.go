@@ -40,6 +40,9 @@ func main() {
 
 	rewardsLib, _ := eng.AddLibrary(engine.LibraryName("rewards"))
 	rewardsLib.AddColumn(engine.ColumnID("parent"), engine.NewLiteralColumn("parent").SetHidden(true))
+	rwTitle, _ := rewardsLib.NewColumn(engine.NewLiteralColumn("title"))
+	rwType, _ := rewardsLib.NewColumn(engine.NewLiteralColumn("type"))
+	rwPrice, _ := rewardsLib.NewColumn(engine.NewLiteralColumn("price"))
 
 	tasksLib, _ := eng.AddLibrary(engine.LibraryName("tasks"))
 	tasksLib.AddColumn(engine.ColumnID("parent"), engine.NewLiteralColumn("parent").SetHidden(true))
@@ -61,12 +64,30 @@ func main() {
 				questRow.ToString(),
 			)
 
-			for k := 1; k < i*j; k++ {
+			for k := 1; k < 4; k++ {
 				rewardRow, _ := rewardsLib.NewRow()
 				rewardsLib.UpdateValue(
 					rewardRow,
 					engine.ColumnID("parent"),
 					taskRow.ToString(),
+				)
+
+				rewardsLib.UpdateValue(
+					rewardRow,
+					rwTitle.ID(),
+					randomdata.Email(),
+				)
+
+				rewardsLib.UpdateValue(
+					rewardRow,
+					rwType.ID(),
+					randomdata.Adjective(),
+				)
+
+				rewardsLib.UpdateValue(
+					rewardRow,
+					rwPrice.ID(),
+					randomdata.StringNumber(2, "."),
 				)
 			}
 		}
