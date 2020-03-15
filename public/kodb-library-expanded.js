@@ -1,5 +1,6 @@
 Vue.component("kodb-library-expanded", {
     props: [
+        "depth",
         "schema",
         "libraryName",
         
@@ -38,11 +39,14 @@ Vue.component("kodb-library-expanded", {
                                 this.expandedLibraryName = library
                         }
                     }
+            },
+            colorFromDepth(depth) {
+                    return 'grey lighten-2'
             }
     },
     template:
 `
-<div>
+<v-card outlined :color=colorFromDepth(depth)>
         <v-simple-table>
                 <thead>
                         <tr>
@@ -77,6 +81,7 @@ Vue.component("kodb-library-expanded", {
                                         <kodb-library-expanded
                                                 v-if="expandedLibraryName"
 
+                                                :depth="Number(depth)+1"
                                                 :schema="schema"
                                                 :libraryName="expandedLibraryName"
                                                 
@@ -88,6 +93,6 @@ Vue.component("kodb-library-expanded", {
                         </tr>
                 </tbody>
         </v-simple-table>
-</div>
+</v-card>
 `
 });

@@ -95,6 +95,7 @@ Vue.component("kodb-library", {
                 <td :colspan="headers.length"
                 >
                         <kodb-library-expanded
+                                depth=1
                                 :schema="schema"
                                 :libraryName="expandedLibraryName"
                                 
