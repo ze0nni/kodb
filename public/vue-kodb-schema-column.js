@@ -2,8 +2,6 @@
 
 Vue.component("vue-kodb-schema-literal-column", {
         props: [
-                "libraryName",
-
                 "confirm"
         ],
         data() {
@@ -14,7 +12,6 @@ Vue.component("vue-kodb-schema-literal-column", {
         methods: {
                 submit() {
                         this.confirm({
-                                library: this.libraryName,
                                 name: this.columnName,
                                 type: "literal"
                         })
@@ -75,7 +72,6 @@ Vue.component("vue-kodb-schema-ref-column", {
         mixins: [ColumnsToItemsMixin],
         props: [
                 "schema",
-                "libraryName",
 
                 "confirm"
         ],
@@ -123,7 +119,6 @@ Vue.component("vue-kodb-schema-list-column", {
         mixins: [ColumnsToItemsMixin],
         props: [
                 "schema",
-                "libraryName",
 
                 "confirm"
         ],
@@ -136,7 +131,6 @@ Vue.component("vue-kodb-schema-list-column", {
         methods: {
                 submit() {
                         this.confirm({
-                                library: this.libraryName,
                                 name: this.columnName,
                                 type: "list",
                                 "ref": this.selectedLibrary
