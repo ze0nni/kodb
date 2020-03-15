@@ -163,7 +163,7 @@ Vue.component("kodb", {
                                 })
                         },
                         deleteRow(msg) {
-                                const rows = this.librarisData[msg.library]
+                                const rows = this.schema.rowsMap[msg.library]
                                 if (null == rows) {
                                         return
                                 }
