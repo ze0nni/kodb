@@ -1,7 +1,6 @@
 Vue.component("kodb-schema-manager", {
     props: [
-        "schema",
-        "orderedSchema"
+        "schema"
     ],
     methods: {
             
@@ -20,14 +19,14 @@ Vue.component("kodb-schema-manager", {
             <v-toolbar-title>Schema</v-toolbar-title>
         </v-toolbar>
         <v-tabs vertical>
-            <v-tab v-for="t in orderedSchema"
+            <v-tab v-for="t in schema.list"
                 :key="t.name"
             >
                 <v-icon left>table-large</v-icon>
                 {{ t.name }}
             </v-tab>
 
-            <v-tab-item v-for="t in orderedSchema"
+            <v-tab-item v-for="t in schema.list"
                 :key="t.name"
             >
                 <kodb-current-schema-manager
@@ -176,7 +175,7 @@ Vue.component("kodb-literal-column-schema", {
     <v-dialog v-model="dialog">
         <template v-slot:activator="{ on }">
             <v-btn outlined block text v-on="on">
-                Edit {{ schema }}
+                Edit
             </v-btn>
         </template>
 

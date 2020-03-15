@@ -102,7 +102,7 @@ Vue.component("vue-kodb-schema-ref-column", {
 
                 <v-select
                         v-model="selectedLibrary"
-                        :items="toItems(schema)"
+                        :items="toItems(schema.list)"
                 >
                 </v-select>
         </v-col>
@@ -148,7 +148,7 @@ Vue.component("vue-kodb-schema-list-column", {
 
                 <v-select
                         v-model="selectedLibrary"
-                        :items="toItems(schema)"
+                        :items="toItems(schema.list)"
                 >
                 </v-select>
         </v-col>
