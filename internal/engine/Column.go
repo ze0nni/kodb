@@ -33,6 +33,13 @@ func (t ColumnType) ToString() string {
 	return string(t)
 }
 
+func NewLiteralColumn(name string) ColumnData {
+	e := make(entry.Entry)
+	e["name"] = name
+	e["type"] = Literal.ToString()
+	return ColumnData{e}
+}
+
 // ColumnData type
 type ColumnData struct {
 	entry entry.Entry
@@ -63,7 +70,11 @@ func (d ColumnData) NewID(id ColumnID) ColumnData {
 // Type of column
 func (d ColumnData) Type() ColumnType {
 	t := d.entry["type"]
-	switch t {
+	return ColumnTypeOf(t)
+}
+
+func ColumnTypeOf(value string) ColumnType {
+	switch value {
 	case "literal":
 		return Literal
 	case "reference":

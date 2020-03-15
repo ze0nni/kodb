@@ -4,7 +4,16 @@ import (
 	"fmt"
 
 	"github.com/bitly/go-simplejson"
+	"github.com/ze0nni/kodb/internal/entry"
 )
+
+func NewRefColumn(name string, ref LibraryName) ColumnData {
+	e := make(entry.Entry)
+	e["name"] = name
+	e["type"] = Reference.ToString()
+	e["ref"] = ref.ToString()
+	return ColumnData{e}
+}
 
 // ColumnRef reference to one or many rows from other library
 type ColumnRef struct {

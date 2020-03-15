@@ -2,7 +2,16 @@ package engine
 
 import (
 	"github.com/bitly/go-simplejson"
+	"github.com/ze0nni/kodb/internal/entry"
 )
+
+func NewListColumn(name string, ref LibraryName) ColumnData {
+	e := make(entry.Entry)
+	e["name"] = name
+	e["type"] = List.ToString()
+	e["ref"] = ref.ToString()
+	return ColumnData{e}
+}
 
 // ColumnList manage other column rows
 type ColumnList struct {
