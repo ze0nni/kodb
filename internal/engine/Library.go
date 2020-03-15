@@ -34,6 +34,8 @@ type (
 		NewListColumn(eng Engine, columnName string, ref LibraryName) (ColumnID, error)
 		AddListColumn(eng Engine, id ColumnID, columnName string, ref LibraryName) error
 
+		NewColumnOf(ColumnData) (ColumnData, error)
+
 		Column(index int) (ColumnID, error)
 		ColumnName(index int) (string, error)
 		ColumnData(int) (ColumnData, error)
@@ -241,6 +243,37 @@ func (lib *libraryImp) AddListColumn(eng Engine, id ColumnID, name string, ref L
 
 		return data.Initilize(eng)
 	})
+}
+
+func (lib *libraryImp) NewColumnOf(data ColumnData) (ColumnData, error) {
+	columnV4, err := uuid.NewV4()
+	if nil != err {
+		return ColumnData{nil}, err
+	}
+	id := ColumnID(columnV4.String())
+
+	root, err := lib.getSchemaRoot()
+	if nil != err {
+		return ColumnData{nil}, err
+	}
+
+	if s, _ := lib.schema.Get(id.ToString()); nil != s {
+		return ColumnData{nil}, errors.New("duplicate column " + id.ToString())
+	}
+
+	num := entry.IntDef("columns", 0, root)
+	entry.SetInt("columns", num+1, root)
+
+	entry.SetString("column_"+strconv.Itoa(num), id.ToString(), root)
+
+	data = data.NewID(id)
+
+	lib.schema.Put(id.ToString(), data.entry)
+	lib.schema.Put("root", root)
+
+	//TODO: lib.listener
+
+	return data, nil
 }
 
 func (lib *libraryImp) Column(index int) (ColumnID, error) {

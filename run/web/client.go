@@ -22,6 +22,8 @@ type serverController interface {
 	UpdateValue(ClientID, string, string, string, string)
 
 	AddLibrary(ClientID, string)
+
+	NewColumn(msgNewColumn)
 }
 
 func clientHandle(server serverController) func(http.ResponseWriter, *http.Request) {
@@ -130,6 +132,13 @@ func (client *clientConnection) clientRecieveMessage(
 	case "addLibrary":
 		libraryName := msg.Get("library").MustString()
 		client.server.AddLibrary(client.id, libraryName)
+	case "newColumn":
+		m, err := msgNewColumnFromJson(client.id, msg)
+		if nil != err {
+			log.Printf("[%d] %s | %s", client.id, msg, err)
+			return
+		}
+		client.server.NewColumn(m)
 	default:
 		log.Printf("[%d] Unknown message %s", client.id, msg)
 	}

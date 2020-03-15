@@ -22,6 +22,8 @@ func newServer(engine engine.Engine) *serverInstance {
 		msgUpdateValueCh:    make(chan msgUpdateValue),
 
 		msgAddLibraryCh: make(chan msgAddLibrary),
+
+		msgNewColumnCh: make(chan msgNewColumn),
 	}
 }
 
@@ -65,6 +67,8 @@ type serverInstance struct {
 	msgUpdateValueCh    chan msgUpdateValue
 
 	msgAddLibraryCh chan msgAddLibrary
+
+	msgNewColumnCh chan msgNewColumn
 }
 
 // ClientConnected
@@ -190,6 +194,25 @@ func (server *serverInstance) addLibrary(m msgAddLibrary) {
 	}
 }
 
+//
+
+func (server *serverInstance) NewColumn(m msgNewColumn) {
+	server.msgNewColumnCh <- m
+}
+
+func (server *serverInstance) newColumn(m msgNewColumn) {
+	l, err := server.engine.Library(m.libraryName)
+	if nil != err {
+		log.Printf("Error when <newColumn>: %s", err)
+		return
+	}
+	_, err = l.NewColumnOf(m.columnData)
+	if nil != err {
+		log.Printf("Error when <newColumn>: %s", err)
+		return
+	}
+}
+
 //listen
 func (server *serverInstance) listen() {
 	listenerHandle := server.engine.Listen(&serverListener{server})
@@ -214,6 +237,8 @@ func (server *serverInstance) listen() {
 			server.updateValue(msg)
 		case msg := <-server.msgAddLibraryCh:
 			server.addLibrary(msg)
+		case msg := <-server.msgNewColumnCh:
+			server.newColumn(msg)
 		}
 	}
 }
