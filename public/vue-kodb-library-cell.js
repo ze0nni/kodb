@@ -191,8 +191,8 @@ Vue.component("kodb-library-list-cell", {
         <v-chip
                 v-on:click="expandRow"
         >
-                <v-icon left v-if="!isExpanded">mdi-plus</v-icon>
-                <v-icon left v-if="isExpanded">mdi-minus</v-icon>
+                <v-icon left v-if="!isExpanded">mdi-chevron-down</v-icon>
+                <v-icon left v-if="isExpanded">mdi-chevron-up</v-icon>
                 
                 [ {{ filterItems(schema.rowsMap[column.reference]).length }} ]
         </v-chip>

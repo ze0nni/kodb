@@ -92,7 +92,8 @@ Vue.component("kodb-library", {
         </template>
 
         <template v-slot:expanded-item="{ item, headers }">
-                <td :colspan="headers.length"
+                <td></td>
+                <td :colspan="headers.length-1"
                 >
                         <kodb-library-expanded
                                 depth=1

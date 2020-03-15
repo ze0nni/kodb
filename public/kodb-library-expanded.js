@@ -50,6 +50,11 @@ Vue.component("kodb-library-expanded", {
         <v-simple-table>
                 <thead>
                         <tr>
+                                <th style="width:1em; min-wdth:1em">
+                                        <v-icon>
+                                                mdi-chevron-up
+                                        </v-icon>
+                                </th>
                                 <th v-for="col in schema.map[libraryName].columns"
                                 >
                                         {{ col.name }}
@@ -59,6 +64,7 @@ Vue.component("kodb-library-expanded", {
                 <tbody>
                         <tr v-for="r in filterItems(schema.rowsMap[libraryName])"
                         >
+                                <td v-if="!r.extendedRow"></td>
                                 <td v-for="col in r.columns"
                                 >
                                         <kodb-library-cell
@@ -77,7 +83,9 @@ Vue.component("kodb-library-expanded", {
                                         </kodb-library-cell>
                                 </td>
 
-                                <td v-if="r.extendedRow && expandedLibraryName" :colspan="schema.map[libraryName].columns.length">
+                                <td v-if="r.extendedRow && r.extendedRow && expandedLibraryName"></td>
+                                <td v-if="r.extendedRow && expandedLibraryName"
+                                        :colspan="schema.map[libraryName].columns.length">
                                         <kodb-library-expanded
                                                 v-if="expandedLibraryName"
 
