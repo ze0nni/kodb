@@ -20,6 +20,10 @@ func (l *logListener) OnNewLibrary(name LibraryName) {
 	l.log = append(l.log, "newLibrary "+name.ToString())
 }
 
+func (l *logListener) OnNewColumn(LibraryName, ColumnID) {
+	panic("not inplements")
+}
+
 func (l *logListener) OnNewRow(name LibraryName, row RowID) {
 	l.log = append(l.log, fmt.Sprintf("newRow %s:%s", name.ToString(), row.ToString()))
 }
