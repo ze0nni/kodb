@@ -5,11 +5,13 @@ Vue.component("kodb-library-expanded", {
         "libraryName",
         
         "parentLibraryName",
+        "parentColumnId",
         "parentRowId",
     ],
     data() {
         return {
-                expandedLibraryName: null
+                expandedLibraryName: null,
+                expandedColumnId: null,
         }
     },
     computed: {
@@ -36,12 +38,13 @@ Vue.component("kodb-library-expanded", {
                         ])
                         .reduce((a, b) => a.concat(b), [])
             },
-            expandRow(library) {
+            expandRow(library, columnId) {
                     return () => {
                         if (this.expandedLibraryName == library) {
                                 this.expandedLibraryName = null
                         } else {
                                 this.expandedLibraryName = library
+                                this.expandedColumnId = columnId
                         }
                     }
             },
@@ -54,6 +57,13 @@ Vue.component("kodb-library-expanded", {
 <v-card dense outlined :color=colorFromDepth(depth)>
         <v-simple-table dense>
                 <thead>
+                        <tr color="red">
+                                <th :colspan="columns.length + 1">
+                                        <v-card>
+                                        {{ parentColumnId }}
+                                        </v-card>
+                                </th>
+                        </tr>
                         <tr>
                                 <th style="width:1em; min-wdth:1em">
                                         <v-icon>
@@ -82,7 +92,7 @@ Vue.component("kodb-library-expanded", {
                                                 :rowData="r.row"
                                                 :cellData="r.row.data[col.value]"
 
-                                                :expandRow="expandRow(col.reference)"
+                                                :expandRow="expandRow(col.reference, col.id)"
                                                 :isExpanded="false"
                                         >
                                         </kodb-library-cell>
@@ -99,6 +109,7 @@ Vue.component("kodb-library-expanded", {
                                                 :libraryName="expandedLibraryName"
                                                 
                                                 :parentLibraryName="libraryName"
+                                                :parentColumnId="expandedColumnId"
                                                 :parentRowId="r.row.rowId"
                                         >
                                         </kodb-library-expanded>

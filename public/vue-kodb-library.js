@@ -7,7 +7,9 @@ Vue.component("kodb-library", {
                 return {
                         multiSelect: false,
                         selectedRows:[],
-                        expandedLibraryName: null
+
+                        expandedLibraryName: null,
+                        expandedColumnId: null,
                 }
         },
         methods: {
@@ -81,6 +83,7 @@ Vue.component("kodb-library", {
                                         :expandRow="() => {
                                                 if (expandedLibraryName != col.reference) {
                                                         expandedLibraryName = col.reference
+                                                        expandedColumnId = col.id
                                                         expand(true);
                                                 } else {
                                                         expand(!isExpanded);
@@ -103,6 +106,7 @@ Vue.component("kodb-library", {
                                 :libraryName="expandedLibraryName"
                                 
                                 :parentLibraryName="libraryName"
+                                :parentColumnId="expandedColumnId"
                                 :parentRowId="item.rowId"
                         >
                         </kodb-library-expanded>

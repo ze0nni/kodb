@@ -42,6 +42,10 @@ Vue.mixin({
                         return column
                 },
 
+                getColumnName(libraryName, columnId) {
+                        return this.getColumnData(libraryName, columnId).name
+                },
+
                 getColumnType(libraryName, columnId) {
                         return this.getColumnData(libraryName, columnId).type
                 },
