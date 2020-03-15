@@ -187,15 +187,17 @@ Vue.component("kodb-library-list-cell", {
         },
         template:
 `
-<div>
-        <v-chip
-                v-on:click="expandRow"
-        >
-                <v-icon left v-if="!isExpanded">mdi-chevron-down</v-icon>
-                <v-icon left v-if="isExpanded">mdi-chevron-up</v-icon>
-                
-                [ {{ filterItems(schema.rowsMap[column.reference]).length }} ]
-        </v-chip>
-</div>
+<v-btn small text
+        v-on:click="expandRow"
+>
+        [ {{ column.name }}({{ filterItems(schema.rowsMap[column.reference]).length }}) ]
+
+        <v-icon v-if="!isExpanded">
+                mdi-chevron-down
+        </v-icon>
+        <v-icon v-if="isExpanded">
+                mdi-chevron-up
+        </v-icon>
+</v-btn>
 `
 })
