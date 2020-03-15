@@ -1,3 +1,5 @@
+(function() {
+
 Vue.component("vue-kodb-schema-literal-column", {
         props: [
                 "libraryName",
@@ -57,7 +59,20 @@ Vue.component("vue-kodb-schema-literal-column", {
 </v-card>
 `})
 
+//
+const ColumnsToItemsMixin = {
+        methods: {
+                toItems(items) {
+                        return items.map(x => ({
+                                "text": x.name,
+                                "value": x.name
+                        }))
+                }
+        }
+}
+
 Vue.component("vue-kodb-schema-ref-column", {
+        mixins: [ColumnsToItemsMixin],
         props: [
                 "schema",
                 "libraryName",
@@ -79,7 +94,7 @@ Vue.component("vue-kodb-schema-ref-column", {
                 ></v-text-field>
 
                 <v-select
-                        :items="schema"
+                        :items="toItems(schema)"
                 >
                 </v-select>
         </v-col>
@@ -87,6 +102,7 @@ Vue.component("vue-kodb-schema-ref-column", {
 `})
 
 Vue.component("vue-kodb-schema-list-column", {
+        mixins: [ColumnsToItemsMixin],
         props: [
                 "schema",
                 "libraryName",
@@ -108,9 +124,12 @@ Vue.component("vue-kodb-schema-list-column", {
                 ></v-text-field>
 
                 <v-select
-                        :items="schema"
+                        :items="toItems(schema)"
                 >
                 </v-select>
         </v-col>
 </v-card>
 `})
+
+
+})()
