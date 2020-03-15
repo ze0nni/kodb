@@ -1,6 +1,7 @@
 Vue.component("kodb-schema-manager", {
     props: [
-        "schema"
+        "schema",
+        "orderedSchema"
     ],
     methods: {
             
@@ -19,14 +20,14 @@ Vue.component("kodb-schema-manager", {
             <v-toolbar-title>Schema</v-toolbar-title>
         </v-toolbar>
         <v-tabs vertical>
-            <v-tab v-for="t in schema"
+            <v-tab v-for="t in orderedSchema"
                 :key="t.name"
             >
                 <v-icon left>table-large</v-icon>
                 {{ t.name }}
             </v-tab>
 
-            <v-tab-item v-for="t in schema"
+            <v-tab-item v-for="t in orderedSchema"
                 :key="t.name"
             >
                 <kodb-current-schema-manager
@@ -69,6 +70,9 @@ Vue.component("kodb-current-schema-manager", {
                 case "list": return "mdi-view-list";
             }
             return "mdi-help-circle-outline"
+        },
+        updateColumnData(msg) {
+            console.log(msg)
         }
     },
     template:
@@ -111,14 +115,22 @@ Vue.component("kodb-current-schema-manager", {
 
                     <kodb-literal-column-schema
                             v-if="'literal' == col.type"
+
+                            :schema="schema"
+                            :libraryName="table.name"
+                            :columnId="col.id"
+
+                            :updateColumnData="updateColumnData"
                     ></kodb-literal-column-schema>
 
                     <kodb-ref-column-schema
                             v-else-if="'reference' == col.type"
+                            :updateColumnData="updateColumnData"
                     ></kodb-ref-column-schema>
 
                     <kodb-list-column-schema
                             v-else-if="'list' == col.type"
+                            :updateColumnData="updateColumnData"
                     ></kodb-list-column-schema>
 
                     <td  v-else>
@@ -147,16 +159,37 @@ Vue.component("kodb-current-schema-manager", {
 
 Vue.component("kodb-literal-column-schema", {
     props: [
-        "col",
-        "table"
+        "schema",
+        "libraryName",
+        "columnId",
+
+        "updateColumnData"
     ],
-    methods: {
-            
+    data() {
+        return {
+            "dialog": false
+        }
     },
     template:
 `
 <td>
-    literal
+    <v-dialog v-model="dialog">
+        <template v-slot:activator="{ on }">
+            <v-btn outlined block text v-on="on">
+                Edit {{ schema }}
+            </v-btn>
+        </template>
+
+        
+        <vue-kodb-schema-literal-column
+            v-if="dialog"
+
+            :currentLibraryName="schema[libraryName]"
+
+            :confirm="updateColumnData"
+        >
+        </vue-kodb-schema-literal-column>
+    </v-dialog>
 </td>
 `
 })

@@ -14,20 +14,41 @@ Vue.mixin({
                         }
 
                         return undefined
-                }
-        }
+                },
+
+                getColumnsOf(libraryName) {
+                        console.log(schema)
+                        return []
+                },
+
+                getColumnData(libraryName, columnId) {
+                        const library = this.schema.map[libraryName]
+                        if (null == library) {
+                                console.warn(`library <${libraryName}> not exists`)
+                                return {}
+                        }
+                        const column = library.columnsMap[columnId]
+                        if (null == column) {
+                                console.warn(`column <${columnId}>library <${libraryName}> not exists`)
+                                return {}
+                        }
+                        return column
+                },
+
+                getColumnType(libraryName, columnId) {
+                        return this.getColumnData(libraryName, columnId).type
+                },
+        },
 })
 
 Vue.component("kodb", {
         data: function() {
                 return {
                         selectedLibrary: null,
-                        librarys:[
-                        ],
                         schema: {
-
-                        },
-                        librarisData:{
+                                list: [],
+                                map: {},
+                                rowsMap: {}
                         },
                 }
         },
@@ -39,30 +60,44 @@ Vue.component("kodb", {
                 },
                 command: {
                         setSchema(msg) {
+                                
+                                
+                                const newList = []
+                                const newMap = {}
+                                
                                 for (let l of msg.librarys) {
-                                        if (null == this.librarisData[l.name]) {
-                                                Vue.set(this.schema, l.name, l)
-
-                                                Vue.set(this.librarisData, l.name, [])
-
-                                                this.$wsocket.send({
-                                                        "command": "getLibraryRows",
-                                                        "library": l.name
-                                                })
-                                        }
-
                                         // HACK!!!
                                         l.value = l.id
 
+                                        // HACK
+                                        l.columnsMap = {
+
+                                        }
+
                                         for (let c of l.columns) {
                                                 c.value = c.id
+                                                l.columnsMap[c.id] = c
                                         }
+
+                                        newList.push(l)
+                                        newMap[l.name] = l
+                                                
+                                        if (undefined == this.schema.rowsMap[l.name]) {
+                                                Vue.set(this.schema.rowsMap, l.name, [])
+                                        }
+
+                                        this.$wsocket.send({
+                                                "command": "getLibraryRows",
+                                                "library": l.name
+                                        })
                                 }
 
-                                this.librarys = msg.librarys;
+                                this.schema.list = newList
+                                this.schema.map = newMap
+
                         },
                         setLibraryRows(msg) {
-                                const rows = this.librarisData[msg.library]
+                                const rows = this.schema.rowsMap[msg.library]
                                 if (null == rows) {
                                         return
                                 }
@@ -138,7 +173,7 @@ Vue.component("kodb", {
                         <v-list>
                                 <v-list-item>
                                         <kodb-schema-manager
-                                                :schema="librarys"
+                                                :schema="schema"
                                         >
                                         </kodb-schema-manager>
                                 </v-list-item>
@@ -152,7 +187,7 @@ Vue.component("kodb", {
                                 show-arrows
                         >
                                 <v-tab
-                                        v-for="l in librarys"
+                                        v-for="l in schema.list"
                                         :key="l.id"
                                 >
                                         {{ l.name }}
@@ -167,14 +202,12 @@ Vue.component("kodb", {
                                 v-model="selectedLibrary"
                         >
                                 <v-tab-item
-                                        v-for="l in librarys"
+                                        v-for="l in schema.list"
                                         :key="l.id"
                                 >
                                         <kodb-library
                                                 v-bind:schema="schema"
-                                                v-bind:librarySchema="l"
-                                                v-bind:rows="librarisData[l.name]"
-                                                v-bind:librarisData="librarisData"
+                                                v-bind:libraryName="l.name"
                                         >
                                         </kodb-library>
                                 </v-tab-item>

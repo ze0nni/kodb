@@ -1,9 +1,7 @@
 Vue.component("kodb-library", {
         props: [
                 "schema",
-                "librarySchema",
-                "rows",
-                "librarisData"
+                "libraryName",
         ],
         data: function() {
                 return {
@@ -29,7 +27,7 @@ Vue.component("kodb-library", {
                 newRow() {
                         this.$wsocket.send({
                                 "command": "newRow",
-                                "library": this.librarySchema.name
+                                "library": this.libraryName
                         })
                 },
 
@@ -37,7 +35,7 @@ Vue.component("kodb-library", {
                         for (let row of this.selectedRows) {
                                 this.$wsocket.send({
                                         "command": "deleteRow",
-                                        "library": this.librarySchema.name,
+                                        "library": this.libraryName,
                                         "rowId": row.rowId
                                 })
                         }
@@ -47,8 +45,8 @@ Vue.component("kodb-library", {
         template:
 `
 <v-data-table
-        :headers="mapColumns(librarySchema.columns)"
-        :items="rows"
+        :headers="mapColumns(schema.map[libraryName].columns)"
+        :items="schema.rowsMap[libraryName]"
         :items-per-page="10"
         item-key="rowId"
 
@@ -69,11 +67,14 @@ Vue.component("kodb-library", {
 
                                 <kodb-library-cell
                                         v-else
-                                        :libraryName="librarySchema.name"
+
+                                        :schema="schema"
+                                        :libraryName="libraryName"
                                         :rowId="item.rowId"
-                                        :column="col"
-                                        :data="item.data"
-                                        :librarisData="librarisData"
+                                        :columnId="col.id"
+
+                                        :rowData="item"
+                                        :cellData="item.data[col.value]"
                                         
                                         :expandRow="() => {
                                                 if (expandedLibraryName != col.reference) {

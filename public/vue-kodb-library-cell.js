@@ -1,10 +1,12 @@
 Vue.component("kodb-library-cell", {
         props: [
+                "schema",
                 "libraryName",
                 "rowId",
-                "column",
-                "data",
-                "librarisData",
+                "columnId",
+
+                "rowData",
+                "cellData",
 
                 "expandRow",
                 "isExpanded"
@@ -20,7 +22,7 @@ Vue.component("kodb-library-cell", {
                                 "command": "updateValue",
                                 "library": this.libraryName,
                                 "rowId": this.rowId,
-                                "columnId": this.column.value,
+                                "columnId": this.columnId,
                                 "value": value
                         })
                 }
@@ -29,37 +31,36 @@ Vue.component("kodb-library-cell", {
 `
 <v-row>
         <kodb-library-literal-cell 
-                v-if="'literal' == column.type"
+                v-if="'literal' == getColumnType(libraryName, columnId)"
 
                 v-on:update="updateValue"
-                :column="column"
-                :data="data"
-                :cellData="data[column.value]"
+
+                :column="getColumnData(libraryName, columnId)"
+                :rowData="rowData"
+                :cellData="cellData"
         ></kodb-library-literal-cell>
 
         <kodb-library-reference-cell 
-                v-else-if="'reference' == column.type"
+                v-else-if="'reference' == getColumnType(libraryName, columnId)"
 
                 v-on:update="updateValue"
-                :libraryName="libraryName"
-                :rowId="rowId"
-                :column="column"
-                :data="data"
-                :cellData="data[column.value]"
-                :librarisData="librarisData"
+                
+                :schema="schema"
+                :column="getColumnData(libraryName, columnId)"
+                :rowData="rowData"
+                :cellData="cellData"
 
         ></kodb-library-reference-cell>
 
         <kodb-library-list-cell 
-                v-else-if="'list' == column.type"
+                v-else-if="'list' == getColumnType(libraryName, columnId)"
 
                 v-on:update="updateValue"
-                :libraryName="libraryName"
-                :rowId="rowId"
-                :column="column"
-                :data="data"
-                :cellData="data[column.value]"
-                :librarisData="librarisData"
+
+                :schema="schema"
+                :column="getColumnData(libraryName, columnId)"
+                :rowData="rowData"
+                :cellData="cellData"
 
                 :expandRow="expandRow"
                 :isExpanded="isExpanded"
@@ -70,7 +71,7 @@ Vue.component("kodb-library-cell", {
                 v-else
                 color="error"
         >
-                Unknown type: {{ column.type }}
+                Unknown type: {{ getColumnType(libraryName, columnId) }}
         </v-chip>
 </v-row>
 `
@@ -79,7 +80,7 @@ Vue.component("kodb-library-cell", {
 Vue.component("kodb-library-literal-cell", {
         props: [
                 "column",
-                "data",
+                "rowData",
                 "cellData"
         ],
         data() {
@@ -96,7 +97,7 @@ Vue.component("kodb-library-literal-cell", {
         template:
 `
 <div
-        <div v-if="isRowExists(data, column.value)">
+        <div v-if="cellData.exists">
                 <v-edit-dialog
                         @open="editedValue = cellData.value"
                         @save="$emit('update', editedValue)"
@@ -120,12 +121,10 @@ Vue.component("kodb-library-literal-cell", {
 
 Vue.component("kodb-library-reference-cell", {
         props: [
-                "libraryName",
-                "rowId",
+                "schema",
                 "column",
-                "data",
-                "cellData",
-                "librarisData"
+                "rowData",
+                "cellData"
         ],
         data: function() {
                 return {
@@ -154,7 +153,7 @@ Vue.component("kodb-library-reference-cell", {
         v-model="selectedItem"
 
         :error-messages="cellData.error"
-        :items="mapItems(librarisData[column.reference], column)"
+        :items="mapItems(schema.rowsMap[column.reference], column)"
 >
 </v-select>
 `
@@ -162,12 +161,10 @@ Vue.component("kodb-library-reference-cell", {
 
 Vue.component("kodb-library-list-cell", {
         props: [
-                "libraryName",
-                "rowId",
+                "schema",
                 "column",
-                "data",
+                "rowData",
                 "cellData",
-                "librarisData",
 
                 "expandRow",
                 "isExpanded"
@@ -179,8 +176,9 @@ Vue.component("kodb-library-list-cell", {
         },
         methods: {
                 filterItems(items) {
+                        console.log(items)
                         return (items || [])
-                                .filter(r => this.getRowValue(r, "parent") == this.rowId)
+                                .filter(r => this.getRowValue(r, "parent") == this.rowData.rowId)
                 }
         },
         watch: {
@@ -197,7 +195,7 @@ Vue.component("kodb-library-list-cell", {
                 <v-icon left v-if="!isExpanded">mdi-plus</v-icon>
                 <v-icon left v-if="isExpanded">mdi-minus</v-icon>
                 
-                [ {{ filterItems(librarisData[column.reference]).length }} ]
+                [ {{ filterItems(schema.rowsMap[column.reference]).length }} ]
         </v-chip>
 </div>
 `
