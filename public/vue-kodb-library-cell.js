@@ -58,6 +58,7 @@ Vue.component("kodb-library-cell", {
                 v-on:update="updateValue"
 
                 :schema="schema"
+                :libraryName="libraryName"
                 :column="getColumnData(libraryName, columnId)"
                 :rowData="rowData"
                 :cellData="cellData"
@@ -162,6 +163,7 @@ Vue.component("kodb-library-reference-cell", {
 Vue.component("kodb-library-list-cell", {
         props: [
                 "schema",
+                "libraryName",
                 "column",
                 "rowData",
                 "cellData",
@@ -176,8 +178,16 @@ Vue.component("kodb-library-list-cell", {
         },
         methods: {
                 filterItems(items) {
+                        const libraryName = this.libraryName
+                        const rowId = this.rowData.rowId
+                        const columnId = this.column.id
                         return (items || [])
-                                .filter(r => this.getRowValue(r, "parent") == this.rowData.rowId)
+                                .filter(r => this.isParentOf(
+                                        libraryName,
+                                        rowId,
+                                        columnId,
+                                        r
+                                ))
                 }
         },
         watch: {
