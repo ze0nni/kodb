@@ -55,6 +55,22 @@ func (d ColumnData) Rename(value string) {
 	d.entry["name"] = value
 }
 
+// Hidden field
+func (d ColumnData) Hidden() bool {
+	_, ok := d.entry["hidden"]
+	return ok
+}
+
+// SetHidden update Hidden field
+func (d ColumnData) SetHidden(value bool) ColumnData {
+	if value {
+		d.entry["hidden"] = "1"
+	} else {
+		delete(d.entry, "hidden")
+	}
+	return d
+}
+
 // ID of column
 func (d ColumnData) ID() ColumnID {
 	return ColumnID(d.entry["id"])
@@ -132,6 +148,7 @@ func (d ColumnData) FillJson(json *simplejson.Json) {
 	json.Set("id", d.ID().ToString())
 	json.Set("name", d.Name())
 	json.Set("type", d.Type().ToString())
+	json.Set("hidden", d.Hidden())
 }
 
 func (d ColumnData) IsDependent(

@@ -39,10 +39,10 @@ func main() {
 	}
 
 	rewardsLib, _ := eng.AddLibrary(engine.LibraryName("rewards"))
-	rewardsLib.AddColumn(engine.ColumnID("parent"), engine.NewLiteralColumn("parent"))
+	rewardsLib.AddColumn(engine.ColumnID("parent"), engine.NewLiteralColumn("parent").SetHidden(true))
 
 	tasksLib, _ := eng.AddLibrary(engine.LibraryName("tasks"))
-	tasksLib.AddColumn(engine.ColumnID("parent"), engine.NewLiteralColumn("parent"))
+	tasksLib.AddColumn(engine.ColumnID("parent"), engine.NewLiteralColumn("parent").SetHidden(true))
 	tasksLib.NewColumn(engine.NewListColumn("rewards", rewardsLib.Name()))
 
 	questLib, _ := eng.AddLibrary("quest")
