@@ -206,7 +206,7 @@ func (server *serverInstance) newColumn(m msgNewColumn) {
 		log.Printf("Error when <newColumn>: %s", err)
 		return
 	}
-	_, err = l.NewColumnOf(m.columnData)
+	_, err = l.NewColumn(m.columnData)
 	if nil != err {
 		log.Printf("Error when <newColumn>: %s", err)
 		return

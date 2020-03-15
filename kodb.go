@@ -16,40 +16,42 @@ import (
 func main() {
 	eng := engine.New(driver.InMemory())
 	userLib, _ := eng.AddLibrary(engine.LibraryName("user"))
-	firstname, _ := userLib.NewColumn("firstName")
-	secondName, _ := userLib.NewColumn("secondName")
-	age, _ := userLib.NewColumn("age")
+	firstname, _ := userLib.NewColumn(engine.NewLiteralColumn("firstName"))
+	secondName, _ := userLib.NewColumn(engine.NewLiteralColumn("secondName"))
+	age, _ := userLib.NewColumn(engine.NewLiteralColumn("age"))
 	for i := 0; i < 10; i++ {
 		row, _ := userLib.NewRow()
-		userLib.UpdateValue(row, firstname, randomdata.FirstName(0))
-		userLib.UpdateValue(row, secondName, randomdata.LastName())
-		userLib.UpdateValue(row, age, strconv.Itoa(randomdata.Number(16, 40)))
+		userLib.UpdateValue(row, firstname.ID(), randomdata.FirstName(0))
+		userLib.UpdateValue(row, secondName.ID(), randomdata.LastName())
+		userLib.UpdateValue(row, age.ID(), strconv.Itoa(randomdata.Number(16, 40)))
 	}
 
 	invLib, _ := eng.AddLibrary(engine.LibraryName("location"))
-	name, _ := invLib.NewColumn("name")
-	invLib.NewColumn("type")
-	invLib.NewColumn("title")
-	invLib.NewColumn("picture")
-	owner, _ := invLib.NewRefColumn("owner", userLib.Name())
+	name, _ := invLib.NewColumn(engine.NewLiteralColumn("name"))
+	invLib.NewColumn(engine.NewLiteralColumn("type"))
+	invLib.NewColumn(engine.NewLiteralColumn("title"))
+	invLib.NewColumn(engine.NewLiteralColumn("picture"))
+	owner, _ := invLib.NewColumn(engine.NewRefColumn("owner", userLib.Name()))
 	for i := 0; i < 20; i++ {
 		row, _ := invLib.NewRow()
-		invLib.UpdateValue(row, name, randomdata.Adjective())
-		invLib.UpdateValue(row, owner, randomdata.Alphanumeric(32))
+		invLib.UpdateValue(row, name.ID(), randomdata.Adjective())
+		invLib.UpdateValue(row, owner.ID(), randomdata.Alphanumeric(32))
 	}
 
+	rewardsLib, _ := eng.AddLibrary(engine.LibraryName("rewards"))
+	rewardsLib.AddColumn(engine.ColumnID("parent"), engine.NewLiteralColumn("parent"))
+
+	tasksLib, _ := eng.AddLibrary(engine.LibraryName("tasks"))
+	tasksLib.AddColumn(engine.ColumnID("parent"), engine.NewLiteralColumn("parent"))
+	tasksLib.NewColumn(engine.NewListColumn("rewards", rewardsLib.Name()))
+
 	questLib, _ := eng.AddLibrary("quest")
-	questName, _ := questLib.NewColumn("name")
-	questLib.NewListColumn(eng, "tasks", engine.LibraryName("tasks"))
-
-	tasksLib, _ := eng.Library(engine.LibraryName("tasks"))
-	tasksLib.NewListColumn(eng, "rewards", engine.LibraryName("rewards"))
-
-	rewardsLib, _ := eng.Library(engine.LibraryName("rewards"))
+	questName, _ := questLib.NewColumn(engine.NewLiteralColumn("name"))
+	questLib.NewColumn(engine.NewListColumn("tasks", engine.LibraryName("tasks")))
 
 	for i := 1; i <= 3; i++ {
 		questRow, _ := questLib.NewRow()
-		questLib.UpdateValue(questRow, questName, "quest_00"+strconv.Itoa(i))
+		questLib.UpdateValue(questRow, questName.ID(), "quest_00"+strconv.Itoa(i))
 
 		for j := 1; j <= 1+i; j++ {
 			taskRow, _ := tasksLib.NewRow()
