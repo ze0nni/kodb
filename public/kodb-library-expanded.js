@@ -47,7 +47,7 @@ Vue.component("kodb-library-expanded", {
     template:
 `
 <v-card outlined :color=colorFromDepth(depth)>
-        <v-simple-table>
+        <v-simple-table dense>
                 <thead>
                         <tr>
                                 <th style="width:1em; min-wdth:1em">

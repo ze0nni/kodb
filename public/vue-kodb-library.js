@@ -52,6 +52,7 @@ Vue.component("kodb-library", {
 
         v-model="selectedRows"
 
+        dense
         show-select
         :single-select="!multiSelect"
 >       
@@ -60,10 +61,11 @@ Vue.component("kodb-library", {
                 <tr v-on:click="select(!isSelected)">
                         <td v-for="col in headers"
                         >
-                                <v-checkbox
+                                <v-icon
                                         v-if="col.value == 'data-table-select'"
-                                        v-bind:value="isSelected">
-                                </v-checkbox>
+                                >
+                                        {{ isSelected ? "mdi-check-box-outline" : "mdi-checkbox-blank-outline" }}
+                                </v-icon>
 
                                 <kodb-library-cell
                                         v-else
