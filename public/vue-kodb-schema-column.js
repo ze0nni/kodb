@@ -81,7 +81,18 @@ Vue.component("vue-kodb-schema-ref-column", {
         ],
         data() {
                 return {
-                        columnName: ""
+                        columnName: "",
+                        "selectedLibrary": null,
+                }
+        },
+        methods: {
+                submit() {
+                        this.confirm({
+                                library: this.libraryName,
+                                name: this.columnName,
+                                type: "reference",
+                                "ref": this.selectedLibrary
+                        })
                 }
         },
         template:
@@ -94,10 +105,17 @@ Vue.component("vue-kodb-schema-ref-column", {
                 ></v-text-field>
 
                 <v-select
+                        v-model="selectedLibrary"
                         :items="toItems(schema)"
                 >
                 </v-select>
         </v-col>
+
+        <v-card-actions>
+                <v-btn text block
+                        v-on:click="submit"
+                >OK</v-btn>
+        </v-card-actions>
 </v-card>
 `})
 
@@ -111,7 +129,18 @@ Vue.component("vue-kodb-schema-list-column", {
         ],
         data() {
                 return {
-                        columnName: ""
+                        columnName: "",
+                        selectedLibrary: null
+                }
+        },
+        methods: {
+                submit() {
+                        this.confirm({
+                                library: this.libraryName,
+                                name: this.columnName,
+                                type: "list",
+                                "ref": this.selectedLibrary
+                        })
                 }
         },
         template:
@@ -124,10 +153,17 @@ Vue.component("vue-kodb-schema-list-column", {
                 ></v-text-field>
 
                 <v-select
+                        v-model="selectedLibrary"
                         :items="toItems(schema)"
                 >
                 </v-select>
         </v-col>
+
+        <v-card-actions>
+                <v-btn text block
+                        v-on:click="submit"
+                >OK</v-btn>
+        </v-card-actions>
 </v-card>
 `})
 

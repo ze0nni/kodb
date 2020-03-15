@@ -49,6 +49,7 @@ Vue.component("vue-kodb-schema-new-column", {
             <v-tab-item>
                 <vue-kodb-schema-ref-column
                     :schema="schema"
+                    :libraryName="libraryName"
 
                     :confirm="confirm"
                 >
@@ -61,6 +62,7 @@ Vue.component("vue-kodb-schema-new-column", {
             <v-tab-item>
                 <vue-kodb-schema-list-column
                     :schema="schema"
+                    :libraryName="libraryName"
 
                     :confirm="confirm"
                 >
