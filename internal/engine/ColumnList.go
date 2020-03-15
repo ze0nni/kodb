@@ -40,7 +40,10 @@ func (cl ColumnList) Initilize(
 	}
 
 	parentCol := ColumnID("parent")
-	return refLib.AddColumn(parentCol, "parent") //TODO validate
+	_, err = refLib.AddColumn(parentCol, NewLiteralColumn("parent")) //TODO validate
+	if nil != err {
+		return err
+	}
 
 	return nil
 }

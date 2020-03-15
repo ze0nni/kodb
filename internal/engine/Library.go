@@ -25,16 +25,8 @@ type (
 
 		Columns() int
 
-		NewColumn(columnName string) (ColumnID, error)
-		AddColumn(id ColumnID, columnName string) error
-
-		NewRefColumn(columnName string, ref LibraryName) (ColumnID, error)
-		AddRefColumn(id ColumnID, columnName string, ref LibraryName) error
-
-		NewListColumn(eng Engine, columnName string, ref LibraryName) (ColumnID, error)
-		AddListColumn(eng Engine, id ColumnID, columnName string, ref LibraryName) error
-
-		NewColumnOf(ColumnData) (ColumnData, error)
+		NewColumn(ColumnData) (ColumnData, error)
+		AddColumn(ColumnID, ColumnData) (ColumnData, error)
 
 		Column(index int) (ColumnID, error)
 		ColumnName(index int) (string, error)
@@ -127,131 +119,16 @@ func (lib *libraryImp) Columns() int {
 	return entry.IntDef("columns", 0, root)
 }
 
-func (lib *libraryImp) newColumn(
-	columnName string,
-	columnType ColumnType,
-	consumer func(ColumnData) error,
-) (ColumnID, error) {
-	columnV4, err := uuid.NewV4()
-	if nil != err {
-		return ColumnID(""), err
-	}
-
-	columnID := ColumnID(columnV4.String())
-	if err := lib.addColumn(columnID, columnName, columnType, consumer); nil != err {
-		return ColumnID(""), err
-	}
-
-	return columnID, nil
-}
-
-func (lib *libraryImp) addColumn(
-	id ColumnID,
-	name string,
-	columnType ColumnType,
-	consumer func(ColumnData) error,
-) error {
-	root, err := lib.getSchemaRoot()
-	if nil != err {
-		return err
-	}
-
-	if s, _ := lib.schema.Get(id.ToString()); nil != s {
-		return errors.New("duplicate column " + id.ToString())
-	}
-
-	num := entry.IntDef("columns", 0, root)
-	entry.SetInt("columns", num+1, root)
-
-	entry.SetString("column_"+strconv.Itoa(num), id.ToString(), root)
-
-	columnEntry := make(entry.Entry)
-
-	entry.SetString("name", name, columnEntry)
-	entry.SetString("id", id.ToString(), columnEntry)
-	entry.SetString("type", columnType.ToString(), columnEntry)
-
-	data := ColumnData{columnEntry}
-	if nil != err {
-		return err
-	}
-
-	err = consumer(data)
-	if nil != err {
-		return err
-	}
-
-	lib.schema.Put(id.ToString(), columnEntry)
-	lib.schema.Put("root", root)
-
-	return nil
-}
-
-func (lib *libraryImp) NewColumn(name string) (ColumnID, error) {
-	return lib.newColumn(name, Literal, func(ColumnData) error {
-		return nil
-	})
-}
-
-func (lib *libraryImp) AddColumn(id ColumnID, name string) error {
-	return lib.addColumn(id, name, Literal, func(ColumnData) error {
-		return nil
-	})
-}
-
-func (lib *libraryImp) NewRefColumn(name string, ref LibraryName) (ColumnID, error) {
-	return lib.newColumn(name, Reference, func(data ColumnData) error {
-		refData, err := data.ToRef()
-		if nil != err {
-			panic(err)
-		}
-		refData.UpdateRef(ref)
-		return nil
-	})
-}
-
-func (lib *libraryImp) AddRefColumn(id ColumnID, name string, ref LibraryName) error {
-	return lib.addColumn(id, name, Reference, func(data ColumnData) error {
-		refData, err := data.ToRef()
-		if nil != err {
-			panic(err)
-		}
-		refData.UpdateRef(ref)
-		return nil
-	})
-}
-
-func (lib *libraryImp) NewListColumn(eng Engine, name string, ref LibraryName) (ColumnID, error) {
-	return lib.newColumn(name, List, func(data ColumnData) error {
-		listData, err := data.ToList()
-		if nil != err {
-			panic(err)
-		}
-		listData.UpdateRef(ref)
-
-		return data.Initilize(eng)
-	})
-}
-
-func (lib *libraryImp) AddListColumn(eng Engine, id ColumnID, name string, ref LibraryName) error {
-	return lib.addColumn(id, name, List, func(data ColumnData) error {
-		listData, err := data.ToList()
-		if nil != err {
-			panic(err)
-		}
-		listData.UpdateRef(ref)
-
-		return data.Initilize(eng)
-	})
-}
-
-func (lib *libraryImp) NewColumnOf(data ColumnData) (ColumnData, error) {
+func (lib *libraryImp) NewColumn(data ColumnData) (ColumnData, error) {
 	columnV4, err := uuid.NewV4()
 	if nil != err {
 		return ColumnData{nil}, err
 	}
 	id := ColumnID(columnV4.String())
+	return lib.AddColumn(id, data)
+}
 
+func (lib *libraryImp) AddColumn(id ColumnID, data ColumnData) (ColumnData, error) {
 	root, err := lib.getSchemaRoot()
 	if nil != err {
 		return ColumnData{nil}, err

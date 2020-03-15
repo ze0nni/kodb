@@ -142,7 +142,7 @@ func TestEngine_Listener_UpdateValue(t *testing.T) {
 	colID := ColumnID("name")
 
 	foo, _ := eng.AddLibrary(LibraryName("foo"))
-	foo.AddColumn(colID, "no name")
+	foo.AddColumn(colID, NewLiteralColumn("no name"))
 	foo.AddRow(RowID("bar"))
 
 	ll := newLogListener()

@@ -26,7 +26,7 @@ func TestLibrary_NewColumn(t *testing.T) {
 	d := driver.InMemory()
 	l := newLibraryInst("foo", newNilColumnContext(), listenerNil(), LensOf("schema", d), nil, nil)
 
-	_, err := l.NewColumn("bar")
+	_, err := l.NewColumn(NewLiteralColumn("bar"))
 
 	assert.NoError(t, err)
 
@@ -37,8 +37,8 @@ func TestLibrary_ColumnName(t *testing.T) {
 	d := driver.InMemory()
 	l := newLibraryInst("foo", newNilColumnContext(), listenerNil(), LensOf("schema", d), nil, nil)
 
-	l.NewColumn("foo")
-	l.NewColumn("bar")
+	l.NewColumn(NewLiteralColumn("foo"))
+	l.NewColumn(NewLiteralColumn("bar"))
 
 	c1, err := l.ColumnName(0)
 	assert.NoError(t, err)
@@ -61,7 +61,7 @@ func TestLibrary_ColumnData_error_if_not_exists(t *testing.T) {
 
 func TestLibrary_ColumnData(t *testing.T) {
 	l, _ := emptyLibrary("foo")
-	id, _ := l.NewColumn("hello")
+	id, _ := l.NewColumn(NewLiteralColumn("hello"))
 
 	e, err := l.ColumnData(0)
 
@@ -74,14 +74,15 @@ func TestLibrary_ColumnData(t *testing.T) {
 
 func TestLibrary_ColumnDataOf(t *testing.T) {
 	l, _ := emptyLibrary("foo")
-	id, _ := l.NewColumn("hello")
+	data, _ := l.NewColumn(NewLiteralColumn("hello"))
+	col := data.ID()
 
-	e, err := l.ColumnDataOf(id)
+	e, err := l.ColumnDataOf(col)
 
 	assert.NotNil(t, e)
 	assert.NoError(t, err)
 	assert.Equal(t, "hello", e.Name())
-	assert.Equal(t, id, e.ID())
+	assert.Equal(t, col, e.ID())
 	assert.Equal(t, Literal, e.Type())
 }
 
@@ -99,7 +100,8 @@ func TestLibrary_UpdateColumnData_error_when_column_not_exists(t *testing.T) {
 
 func TestLibrary_UpdateColumnData(t *testing.T) {
 	l, _ := emptyLibrary("foo")
-	id, _ := l.NewColumn("columnFoo")
+	rowData, _ := l.NewColumn(NewLiteralColumn("columnFoo"))
+	id := rowData.ID()
 
 	e := make(entry.Entry)
 	e["id"] = id.ToString()
@@ -117,8 +119,8 @@ func TestLibrary_UpdateColumnData(t *testing.T) {
 func TestLibrary_AddCoumn_error_on_duplicate(t *testing.T) {
 	l := newLibraryInst("foo", newNilColumnContext(), listenerNil(), LensOf("schema", driver.InMemory()), nil, nil)
 
-	err1 := l.AddColumn(ColumnID("foo"), "foo")
-	err2 := l.AddColumn(ColumnID("foo"), "foo")
+	_, err1 := l.AddColumn(ColumnID("foo"), NewLiteralColumn("foo"))
+	_, err2 := l.AddColumn(ColumnID("foo"), NewLiteralColumn("foo"))
 
 	assert.NoError(t, err1)
 	assert.Error(t, err2)
@@ -306,8 +308,8 @@ func emptyLibrary(libraryName LibraryName) (Library, driver.Driver) {
 
 func emptyUsersLibrary() (Library, driver.Driver) {
 	l, d := emptyLibrary(LibraryName("users"))
-	l.NewColumn("first_name")
-	l.NewColumn("second_name")
-	l.NewColumn("age")
+	l.NewColumn(NewLiteralColumn("first_name"))
+	l.NewColumn(NewLiteralColumn("second_name"))
+	l.NewColumn(NewLiteralColumn("age"))
 	return l, d
 }
