@@ -1,13 +1,31 @@
 Vue.component("vue-kodb-schema-literal-column", {
         props: [
+                "libraryName",
+
+                "confirm"
         ],
+        data() {
+                return {
+                        columnName: ""
+                }
+        },
+        methods: {
+                submit() {
+                        this.confirm({
+                                library: this.libraryName,
+                                name: this.columnName,
+                                type: "literal"
+                        })
+                }
+        },
         template:
 `
 <v-card>
         <v-col>
                 <v-text-field
-                >
-                </v-text-field>    
+                        v-model="columnName"
+                        label="Column name"
+                ></v-text-field>
 
                 <v-radio-group>
                 <v-radio
@@ -30,20 +48,35 @@ Vue.component("vue-kodb-schema-literal-column", {
                 ></v-radio>
                 </v-radio-group>
         </v-col>
+
+        <v-card-actions>
+                <v-btn text block
+                        v-on:click="submit"
+                >OK</v-btn>
+        </v-card-actions>
 </v-card>
 `})
 
 Vue.component("vue-kodb-schema-ref-column", {
         props: [
-                "schema"
+                "schema",
+                "libraryName",
+
+                "confirm"
         ],
+        data() {
+                return {
+                        columnName: ""
+                }
+        },
         template:
 `
 <v-card>
         <v-col>
                 <v-text-field
-                >
-                </v-text-field>
+                        v-model="columnName"
+                        label="Column name"
+                ></v-text-field>
 
                 <v-select
                         :items="schema"
@@ -55,15 +88,24 @@ Vue.component("vue-kodb-schema-ref-column", {
 
 Vue.component("vue-kodb-schema-list-column", {
         props: [
-                "schema"
+                "schema",
+                "libraryName",
+
+                "confirm"
         ],
+        data() {
+                return {
+                        columnName: ""
+                }
+        },
         template:
 `
 <v-card>
         <v-col>
                 <v-text-field
-                >
-                </v-text-field>
+                        v-model="columnName"
+                        label="Column name"
+                ></v-text-field>
 
                 <v-select
                         :items="schema"

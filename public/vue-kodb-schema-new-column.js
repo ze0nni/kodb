@@ -1,7 +1,14 @@
 Vue.component("vue-kodb-schema-new-column", {
         props: [
-            "schema"
+            "schema",
+            "libraryName"
         ],
+        methods: {
+            confirm(msg) {
+                msg['command'] = "newColumn"
+                this.$wsocket.send(msg)
+            }
+        },
         template:
     `
 <v-dialog>
@@ -22,6 +29,9 @@ Vue.component("vue-kodb-schema-new-column", {
             </v-tab>
             <v-tab-item>
                 <vue-kodb-schema-literal-column
+                    :libraryName="libraryName"
+
+                    :confirm="confirm"
                 >
                 </vue-kodb-schema-literal-column>
             </v-tab-item>
@@ -32,6 +42,8 @@ Vue.component("vue-kodb-schema-new-column", {
             <v-tab-item>
                 <vue-kodb-schema-ref-column
                     :schema="schema"
+
+                    :confirm="confirm"
                 >
                 </vue-kodb-schema-ref-column>
             </v-tab-item>
@@ -42,6 +54,8 @@ Vue.component("vue-kodb-schema-new-column", {
             <v-tab-item>
                 <vue-kodb-schema-list-column
                     :schema="schema"
+
+                    :confirm="confirm"
                 >
                 </vue-kodb-schema-list-column>
             </v-tab-item>

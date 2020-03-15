@@ -132,6 +132,7 @@ Vue.component("kodb-current-schema-manager", {
                     <td colspan="3">
                         <vue-kodb-schema-new-column
                             :schema="schema"
+                            :libraryName="table.name"
                         >
                         </vue-kodb-schema-new-column>
                     </td>
