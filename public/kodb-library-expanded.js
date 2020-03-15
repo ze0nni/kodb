@@ -43,7 +43,7 @@ Vue.component("kodb-library-expanded", {
     template:
 `
 <div>
-        <table>
+        <v-simple-table>
                 <thead>
                         <tr>
                                 <th v-for="col in schema.map[libraryName].columns"
@@ -87,7 +87,7 @@ Vue.component("kodb-library-expanded", {
                                 </td>
                         </tr>
                 </tbody>
-        </table>
+        </v-simple-table>
 </div>
 `
 });
