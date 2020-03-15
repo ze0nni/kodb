@@ -271,7 +271,7 @@ func (lib *libraryImp) NewColumnOf(data ColumnData) (ColumnData, error) {
 	lib.schema.Put(id.ToString(), data.entry)
 	lib.schema.Put("root", root)
 
-	//TODO: lib.listener
+	lib.listener.OnNewColumn(lib.Name(), id)
 
 	return data, nil
 }

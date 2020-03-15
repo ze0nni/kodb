@@ -18,6 +18,15 @@ func (l *serverListener) OnNewLibrary(engine.LibraryName) {
 	}
 }
 
+func (l *serverListener) OnNewColumn(engine.LibraryName, engine.ColumnID) {
+	// TODO: send only new schema
+	setSchemaMsg := msg.SetSchemaMsgFromEngine(l.server.engine)
+
+	for _, client := range l.server.clients {
+		client.SetSchema(setSchemaMsg)
+	}
+}
+
 func (l *serverListener) OnNewRow(name engine.LibraryName, row engine.RowID) {
 	newRowMsg := msg.NewRowMsgOf(
 		name,

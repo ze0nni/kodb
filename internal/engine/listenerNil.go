@@ -10,6 +10,10 @@ func (lm *listenerNilInst) OnNewLibrary(name LibraryName) {
 
 }
 
+func (lm *listenerNilInst) OnNewColumn(LibraryName, ColumnID) {
+
+}
+
 func (lm *listenerNilInst) OnNewRow(name LibraryName, row RowID) {
 
 }

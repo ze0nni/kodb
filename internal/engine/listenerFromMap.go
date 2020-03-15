@@ -52,6 +52,15 @@ func (lm *listenerFromMap) OnNewLibrary(name LibraryName) {
 	})
 }
 
+func (lm *listenerFromMap) OnNewColumn(name LibraryName, col ColumnID) {
+	for l, _ := range lm.listeners {
+		l.OnNewColumn(name, col)
+	}
+	lm.forLibrary(name, func(l Listener) {
+		l.OnNewColumn(name, col)
+	})
+}
+
 func (lm *listenerFromMap) OnNewRow(name LibraryName, row RowID) {
 	for l, _ := range lm.listeners {
 		l.OnNewRow(name, row)
