@@ -54,13 +54,17 @@ Vue.component("kodb-library-expanded", {
     },
     template:
 `
-<v-card dense outlined :color=colorFromDepth(depth)>
+<v-card dense tile :color=colorFromDepth(depth)>
         <v-simple-table dense>
                 <thead>
                         <tr color="red">
-                                <th :colspan="columns.length + 1">
-                                        <v-card>
-                                        {{ parentColumnId }}
+                                <th :colspan="columns.length + 1"
+                                        style="margin:0; padding:0"
+                                >
+                                        <v-card tile dark>
+                                                <v-col>
+                                                {{ getColumnName(parentLibraryName, parentColumnId) }}
+                                                </v-col>
                                         </v-card>
                                 </th>
                         </tr>
