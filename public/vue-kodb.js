@@ -16,6 +16,18 @@ Vue.mixin({
                         return undefined
                 },
 
+                getLibraryColumns(libraryName, showHidden) {
+                        const library = this.schema.map[libraryName]
+                        if (null == library) {
+                                console.warn(`library <${libraryName}> not exists`)
+                                return {}
+                        }
+                        if (showHidden) {
+                                return library.columns
+                        }
+                        return library.columns.filter(c => !c.hidden)
+                },
+
                 getColumnData(libraryName, columnId) {
                         const library = this.schema.map[libraryName]
                         if (null == library) {
@@ -177,7 +189,7 @@ Vue.component("kodb", {
         
 
                 <template v-slot:extension>
-                        <v-tabs
+                        <v-tabs dense
                                 v-model="selectedLibrary"
                                 show-arrows
                         >

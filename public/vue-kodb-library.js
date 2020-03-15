@@ -45,7 +45,7 @@ Vue.component("kodb-library", {
         template:
 `
 <v-data-table
-        :headers="mapColumns(schema.map[libraryName].columns)"
+        :headers="mapColumns(getLibraryColumns(libraryName))"
         :items="schema.rowsMap[libraryName]"
         :items-per-page="10"
         item-key="rowId"
