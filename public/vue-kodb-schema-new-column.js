@@ -3,6 +3,11 @@ Vue.component("vue-kodb-schema-new-column", {
             "schema",
             "libraryName"
         ],
+        data() {
+            return {
+                "dialog": false
+            }
+        },
         methods: {
             confirm(msg) {
                 msg['command'] = "newColumn"
@@ -11,7 +16,9 @@ Vue.component("vue-kodb-schema-new-column", {
         },
         template:
     `
-<v-dialog>
+<v-dialog
+        v-model="dialog"
+>
     <template v-slot:activator="{ on }">
         <v-btn text block  v-on="on">
             <v-icon left>mdi-plus</v-icon>
@@ -19,7 +26,7 @@ Vue.component("vue-kodb-schema-new-column", {
         </v-btn>
     </template>
 
-    <v-card>
+    <v-card v-if="dialog">
         <v-toolbar flat dark>
             <v-toolbar-title>New column</v-toolbar-title>
         </v-toolbar>
