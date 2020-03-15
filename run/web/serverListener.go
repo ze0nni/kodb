@@ -18,7 +18,12 @@ func (l *serverListener) OnNewLibrary(engine.LibraryName) {
 	}
 }
 
-func (l *serverListener) OnNewColumn(engine.LibraryName, engine.ColumnID) {
+func (l *serverListener) OnNewColumn(libraryName engine.LibraryName, col engine.ColumnID) {
+	setLibraryRowsMsg := msg.SetLibraryRowsMsgFromEngine(libraryName, l.server.engine)
+	for _, client := range l.server.clients {
+		client.SetLibraryRows(setLibraryRowsMsg)
+	}
+
 	// TODO: send only new schema
 	setSchemaMsg := msg.SetSchemaMsgFromEngine(l.server.engine)
 
