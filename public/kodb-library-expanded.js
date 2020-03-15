@@ -20,18 +20,27 @@ Vue.component("kodb-library-expanded", {
         }
     },
     methods: {
+            newRow() {
+                this.$wsocket.send({
+                        "command": "newRow",
+                        "library": this.libraryName,
+                        "parentLibrary": this.parentLibraryName,
+                        "parentRow": this.parentRowId,
+                        "parentColumn": this.parentColumnId
+                })
+            },
             filterItems(rows) {
                 const columns = this.columns
-                const parentId = this.parentRowId
+                const parentLibraryId = this.parentLibraryName
+                const parentRowId = this.parentRowId
+                const parentColumnId = this.parentColumnId
                 return (rows||[])
-                        .filter(r => {
-                                const parent = r.data.parent
-                                if (null == parent) {
-                                        console.warn(`parentNotExists`)
-                                        return false
-                                }
-                                return parentId == parent.value
-                        })
+                        .filter(r => this.isParentOf(
+                                parentLibraryId,
+                                parentRowId,
+                                parentColumnId,
+                                r
+                        ))
                         .map(r => [
                                 {extendedRow: false, row: r, columns: columns},
                                 { extendedRow: true, row: r, columns:[], numColumns: columns.length }
@@ -125,7 +134,9 @@ Vue.component("kodb-library-expanded", {
                                 <td
                                         :colspan="columns.length + 1"
                                 >
-                                        <v-btn small text>
+                                        <v-btn small text
+                                                v-on:click="newRow"
+                                        >
                                                 New row
                                         </v-btn>
                                 </td>

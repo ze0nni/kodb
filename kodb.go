@@ -39,18 +39,18 @@ func main() {
 	}
 
 	rewardsLib, _ := eng.AddLibrary(engine.LibraryName("rewards"))
-	rewardsLib.AddColumn(engine.ColumnID("parent"), engine.NewLiteralColumn("parent").SetHidden(true))
+	makeOwned(rewardsLib)
 	rwTitle, _ := rewardsLib.NewColumn(engine.NewLiteralColumn("title"))
 	rwType, _ := rewardsLib.NewColumn(engine.NewLiteralColumn("type"))
 	rwPrice, _ := rewardsLib.NewColumn(engine.NewLiteralColumn("price"))
 
 	tasksLib, _ := eng.AddLibrary(engine.LibraryName("tasks"))
-	tasksLib.AddColumn(engine.ColumnID("parent"), engine.NewLiteralColumn("parent").SetHidden(true))
-	tasksLib.NewColumn(engine.NewListColumn("rewards", rewardsLib.Name()))
+	makeOwned(tasksLib)
+	taskRewars, _ := tasksLib.NewColumn(engine.NewListColumn("rewards", rewardsLib.Name()))
 
 	questLib, _ := eng.AddLibrary("quest")
 	questName, _ := questLib.NewColumn(engine.NewLiteralColumn("name"))
-	questLib.NewColumn(engine.NewListColumn("tasks", engine.LibraryName("tasks")))
+	questTasks, _ := questLib.NewColumn(engine.NewListColumn("tasks", engine.LibraryName("tasks")))
 
 	for i := 1; i <= 3; i++ {
 		questRow, _ := questLib.NewRow()
@@ -58,18 +58,22 @@ func main() {
 
 		for j := 1; j <= 1+i; j++ {
 			taskRow, _ := tasksLib.NewRow()
-			tasksLib.UpdateValue(
+			setOwner(
+				questLib.Name(),
+				questRow,
+				questTasks.ID(),
+				tasksLib,
 				taskRow,
-				engine.ColumnID("parent"),
-				questRow.ToString(),
 			)
 
 			for k := 1; k < 4; k++ {
 				rewardRow, _ := rewardsLib.NewRow()
-				rewardsLib.UpdateValue(
+				setOwner(
+					tasksLib.Name(),
+					taskRow,
+					taskRewars.ID(),
+					rewardsLib,
 					rewardRow,
-					engine.ColumnID("parent"),
-					taskRow.ToString(),
 				)
 
 				rewardsLib.UpdateValue(
@@ -103,4 +107,43 @@ func main() {
 	if nil != err {
 		log.Fatal(err)
 	}
+}
+
+func makeOwned(l engine.Library) {
+	l.AddColumn(
+		engine.ListParentLibrary,
+		engine.NewLiteralColumn("parentLibrary").SetHidden(true),
+	)
+	l.AddColumn(
+		engine.ListParentRow,
+		engine.NewLiteralColumn("parentRow").SetHidden(true),
+	)
+	l.AddColumn(
+		engine.ListParentColumn,
+		engine.NewLiteralColumn("parentColumn").SetHidden(true),
+	)
+}
+
+func setOwner(
+	parentLibrary engine.LibraryName,
+	parentRow engine.RowID,
+	parentColumn engine.ColumnID,
+	l engine.Library,
+	row engine.RowID,
+) {
+	l.UpdateValue(
+		row,
+		engine.ListParentLibrary,
+		parentLibrary.ToString(),
+	)
+	l.UpdateValue(
+		row,
+		engine.ListParentRow,
+		parentRow.ToString(),
+	)
+	l.UpdateValue(
+		row,
+		engine.ListParentColumn,
+		parentColumn.ToString(),
+	)
 }

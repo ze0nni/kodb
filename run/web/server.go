@@ -32,10 +32,7 @@ type msgGetLibraryRows = struct {
 	ClientID    ClientID
 	LibraryName engine.LibraryName
 }
-type msgNewRow = struct {
-	ClientID    ClientID
-	LibraryName engine.LibraryName
-}
+
 type msgDeleteRow = struct {
 	ClientID    ClientID
 	LibraryName engine.LibraryName
@@ -123,8 +120,8 @@ func (server *serverInstance) getLibraryRows(m msgGetLibraryRows) {
 }
 
 // NewRow
-func (server *serverInstance) NewRow(clientID ClientID, libraryName string) {
-	server.msgNewRowCh <- msgNewRow{clientID, engine.LibraryName(libraryName)}
+func (server *serverInstance) NewRow(m msgNewRow) {
+	server.msgNewRowCh <- m
 }
 
 func (server *serverInstance) newRow(m msgNewRow) {
@@ -134,10 +131,15 @@ func (server *serverInstance) newRow(m msgNewRow) {
 		return
 	}
 
-	_, err = l.NewRow()
+	id, err := l.NewRow()
 	if nil != err {
 		log.Printf("Error when <newRow>: %s", err)
 		return
+	}
+	if m.HasParent {
+		l.UpdateValue(id, engine.ColumnID("parentLibrary"), m.ParentLibraryName.ToString())
+		l.UpdateValue(id, engine.ColumnID("parentRow"), m.ParentRowID.ToString())
+		l.UpdateValue(id, engine.ColumnID("parentColumn"), m.ParentColumnID.ToString())
 	}
 }
 

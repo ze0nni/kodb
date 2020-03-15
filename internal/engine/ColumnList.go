@@ -5,6 +5,12 @@ import (
 	"github.com/ze0nni/kodb/internal/entry"
 )
 
+const ListParentLibrary = ColumnID("parentLibrary")
+
+const ListParentRow = ColumnID("parentRow")
+
+const ListParentColumn = ColumnID("parentColumn")
+
 func NewListColumn(name string, ref LibraryName) ColumnData {
 	e := make(entry.Entry)
 	e["name"] = name

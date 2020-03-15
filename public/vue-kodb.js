@@ -49,6 +49,27 @@ Vue.mixin({
                 getColumnType(libraryName, columnId) {
                         return this.getColumnData(libraryName, columnId).type
                 },
+
+                isParentOf(libraryName, rowId, columnId, rowData) {
+                        const data = rowData.data
+                        
+                        const parentLibrary = data['parentLibrary']
+                        if (null == parentLibrary
+                                || libraryName != parentLibrary.value
+                        ) return false
+
+                        const parentRow = data['parentRow']
+                        if (null == parentRow
+                                || rowId != parentRow.value
+                        ) return false
+
+                        const parentColumn = data['parentColumn']
+                        if (null == parentColumn
+                                || columnId != parentColumn.value
+                        ) return
+                        
+                        return true
+                }
         },
 })
 
@@ -153,7 +174,7 @@ Vue.component("kodb", {
                                 }
                         },
                         updateValue(msg) {
-                                const rows = this.librarisData[msg.library]
+                                const rows = this.schema.rowsMap[msg.library]
                                 if (null == rows) {
                                         return
                                 }
@@ -164,6 +185,10 @@ Vue.component("kodb", {
                                         return;
                                 }
                                 const row = rows[rowIndex]
+                                if (null == row.data[columnId]) {
+                                        Vue.set(row.data, columnId, {})
+                                }
+
                                 const columnData = row.data[columnId]
                                 
                                 Vue.set(columnData, "exists", msg.exists)

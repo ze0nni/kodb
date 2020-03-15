@@ -17,7 +17,7 @@ type serverController interface {
 
 	GetSchema(ClientID)
 	GetLibraryRows(ClientID, string)
-	NewRow(ClientID, string)
+	NewRow(msgNewRow)
 	DeleteRow(ClientID, string, string)
 	UpdateValue(ClientID, string, string, string, string)
 
@@ -117,8 +117,12 @@ func (client *clientConnection) clientRecieveMessage(
 		libraryName := msg.Get("library").MustString()
 		client.server.GetLibraryRows(client.id, libraryName)
 	case "newRow":
-		libraryName := msg.Get("library").MustString()
-		client.server.NewRow(client.id, libraryName)
+		m, err := msgNewRowFromJson(client.id, msg)
+		if nil != err {
+			log.Printf("[%d] %s | %s", client.id, msg, err)
+			return
+		}
+		client.server.NewRow(m)
 	case "deleteRow":
 		libraryName := msg.Get("library").MustString()
 		rowID := msg.Get("rowId").MustString()
@@ -126,9 +130,9 @@ func (client *clientConnection) clientRecieveMessage(
 	case "updateValue":
 		libraryName := msg.Get("library").MustString()
 		rowID := msg.Get("rowId").MustString()
-		columnId := msg.Get("columnId").MustString()
+		columnID := msg.Get("columnId").MustString()
 		value := msg.Get("value").MustString()
-		client.server.UpdateValue(client.id, libraryName, rowID, columnId, value)
+		client.server.UpdateValue(client.id, libraryName, rowID, columnID, value)
 	case "addLibrary":
 		libraryName := msg.Get("library").MustString()
 		client.server.AddLibrary(client.id, libraryName)
