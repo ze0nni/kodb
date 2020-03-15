@@ -116,13 +116,29 @@ Vue.component("kodb", {
                                 rows.push(...msg.rows)
                         },
                         newRow(msg) {
-                                const rows = this.librarisData[msg.library]
+                                const rows = this.schema.rowsMap[msg.library]
                                 if (null == rows) {
                                         return
                                 }
+                                const library = this.schema.map[msg.library]
+                                if (null == library) {
+                                        return
+                                }
+
+                                // HACK:
+                                const data = {
+
+                                }
+
+                                for (const col of library.columns) {
+                                        data[col.id] = {
+                                                "exists": false
+                                        }
+                                }
+
                                 rows.push({
                                         "rowId": msg.rowId,
-                                        "data": {}
+                                        "data": data
                                 })
                         },
                         deleteRow(msg) {
