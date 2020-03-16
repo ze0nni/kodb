@@ -2,11 +2,13 @@
 
 Vue.component("vue-kodb-schema-literal-column", {
         props: [
+                "column",
+
                 "confirm"
         ],
         data() {
                 return {
-                        columnName: ""
+                        columnName: this.column.name || ""
                 }
         },
         methods: {
@@ -72,22 +74,35 @@ Vue.component("vue-kodb-schema-ref-column", {
         mixins: [ColumnsToItemsMixin],
         props: [
                 "schema",
+                "column",
 
                 "confirm"
         ],
         data() {
                 return {
-                        columnName: "",
-                        "selectedLibrary": null,
+                        columnName: this.column.name || "",
+                        "selectedLibrary": this.column.reference || null,
+                        "displayColumn": this.column["meta:displayColumn"],
                 }
         },
         methods: {
+                toColumnItems(library) {
+                        if (null == library) {
+                                return []
+                        }
+                        return library.columns.map(c => ({
+                                "text": c.name,
+                                "value": c.id
+                        }))
+                },
                 submit() {
                         this.confirm({
                                 library: this.libraryName,
                                 name: this.columnName,
                                 type: "reference",
-                                "ref": this.selectedLibrary
+                                "ref": this.selectedLibrary,
+                                
+                                "meta:displayColumn": this.displayColumn
                         })
                 }
         },
@@ -103,6 +118,16 @@ Vue.component("vue-kodb-schema-ref-column", {
                 <v-select
                         v-model="selectedLibrary"
                         :items="toItems(schema.list)"
+
+                        label="Library"
+                >
+                </v-select>
+
+                <v-select
+                        v-model="displayColumn"
+                        :items="toColumnItems(schema.map[selectedLibrary])"
+
+                        label="Column to display"
                 >
                 </v-select>
         </v-col>
@@ -145,6 +170,12 @@ Vue.component("vue-kodb-schema-list-column", {
                         v-model="columnName"
                         label="Column name"
                 ></v-text-field>
+
+                <v-select
+                        v-model="selectedLibrary"
+                        :items="toItems(schema.list)"
+                >
+                </v-select>
 
                 <v-select
                         v-model="selectedLibrary"

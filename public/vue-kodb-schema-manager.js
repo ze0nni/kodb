@@ -124,6 +124,11 @@ Vue.component("kodb-current-schema-manager", {
 
                     <kodb-ref-column-schema
                             v-else-if="'reference' == col.type"
+
+                            :schema="schema"
+                            :libraryName="table.name"
+                            :columnId="col.id"
+
                             :updateColumnData="updateColumnData"
                     ></kodb-ref-column-schema>
 
@@ -183,7 +188,7 @@ Vue.component("kodb-literal-column-schema", {
         <vue-kodb-schema-literal-column
             v-if="dialog"
 
-            :currentLibraryName="schema[libraryName]"
+            :column="schema.map[libraryName].columnsMap[columnId]"
 
             :confirm="updateColumnData"
         >
@@ -195,16 +200,41 @@ Vue.component("kodb-literal-column-schema", {
 
 Vue.component("kodb-ref-column-schema", {
     props: [
-        "col",
-        "table"
+        "schema",
+        "libraryName",
+        "columnId",
+
+        "updateColumnData"
     ],
+    data() {
+        return {
+            "dialog": false
+        }
+    },
     methods: {
             
     },
     template:
 `
 <td>
-    ref
+    <v-dialog v-model="dialog">
+    <template v-slot:activator="{ on }">
+        <v-btn outlined block text v-on="on">
+            Edit
+        </v-btn>
+    </template>
+
+
+        <vue-kodb-schema-ref-column
+            v-if="dialog"
+
+            :schema="schema"
+            :column="schema.map[libraryName].columnsMap[columnId]"
+
+            :confirm="updateColumnData"
+        >
+        </vue-kodb-schema-ref-column>
+    </v-dialog>
 </td>
 `
 })

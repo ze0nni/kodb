@@ -37,7 +37,8 @@ Vue.component("vue-kodb-schema-new-column", {
             </v-tab>
             <v-tab-item>
                 <vue-kodb-schema-literal-column
-                    
+                    :column="{}"
+
                     :confirm="confirm"
                 >
                 </vue-kodb-schema-literal-column>
@@ -49,6 +50,7 @@ Vue.component("vue-kodb-schema-new-column", {
             <v-tab-item>
                 <vue-kodb-schema-ref-column
                     :schema="schema"
+                    :column="{}"
 
                     :confirm="confirm"
                 >
