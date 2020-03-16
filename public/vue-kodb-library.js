@@ -92,7 +92,7 @@ Vue.component("kodb-library", {
                                         :rowData="item"
                                         :cellData="item.data[col.value]"
                                         
-                                        :expandRow="expandRow(expand, libraryName, col.value)"
+                                        :expandRow="expandRow(expand, col.reference, col.value)"
                                         :isExpanded="expandedLibraryName == col.reference && isExpanded"
                                 >
                                 </kodb-library-cell>
@@ -101,7 +101,7 @@ Vue.component("kodb-library", {
         </template>
 
         <template v-slot:expanded-item="{ item, headers }">
-                <td></td>
+                <td>{{expandedLibraryName}}</td>
                 <td :colspan="headers.length-1"
                 >
                         <kodb-library-expanded
