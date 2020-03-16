@@ -26,6 +26,19 @@ Vue.component("kodb-library", {
                         })
                 },
 
+                expandRow(expand, library, columnId) {
+                        return () => {
+                            if (this.expandedLibraryName == library) {
+                                    this.expandedLibraryName = null
+                                    expand(false)
+                            } else {
+                                    this.expandedLibraryName = library
+                                    this.expandedColumnId = columnId
+                                    expand(true)
+                            }
+                        }
+                },
+
                 newRow() {
                         this.$wsocket.send({
                                 "command": "newRow",
@@ -68,7 +81,6 @@ Vue.component("kodb-library", {
                                 >
                                         {{ isSelected ? "mdi-check-box-outline" : "mdi-checkbox-blank-outline" }}
                                 </v-icon>
-
                                 <kodb-library-cell
                                         v-else
 
@@ -80,15 +92,7 @@ Vue.component("kodb-library", {
                                         :rowData="item"
                                         :cellData="item.data[col.value]"
                                         
-                                        :expandRow="() => {
-                                                if (expandedLibraryName != col.reference) {
-                                                        expandedLibraryName = col.reference
-                                                        expandedColumnId = col.id
-                                                        expand(true);
-                                                } else {
-                                                        expand(!isExpanded);
-                                                }
-                                        }"
+                                        :expandRow="expandRow(expand, libraryName, col.value)"
                                         :isExpanded="expandedLibraryName == col.reference && isExpanded"
                                 >
                                 </kodb-library-cell>
