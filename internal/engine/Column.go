@@ -55,6 +55,11 @@ func (d ColumnData) Rename(value string) {
 	d.entry["name"] = value
 }
 
+// Meta returns ColumnMeta
+func (d ColumnData) Meta() ColumnMeta {
+	return ColumnMeta{d}
+}
+
 // Hidden field
 func (d ColumnData) Hidden() bool {
 	_, ok := d.entry["hidden"]
