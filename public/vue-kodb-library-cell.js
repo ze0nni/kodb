@@ -98,24 +98,30 @@ Vue.component("kodb-library-literal-cell", {
         template:
 `
 <div
-        <div v-if="cellData.exists">
-                <v-edit-dialog
-                        @open="editedValue = cellData.value"
-                        @save="$emit('update', editedValue)"
-                >
+        <v-edit-dialog
+                @open="editedValue = cellData.value"
+                @save="$emit('update', editedValue)"
+        >
+                <div v-if="cellData.exists && cellData.value">
                         {{ cellData.value }}
-                        <template v-slot:input>
-                                <v-text-field
-                                        v-model="editedValue"
-                                        label="Edit"
-                                        single-line
-                                ></v-text-field>
-                        </template>
-                </v-edit-dialog>
-        </div>
-        <v-chip v-else>
-                nil
-        </v-chip>
+                </div>
+                <div v-else-if="cellData.exists">
+                        <v-icon small>mdi-cursor-text</v-icon>
+                </div>
+                <v-chip v-else
+                        x-small
+                >
+                        nil
+                </v-chip>
+
+                <template v-slot:input>
+                        <v-text-field
+                                v-model="editedValue"
+                                label="Edit"
+                                single-line
+                        ></v-text-field>
+                </template>
+        </v-edit-dialog>
 </div>
 `
 })
