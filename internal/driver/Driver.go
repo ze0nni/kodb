@@ -6,6 +6,7 @@ type (
 	// Driver type
 	Driver interface {
 		Prefixes() ([]string, error)
+		IDs(prefix string) ([]string, error)
 		Get(prefix string, id string) (entry.Entry, error)
 		Put(prefix string, id string, entry entry.Entry) error
 		Delete(prefix string, id string) error

@@ -24,6 +24,19 @@ func (d *inMemory) Prefixes() ([]string, error) {
 	return out, nil
 }
 
+func (d *inMemory) IDs(prefix string) ([]string, error) {
+	entrys := d.data[prefix]
+	if nil == entrys {
+		return nil, fmt.Errorf("Entry storage not exists: %s", prefix)
+	}
+
+	out := []string{}
+	for k := range entrys {
+		out = append(out, k)
+	}
+	return out, nil
+}
+
 func (d *inMemory) Get(prefix string, id string) (entry.Entry, error) {
 	entrys := d.data[prefix]
 

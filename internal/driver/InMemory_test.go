@@ -120,3 +120,29 @@ func TestInMemory_DeletePrefix(t *testing.T) {
 	assert.NotNil(t, b2)
 	assert.NotNil(t, b3)
 }
+
+func TestInMemory_IDs_error_when_prefix_not_exists(t *testing.T) {
+	m := InMemory()
+
+	fs, err := m.IDs("foo")
+
+	assert.Nil(t, fs)
+	assert.Error(t, err)
+}
+
+func TestInMemory_IDs(t *testing.T) {
+	m := InMemory()
+
+	m.Put("foo", "1", make(entry.Entry))
+	m.Put("foo", "2", make(entry.Entry))
+	m.Put("foo", "3", make(entry.Entry))
+	m.Put("bar", "4", make(entry.Entry))
+	m.Put("bar", "5", make(entry.Entry))
+	m.Put("bar", "6", make(entry.Entry))
+
+	fs, _ := m.IDs("foo")
+	bs, _ := m.IDs("bar")
+
+	assert.ElementsMatch(t, []string{"1", "2", "3"}, fs)
+	assert.ElementsMatch(t, []string{"4", "5", "6"}, bs)
+}
