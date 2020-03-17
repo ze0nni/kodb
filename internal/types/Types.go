@@ -5,6 +5,8 @@ type Type interface {
 }
 
 type Types interface {
-	Names() ([]string, error)
-	Add(name string) (Type, error)
+	Names() []string
+	New(string) (Type, error)
+	Get(string) (Type, error)
+	Delete(string) error
 }
