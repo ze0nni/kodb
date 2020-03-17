@@ -20,6 +20,8 @@ func New(driver driver.Driver) Engine {
 }
 
 type Engine interface {
+	Types() Types
+
 	Context() ColumnContext
 	Librarys() []LibraryName
 	Library(LibraryName) (Library, error)
@@ -56,6 +58,10 @@ func loadLibrarys(e *engine) {
 			}
 		}
 	}
+}
+
+func (e *engine) Types() Types {
+	return nil
 }
 
 func (e *engine) Context() ColumnContext {
