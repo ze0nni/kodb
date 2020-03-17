@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/ze0nni/kodb/internal/driver"
+	"github.com/ze0nni/kodb/internal/types"
 )
 
 func New(driver driver.Driver) Engine {
@@ -20,7 +21,7 @@ func New(driver driver.Driver) Engine {
 }
 
 type Engine interface {
-	Types() Types
+	Types() types.Types
 
 	Context() ColumnContext
 	Librarys() []LibraryName
@@ -60,7 +61,7 @@ func loadLibrarys(e *engine) {
 	}
 }
 
-func (e *engine) Types() Types {
+func (e *engine) Types() types.Types {
 	return nil
 }
 
