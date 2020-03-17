@@ -65,3 +65,9 @@ func (d *inMemory) Delete(prefix string, id string) error {
 	delete(entrys, id)
 	return nil
 }
+
+func (d *inMemory) DeletePrefix(prefix string) error {
+	delete(d.data, prefix)
+
+	return nil
+}

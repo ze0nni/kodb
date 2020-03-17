@@ -93,3 +93,30 @@ func TestInMemory_Delete(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Nil(t, e)
 }
+
+func TestInMemory_DeletePrefix(t *testing.T) {
+	m := InMemory()
+
+	m.Put("foo", "1", make(entry.Entry))
+	m.Put("foo", "2", make(entry.Entry))
+	m.Put("foo", "3", make(entry.Entry))
+	m.Put("bar", "1", make(entry.Entry))
+	m.Put("bar", "2", make(entry.Entry))
+	m.Put("bar", "3", make(entry.Entry))
+
+	m.DeletePrefix("foo")
+
+	f1, _ := m.Get("foo", "1")
+	f2, _ := m.Get("foo", "2")
+	f3, _ := m.Get("foo", "3")
+	b1, _ := m.Get("bar", "1")
+	b2, _ := m.Get("bar", "2")
+	b3, _ := m.Get("bar", "3")
+
+	assert.Nil(t, f1)
+	assert.Nil(t, f2)
+	assert.Nil(t, f3)
+	assert.NotNil(t, b1)
+	assert.NotNil(t, b2)
+	assert.NotNil(t, b3)
+}
