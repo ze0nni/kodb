@@ -7,51 +7,43 @@ Vue.component("kodb-schema-manager", {
     },
     template:
 `
-<v-dialog>
-    <template v-slot:activator="{ on }">
-        <v-btn block text v-on="on">
-            Edit schema
-        </v-btn>
-    </template>
+<v-card>
+    <v-toolbar flat dark>
+        <v-toolbar-title>Schema</v-toolbar-title>
+    </v-toolbar>
+    <v-tabs vertical>
+        <v-tab v-for="t in schema.list"
+            :key="t.name"
+        >
+            <v-icon left>table-large</v-icon>
+            {{ t.name }}
+        </v-tab>
 
-    <v-card>
-        <v-toolbar flat dark>
-            <v-toolbar-title>Schema</v-toolbar-title>
-        </v-toolbar>
-        <v-tabs vertical>
-            <v-tab v-for="t in schema.list"
-                :key="t.name"
+        <v-tab-item v-for="t in schema.list"
+            :key="t.name"
+        >
+            <kodb-current-schema-manager
+                :table="t"
+                :schema="schema"
             >
-                <v-icon left>table-large</v-icon>
-                {{ t.name }}
-            </v-tab>
+            </kodb-current-schema-manager>
+        </v-tab-item>
+        
+        <!-- new table -->
 
-            <v-tab-item v-for="t in schema.list"
-                :key="t.name"
+        <v-tab>
+            <v-icon left>mdi-plus</v-icon>New
+        </v-tab>
+
+        <v-tab-item>
+            <kodb-new-table-manager
+                :schema="schema"
             >
-                <kodb-current-schema-manager
-                    :table="t"
-                    :schema="schema"
-                >
-                </kodb-current-schema-manager>
-            </v-tab-item>
-            
-            <!-- new table -->
+            </kodb-new-table-manager>
+        </v-tab-item>
 
-            <v-tab>
-                <v-icon left>mdi-plus</v-icon>New
-            </v-tab>
-
-            <v-tab-item>
-                <kodb-new-table-manager
-                    :schema="schema"
-                >
-                </kodb-new-table-manager>
-            </v-tab-item>
-
-        </v-tabs>
-    </v-card>
-</v-dialog>
+    </v-tabs>
+</v-card>
 `
 });
 

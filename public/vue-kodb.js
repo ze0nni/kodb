@@ -215,23 +215,20 @@ Vue.component("kodb", {
                         <v-icon>mdi-magnify</v-icon>
                 </v-btn>
 
-                <v-menu offset-y left>
+                <v-dialog>
                         <template v-slot:activator="{ on }">
-                                <v-btn icon v-on="on">
-                                        <v-icon>mdi-dots-vertical</v-icon>
-                                </v-btn>
+                        <v-btn text v-on="on">
+                                <v-icon left>mdi-shape-outline</v-icon>
+                                Types
+                        </v-btn>
                         </template>
 
-                        <v-list>
-                                <v-list-item>
-                                        <kodb-schema-manager
-                                                :schema="schema"
-                                        >
-                                        </kodb-schema-manager>
-                                </v-list-item>
-                      </v-list>
-                </v-menu>
-        
+                        <kodb-schema-manager
+                                :schema="schema"
+                        >
+                        </kodb-schema-manager>
+                </v-dialog>
+            
 
                 <template v-slot:extension>
                         <v-tabs dense
