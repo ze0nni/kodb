@@ -2,6 +2,9 @@ package types
 
 import (
 	"fmt"
+	"strings"
+
+	"github.com/ze0nni/kodb/internal/entry"
 
 	"github.com/ze0nni/kodb/internal/driver"
 )
@@ -10,14 +13,30 @@ const typePrefix = "type_"
 
 func typesOfDriver(
 	driver driver.Driver,
-) Types {
-	return &types{
-		dict: make(map[string]Type),
+) (Types, error) {
+	types := &types{
+		driver: driver,
+		dict:   make(map[string]Type),
 	}
+
+	ps, err := driver.Prefixes()
+	if nil != err {
+		return nil, err
+	}
+
+	for _, p := range ps {
+		if strings.HasPrefix(p, typePrefix) {
+			name := p[len(typePrefix):]
+			types.dict[name] = newCommonType(name)
+		}
+	}
+
+	return types, nil
 }
 
 type types struct {
-	dict map[string]Type
+	driver driver.Driver
+	dict   map[string]Type
 }
 
 func (ts *types) Names() []string {
@@ -35,6 +54,8 @@ func (ts *types) New(name string) (Type, error) {
 		return nil, fmt.Errorf("Duplicate type <%s>", name)
 	}
 
+	ts.driver.Put(typePrefix+name, "root", make(entry.Entry))
+
 	t := newCommonType(name)
 	ts.dict[name] = t
 	return t, nil
@@ -48,7 +69,13 @@ func (ts *types) Get(name string) (Type, error) {
 }
 
 func (ts *types) Delete(name string) error {
+
 	if _, ok := ts.dict[name]; ok {
+		err := ts.driver.DeletePrefix(typePrefix + name)
+		if nil != err {
+			return err
+		}
+
 		delete(ts.dict, name)
 		return nil
 	}
