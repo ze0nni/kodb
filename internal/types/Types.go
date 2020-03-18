@@ -16,13 +16,20 @@ func (fid FieldID) String() string {
 
 //Field type
 type Field interface {
+	ID() FieldID
+	newID(id FieldID)
+
+	Name() string
+	Kind() FieldDataKind
+
+	private()
 }
 
 //Type type
 type Type interface {
 	Name() TypeName
 	Fields() []Field
-	New(FieldData) (FieldData, error)
+	New(Field) (Field, error)
 }
 
 //Types type

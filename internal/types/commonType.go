@@ -2,7 +2,8 @@ package types
 
 func newCommonType(name TypeName) Type {
 	return &commonType{
-		name: name,
+		name:   name,
+		fields: make(map[FieldID]Field),
 	}
 }
 
@@ -19,6 +20,6 @@ func (t *commonType) Fields() []Field {
 	return []Field{}
 }
 
-func (t *commonType) New(FieldData) (FieldData, error) {
-	panic("not inplements")
+func (t *commonType) New(field Field) (Field, error) {
+	return field, nil
 }
