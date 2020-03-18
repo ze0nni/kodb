@@ -30,6 +30,7 @@ type Type interface {
 	Name() TypeName
 	Fields() []Field
 	New(Field) (Field, error)
+	Delete(Field) error
 }
 
 //Types type

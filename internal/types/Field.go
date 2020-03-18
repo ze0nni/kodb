@@ -13,6 +13,9 @@ const (
 	// ListFieldKind field kind
 	ListFieldKind = FieldDataKind("list")
 
+	// InstanceFieldKind field kind
+	InstanceFieldKind = FieldDataKind("instance")
+
 	// UnknownFieldKind field kind
 	UnknownFieldKind = FieldDataKind("unknown")
 )
