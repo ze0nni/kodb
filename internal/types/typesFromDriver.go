@@ -16,7 +16,7 @@ func typesOfDriver(
 ) (Types, error) {
 	types := &types{
 		driver: driver,
-		dict:   make(map[string]Type),
+		dict:   make(map[TypeName]Type),
 	}
 
 	ps, err := driver.Prefixes()
@@ -26,7 +26,7 @@ func typesOfDriver(
 
 	for _, p := range ps {
 		if strings.HasPrefix(p, typePrefix) {
-			name := p[len(typePrefix):]
+			name := TypeName(p[len(typePrefix):])
 			types.dict[name] = newCommonType(name)
 		}
 	}
@@ -36,11 +36,11 @@ func typesOfDriver(
 
 type types struct {
 	driver driver.Driver
-	dict   map[string]Type
+	dict   map[TypeName]Type
 }
 
-func (ts *types) Names() []string {
-	out := []string{}
+func (ts *types) Names() []TypeName {
+	out := []TypeName{}
 
 	for k := range ts.dict {
 		out = append(out, k)
@@ -49,29 +49,29 @@ func (ts *types) Names() []string {
 	return out
 }
 
-func (ts *types) New(name string) (Type, error) {
+func (ts *types) New(name TypeName) (Type, error) {
 	if _, ok := ts.dict[name]; ok {
 		return nil, fmt.Errorf("Duplicate type <%s>", name)
 	}
 
-	ts.driver.Put(typePrefix+name, "root", make(entry.Entry))
+	ts.driver.Put(typePrefix+name.String(), "root", make(entry.Entry))
 
 	t := newCommonType(name)
 	ts.dict[name] = t
 	return t, nil
 }
 
-func (ts *types) Get(name string) (Type, error) {
+func (ts *types) Get(name TypeName) (Type, error) {
 	if t, ok := ts.dict[name]; ok {
 		return t, nil
 	}
 	return nil, fmt.Errorf("Type <%s> not exists", name)
 }
 
-func (ts *types) Delete(name string) error {
+func (ts *types) Delete(name TypeName) error {
 
 	if _, ok := ts.dict[name]; ok {
-		err := ts.driver.DeletePrefix(typePrefix + name)
+		err := ts.driver.DeletePrefix(typePrefix + name.String())
 		if nil != err {
 			return err
 		}
