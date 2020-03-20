@@ -1,5 +1,9 @@
 package types
 
+import (
+	"github.com/ze0nni/kodb/internal/entry"
+)
+
 //TypeName type
 type TypeName string
 
@@ -22,7 +26,8 @@ type Field interface {
 	Name() string
 	Kind() FieldDataKind
 
-	private()
+	fromEntry(entry.Entry) error
+	toEntry() entry.Entry
 }
 
 //Type type

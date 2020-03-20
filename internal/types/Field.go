@@ -1,7 +1,17 @@
 package types
 
+import (
+	"fmt"
+
+	"github.com/ze0nni/kodb/internal/entry"
+)
+
 // FieldDataKind type
 type FieldDataKind string
+
+func (k FieldDataKind) String() string {
+	return string(k)
+}
 
 const (
 	// ValueFieldKind field kind
@@ -42,23 +52,29 @@ func (fd fieldData) Kind() FieldDataKind {
 	return fd.kind
 }
 
-//NewValueFieldData returns ValueFieldData
-func NewValueFieldData(name string) *ValueFieldData {
-	return &ValueFieldData{
-		fieldData{
-			name: name,
-			kind: ValueFieldKind,
-		},
+func (fd *fieldData) readEntry(e entry.Entry) error {
+	id := FieldID(e["id"])
+	if id != fd.id {
+		return fmt.Errorf("IDs <%s> and <%s> not match", id, fd.id)
 	}
+
+	kind := FieldDataKind(e["kind"])
+	if kind != fd.kind {
+		return fmt.Errorf("Kinds <%s> and <%s> not match", kind, fd.kind)
+	}
+
+	fd.name = e["name"]
+	return nil
 }
 
-//ValueFieldData type
-type ValueFieldData struct {
-	fieldData
-}
+func (fd fieldData) createEntry() entry.Entry {
+	e := make(entry.Entry)
 
-func (vfd *ValueFieldData) private() {
+	e["id"] = fd.id.String()
+	e["kind"] = fd.kind.String()
+	e["name"] = fd.name
 
+	return e
 }
 
 //ReferenceFieldData type
