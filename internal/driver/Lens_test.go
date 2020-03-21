@@ -1,4 +1,4 @@
-package engine
+package driver
 
 import (
 	"testing"
@@ -6,12 +6,10 @@ import (
 	"github.com/ze0nni/kodb/internal/entry"
 
 	"github.com/stretchr/testify/assert"
-
-	"github.com/ze0nni/kodb/internal/driver"
 )
 
 func TestLens_Get(t *testing.T) {
-	l := LensOf("foo", driver.InMemory())
+	l := LensOf("foo", InMemory())
 
 	e, err := l.Get("bar")
 
@@ -20,7 +18,7 @@ func TestLens_Get(t *testing.T) {
 }
 
 func TestLens_Put(t *testing.T) {
-	l := LensOf("foo", driver.InMemory())
+	l := LensOf("foo", InMemory())
 
 	err := l.Put("bar", make(entry.Entry))
 
@@ -31,7 +29,7 @@ func TestLens_Put(t *testing.T) {
 }
 
 func TestLens_Update(t *testing.T) {
-	l := LensOf("foo", driver.InMemory())
+	l := LensOf("foo", InMemory())
 
 	e1 := make(entry.Entry)
 	e1["value"] = "foo"
@@ -52,7 +50,7 @@ func TestLens_Update(t *testing.T) {
 }
 
 func TestLens_prefix(t *testing.T) {
-	d := driver.InMemory()
+	d := InMemory()
 
 	foo := LensOf("foo", d)
 	bar := LensOf("bar", d)
@@ -69,7 +67,7 @@ func TestLens_prefix(t *testing.T) {
 }
 
 func TestLens_driver(t *testing.T) {
-	d := driver.InMemory()
+	d := InMemory()
 
 	foo1 := LensOf("foo", d)
 

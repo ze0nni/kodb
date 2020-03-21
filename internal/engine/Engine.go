@@ -98,9 +98,9 @@ func (e *engine) AddLibrary(name LibraryName) (Library, error) {
 		name,
 		e.Context(),
 		e.listeners,
-		LensOf(name.ToString()+"$schema", e.driver),
-		LensOf(name.ToString()+"$data", e.driver),
-		LensOf(name.ToString()+"$meta", e.driver),
+		driver.LensOf(name.ToString()+"$schema", e.driver),
+		driver.LensOf(name.ToString()+"$data", e.driver),
+		driver.LensOf(name.ToString()+"$meta", e.driver),
 	)
 	e.librarys[name] = newLib
 

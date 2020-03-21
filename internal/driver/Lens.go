@@ -1,7 +1,6 @@
-package engine
+package driver
 
 import (
-	"github.com/ze0nni/kodb/internal/driver"
 	"github.com/ze0nni/kodb/internal/entry"
 )
 
@@ -13,7 +12,7 @@ type Lens interface {
 }
 
 // LensOf make 'DriverLens' from 'Driver'
-func LensOf(prefix string, driver driver.Driver) Lens {
+func LensOf(prefix string, driver Driver) Lens {
 	return &driverLens{
 		prefix: prefix,
 		driver: driver,
@@ -22,7 +21,7 @@ func LensOf(prefix string, driver driver.Driver) Lens {
 
 type driverLens struct {
 	prefix string
-	driver driver.Driver
+	driver Driver
 }
 
 func (lens *driverLens) Get(id string) (entry.Entry, error) {

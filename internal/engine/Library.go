@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	uuid "github.com/nu7hatch/gouuid"
+	"github.com/ze0nni/kodb/internal/driver"
 	"github.com/ze0nni/kodb/internal/entry"
 )
 
@@ -64,9 +65,9 @@ func newLibraryInst(
 	name LibraryName,
 	context ColumnContext,
 	listener Listener,
-	schema Lens,
-	data Lens,
-	meta Lens,
+	schema driver.Lens,
+	data driver.Lens,
+	meta driver.Lens,
 ) *libraryImp {
 	//TODO: error or panic
 	if root, _ := schema.Get("root"); nil == root {
@@ -101,9 +102,9 @@ type libraryImp struct {
 	name     LibraryName
 	context  ColumnContext
 	listener Listener
-	schema   Lens
-	data     Lens
-	meta     Lens
+	schema   driver.Lens
+	data     driver.Lens
+	meta     driver.Lens
 	rows     []RowID
 }
 

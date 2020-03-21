@@ -27,7 +27,9 @@ func typesOfDriver(
 	for _, p := range ps {
 		if strings.HasPrefix(p, typePrefix) {
 			name := TypeName(p[len(typePrefix):])
-			types.dict[name] = newCommonType(name)
+			types.dict[name] = newCommonType(
+				name,
+			)
 		}
 	}
 
