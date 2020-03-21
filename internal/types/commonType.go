@@ -4,17 +4,20 @@ import (
 	"fmt"
 
 	uuid "github.com/nu7hatch/gouuid"
+	"github.com/ze0nni/kodb/internal/driver"
 )
 
-func newCommonType(name TypeName) Type {
+func newCommonType(name TypeName, lens driver.Lens) Type {
 	return &commonType{
 		name:   name,
+		lens:   lens,
 		fields: make(map[FieldID]Field),
 	}
 }
 
 type commonType struct {
 	name   TypeName
+	lens   driver.Lens
 	fields map[FieldID]Field
 }
 

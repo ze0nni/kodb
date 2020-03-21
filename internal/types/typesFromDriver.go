@@ -12,14 +12,14 @@ import (
 const typePrefix = "type_"
 
 func typesOfDriver(
-	driver driver.Driver,
+	drv driver.Driver,
 ) (Types, error) {
 	types := &types{
-		driver: driver,
+		driver: drv,
 		dict:   make(map[TypeName]Type),
 	}
 
-	ps, err := driver.Prefixes()
+	ps, err := drv.Prefixes()
 	if nil != err {
 		return nil, err
 	}
@@ -29,6 +29,7 @@ func typesOfDriver(
 			name := TypeName(p[len(typePrefix):])
 			types.dict[name] = newCommonType(
 				name,
+				driver.LensOf(p, drv),
 			)
 		}
 	}
@@ -56,9 +57,10 @@ func (ts *types) New(name TypeName) (Type, error) {
 		return nil, fmt.Errorf("Duplicate type <%s>", name)
 	}
 
-	ts.driver.Put(typePrefix+name.String(), "root", make(entry.Entry))
+	lens := driver.LensOf(typePrefix+name.String(), ts.driver)
+	lens.Put("root", make(entry.Entry))
 
-	t := newCommonType(name)
+	t := newCommonType(name, lens)
 	ts.dict[name] = t
 	return t, nil
 }
