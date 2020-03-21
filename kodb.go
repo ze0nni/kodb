@@ -107,6 +107,21 @@ func main() {
 	userType.New(types.NewValueFieldData("iq"))
 	userType.New(types.NewValueFieldData("age"))
 
+	mathOp, _ := eng.Types().New(types.TypeName("mathOp"))
+
+	constValue, _ := mathOp.New(types.NewValueFieldData("value"))
+	constValue.SetCase("const")
+
+	opSumLeft, _ := mathOp.New(types.NewValueFieldData("left"))
+	opSumRight, _ := mathOp.New(types.NewValueFieldData("right"))
+	opSumLeft.SetCase("Sum")
+	opSumRight.SetCase("Sum")
+
+	opMultLeft, _ := mathOp.New(types.NewValueFieldData("left"))
+	opMultRight, _ := mathOp.New(types.NewValueFieldData("right"))
+	opMultLeft.SetCase("Mult")
+	opMultRight.SetCase("Mult")
+
 	validate.Validate(eng, func(
 		l engine.LibraryName, r engine.RowID, c engine.ColumnID, err error,
 	) {
