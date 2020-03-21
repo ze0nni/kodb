@@ -1,9 +1,5 @@
 package web
 
-import (
-	"github.com/bitly/go-simplejson"
-)
-
 type msgGetTypes struct {
 	clientID ClientID
 }
@@ -14,22 +10,10 @@ func (m *msgGetTypes) Perform(srv *serverInstance) error {
 		return nil
 	}
 
-	types := simplejson.New()
-
-TypesLoop:
-	for _, name := range srv.engine.Types().Names() {
-		t, err := srv.engine.Types().Get(name)
-		if nil != err {
-			continue TypesLoop
-		}
-		body := simplejson.New()
-		t.FillJson(body)
-		types.Set(name.String(), body)
+	resp, err := rspSetTypes(srv.engine.Types())
+	if nil != err {
+		return err
 	}
-
-	resp := simplejson.New()
-	resp.Set("command", "setTypes")
-	resp.Set("types", types)
 
 	client.Send(resp)
 

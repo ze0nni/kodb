@@ -2,6 +2,7 @@ package web
 
 import (
 	"github.com/ze0nni/kodb/internal/engine"
+	"github.com/ze0nni/kodb/internal/types"
 	"github.com/ze0nni/kodb/run/web/msg"
 )
 
@@ -72,5 +73,71 @@ func (l *serverListener) OnUpdateValue(
 
 	for _, client := range l.server.clients {
 		client.UpdateValue(updateValueMsg)
+	}
+}
+
+func (l *serverListener) OnNewType(types.TypeName) {
+	//TODO newType
+	rsp, err := rspSetTypes(l.server.engine.Types())
+	if nil != err {
+		return
+	}
+	for _, client := range l.server.clients {
+		client.Send(rsp)
+	}
+}
+
+func (l *serverListener) OnDeleteType(types.TypeName) {
+	//TODO deleteType
+	rsp, err := rspSetTypes(l.server.engine.Types())
+	if nil != err {
+		return
+	}
+	for _, client := range l.server.clients {
+		client.Send(rsp)
+	}
+}
+
+func (l *serverListener) OnChangedType(types.TypeName) {
+	//TODO changedType
+	rsp, err := rspSetTypes(l.server.engine.Types())
+	if nil != err {
+		return
+	}
+	for _, client := range l.server.clients {
+		client.Send(rsp)
+	}
+}
+
+func (l *serverListener) OnNewField(types.TypeName, types.FieldID) {
+	//TODO newField
+	rsp, err := rspSetTypes(l.server.engine.Types())
+	if nil != err {
+		return
+	}
+	for _, client := range l.server.clients {
+		client.Send(rsp)
+	}
+}
+
+func (l *serverListener) OnDeleteField(types.TypeName, types.FieldID) {
+	//TODO deleteField
+	rsp, err := rspSetTypes(l.server.engine.Types())
+	if nil != err {
+		return
+	}
+	for _, client := range l.server.clients {
+		client.Send(rsp)
+	}
+}
+
+func (l *serverListener) OnChangedField(types.TypeName, types.FieldID) {
+	//TODO changedField
+	rsp, err := rspSetTypes(l.server.engine.Types())
+	if nil != err {
+		return
+	}
+	for _, client := range l.server.clients {
+		client.Send(rsp)
 	}
 }

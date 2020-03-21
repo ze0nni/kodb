@@ -236,8 +236,13 @@ func (server *serverInstance) newColumn(m msgNewColumn) {
 
 //listen
 func (server *serverInstance) listen() {
-	listenerHandle := server.engine.Listen(&serverListener{server})
+	listener := &serverListener{server}
+
+	listenerHandle := server.engine.Listen(listener)
 	defer listenerHandle()
+
+	typesHandle := server.engine.Types().Listen(listener)
+	defer typesHandle()
 
 	for {
 		select {
