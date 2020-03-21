@@ -9,18 +9,20 @@ import (
 	"github.com/ze0nni/kodb/internal/driver"
 )
 
-func newCommonType(name TypeName, lens driver.Lens) Type {
+func newCommonType(name TypeName, lens driver.Lens, lisrener TypesListener) Type {
 	return &commonType{
-		name:   name,
-		lens:   lens,
-		fields: make(map[FieldID]Field),
+		name:     name,
+		lens:     lens,
+		lisrener: lisrener,
+		fields:   make(map[FieldID]Field),
 	}
 }
 
 type commonType struct {
-	name   TypeName
-	lens   driver.Lens
-	fields map[FieldID]Field
+	name     TypeName
+	lens     driver.Lens
+	lisrener TypesListener
+	fields   map[FieldID]Field
 }
 
 func (t *commonType) Name() TypeName {

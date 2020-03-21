@@ -16,3 +16,39 @@ func (tl *typesListener) Listen(l TypesListener) func() {
 		delete(tl.listeners, l)
 	}
 }
+
+func (tl *typesListener) OnNewType(name TypeName) {
+	for l, _ := range tl.listeners {
+		l.OnNewType(name)
+	}
+}
+
+func (tl *typesListener) OnDeleteType(name TypeName) {
+	for l, _ := range tl.listeners {
+		l.OnDeleteType(name)
+	}
+}
+
+func (tl *typesListener) OnChangedType(name TypeName) {
+	for l, _ := range tl.listeners {
+		l.OnChangedType(name)
+	}
+}
+
+func (tl *typesListener) OnNewField(name TypeName, id FieldID) {
+	for l, _ := range tl.listeners {
+		l.OnNewField(name, id)
+	}
+}
+
+func (tl *typesListener) OnDeleteField(name TypeName, id FieldID) {
+	for l, _ := range tl.listeners {
+		l.OnDeleteField(name, id)
+	}
+}
+
+func (tl *typesListener) OnChangedField(name TypeName, id FieldID) {
+	for l, _ := range tl.listeners {
+		l.OnChangedField(name, id)
+	}
+}

@@ -31,6 +31,7 @@ func TypesOfDriver(
 			types.dict[name] = newCommonType(
 				name,
 				driver.LensOf(p, drv),
+				types.listener,
 			)
 		}
 	}
@@ -62,8 +63,9 @@ func (ts *types) New(name TypeName) (Type, error) {
 	lens := driver.LensOf(typePrefix+name.String(), ts.driver)
 	lens.Put("root", make(entry.Entry))
 
-	t := newCommonType(name, lens)
+	t := newCommonType(name, lens, ts.listener)
 	ts.dict[name] = t
+
 	return t, nil
 }
 
