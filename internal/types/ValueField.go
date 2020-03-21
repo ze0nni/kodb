@@ -1,6 +1,9 @@
 package types
 
-import "github.com/ze0nni/kodb/internal/entry"
+import (
+	"github.com/bitly/go-simplejson"
+	"github.com/ze0nni/kodb/internal/entry"
+)
 
 //NewValueFieldData returns ValueFieldData
 func NewValueFieldData(name string) *ValueFieldData {
@@ -15,6 +18,10 @@ func NewValueFieldData(name string) *ValueFieldData {
 //ValueFieldData type
 type ValueFieldData struct {
 	fieldData
+}
+
+func (vfd *ValueFieldData) FillJson(body *simplejson.Json) {
+	vfd.fillJson(body)
 }
 
 func (vfd *ValueFieldData) fromEntry(e entry.Entry) error {

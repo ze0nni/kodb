@@ -15,6 +15,8 @@ func newServer(engine engine.Engine) *serverInstance {
 		clientDisconnectedCh: make(chan *clientConnection),
 		clients:              make(map[ClientID]*clientConnection),
 
+		msgQueue: make(chan ClientMsg),
+
 		msgGetSchemaCh:      make(chan msgGetSchema),
 		msgGetLibraryRowsCh: make(chan msgGetLibraryRows),
 		msgNewRowCh:         make(chan msgNewRow),
@@ -57,6 +59,7 @@ type serverInstance struct {
 	clientDisconnectedCh chan *clientConnection
 	clients              map[ClientID]*clientConnection
 
+	msgQueue            chan ClientMsg
 	msgGetSchemaCh      chan msgGetSchema
 	msgGetLibraryRowsCh chan msgGetLibraryRows
 	msgNewRowCh         chan msgNewRow
@@ -92,6 +95,16 @@ func (server *serverInstance) clientDisconnected(client *clientConnection) {
 	} else {
 		log.Panicf("Can't disconnec for client [%d]", client.id)
 	}
+}
+
+// Perform
+
+func (server *serverInstance) Perform(msg ClientMsg) {
+	server.msgQueue <- msg
+}
+
+func (server *serverInstance) perform(msg ClientMsg) {
+	msg.Perform(server)
 }
 
 func (server *serverInstance) GetSchema(clientId ClientID) {
@@ -227,6 +240,8 @@ func (server *serverInstance) listen() {
 		case client := <-server.clientDisconnectedCh:
 			server.clientDisconnected(client)
 
+		case msg := <-server.msgQueue:
+			server.perform(msg)
 		case msg := <-server.msgGetSchemaCh:
 			server.getSchema(msg)
 		case msg := <-server.msgGetLibraryRowsCh:

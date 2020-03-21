@@ -3,6 +3,7 @@ package types
 import (
 	"fmt"
 
+	"github.com/bitly/go-simplejson"
 	"github.com/ze0nni/kodb/internal/entry"
 )
 
@@ -57,6 +58,12 @@ func (fd *fieldData) Rename(name string) {
 
 func (fd fieldData) Kind() FieldDataKind {
 	return fd.kind
+}
+
+func (fd fieldData) fillJson(body *simplejson.Json) {
+	body.Set("id", fd.id.String())
+	body.Set("kind", fd.kind.String())
+	body.Set("name", fd.name)
 }
 
 func (fd *fieldData) readEntry(e entry.Entry) error {

@@ -3,6 +3,8 @@ package types
 import (
 	"fmt"
 
+	"github.com/bitly/go-simplejson"
+
 	uuid "github.com/nu7hatch/gouuid"
 	"github.com/ze0nni/kodb/internal/driver"
 )
@@ -69,4 +71,17 @@ func (t *commonType) Delete(field Field) error {
 	delete(t.fields, field.ID())
 
 	return nil
+}
+
+func (t *commonType) FillJson(body *simplejson.Json) {
+	body.Set("name", t.name.String())
+
+	fields := simplejson.New()
+	for n, f := range t.fields {
+		fbody := simplejson.New()
+		f.FillJson(fbody)
+		fields.Set(n.String(), fbody)
+	}
+
+	body.Set("fields", fields)
 }

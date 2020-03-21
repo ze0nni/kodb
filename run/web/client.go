@@ -11,9 +11,15 @@ import (
 
 type ClientID int
 
+type ClientMsg interface {
+	Perform(*serverInstance)
+}
+
 type serverController interface {
 	ClientConnected(client *clientConnection)
 	ClientDisconnected(client *clientConnection)
+
+	Perform(ClientMsg)
 
 	GetSchema(ClientID)
 	GetLibraryRows(ClientID, string)
@@ -111,6 +117,8 @@ func (client *clientConnection) clientRecieveMessage(
 	}
 
 	switch command {
+	case "getTypes":
+		client.server.Perform(&(msgGetTypes{client.id}))
 	case "getSchema":
 		client.server.GetSchema(client.id)
 	case "getLibraryRows":
@@ -163,6 +171,10 @@ WriteLoop:
 			log.Printf("[%d] Message sended", client.id)
 		}
 	}
+}
+
+func (client *clientConnection) Send(msg *simplejson.Json) {
+	client.responseCh <- msg
 }
 
 func (client *clientConnection) SetSchema(msg *msg.SetSchemaMsg) {

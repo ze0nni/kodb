@@ -1,6 +1,7 @@
 package types
 
 import (
+	"github.com/bitly/go-simplejson"
 	"github.com/ze0nni/kodb/internal/entry"
 )
 
@@ -27,6 +28,8 @@ type Field interface {
 	Rename(string)
 	Kind() FieldDataKind
 
+	FillJson(*simplejson.Json)
+
 	fromEntry(entry.Entry) error
 	toEntry() entry.Entry
 	setListener(l func())
@@ -38,6 +41,8 @@ type Type interface {
 	Fields() []Field
 	New(Field) (Field, error)
 	Delete(Field) error
+
+	FillJson(*simplejson.Json)
 }
 
 //Types type
