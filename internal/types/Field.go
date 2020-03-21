@@ -65,7 +65,7 @@ func (fd fieldData) Case() FieldCase {
 	return fd.fcase
 }
 
-func (fd fieldData) SetCase(value FieldCase) {
+func (fd *fieldData) SetCase(value FieldCase) {
 	fd.fcase = value
 
 	fd.onChanged()
