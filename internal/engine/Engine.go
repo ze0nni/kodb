@@ -9,8 +9,14 @@ import (
 )
 
 func New(driver driver.Driver) Engine {
+	types, err := types.TypesOfDriver(driver)
+	if nil != err {
+		panic(err)
+	}
+
 	e := &engine{
 		driver:    driver,
+		types:     types,
 		librarys:  make(map[LibraryName]*libraryImp),
 		listeners: newListenerFromMap(),
 	}
@@ -45,6 +51,7 @@ type Listener interface {
 type engine struct {
 	context         *engineColumnContext
 	driver          driver.Driver
+	types           types.Types
 	librarys        map[LibraryName]*libraryImp
 	listeners       *listenerFromMap
 	currentListener func()
@@ -62,7 +69,7 @@ func loadLibrarys(e *engine) {
 }
 
 func (e *engine) Types() types.Types {
-	return nil
+	return e.types
 }
 
 func (e *engine) Context() ColumnContext {
