@@ -35,6 +35,7 @@ type fieldData struct {
 	id       FieldID
 	name     string
 	kind     FieldDataKind
+	fcase    FieldCase
 	listener func()
 }
 
@@ -60,10 +61,21 @@ func (fd fieldData) Kind() FieldDataKind {
 	return fd.kind
 }
 
+func (fd fieldData) Case() FieldCase {
+	return fd.fcase
+}
+
+func (fd fieldData) SetCase(value FieldCase) {
+	fd.fcase = value
+
+	fd.onChanged()
+}
+
 func (fd fieldData) fillJson(body *simplejson.Json) {
 	body.Set("id", fd.id.String())
 	body.Set("kind", fd.kind.String())
 	body.Set("name", fd.name)
+	body.Set("case", fd.fcase.String())
 }
 
 func (fd *fieldData) readEntry(e entry.Entry) error {

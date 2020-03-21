@@ -19,6 +19,12 @@ func (fid FieldID) String() string {
 	return string(fid)
 }
 
+type FieldCase string
+
+func (fc FieldCase) String() string {
+	return string(fc)
+}
+
 //Field type
 type Field interface {
 	ID() FieldID
@@ -27,6 +33,9 @@ type Field interface {
 	Name() string
 	Rename(string)
 	Kind() FieldDataKind
+
+	Case() FieldCase
+	SetCase(FieldCase)
 
 	FillJson(*simplejson.Json)
 
