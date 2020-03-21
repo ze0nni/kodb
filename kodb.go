@@ -7,6 +7,7 @@ import (
 
 	"github.com/ze0nni/kodb/internal/driver"
 	"github.com/ze0nni/kodb/internal/engine"
+	"github.com/ze0nni/kodb/internal/types"
 	"github.com/ze0nni/kodb/internal/validate"
 	"github.com/ze0nni/kodb/run/web"
 
@@ -96,6 +97,15 @@ func main() {
 			}
 		}
 	}
+
+	userType, _ := eng.Types().New(types.TypeName("user"))
+	userType.New(types.NewValueFieldData("picture"))
+	userType.New(types.NewValueFieldData("firstName"))
+	userType.New(types.NewValueFieldData("secondName"))
+	userType.New(types.NewValueFieldData("ht"))
+	userType.New(types.NewValueFieldData("dx"))
+	userType.New(types.NewValueFieldData("iq"))
+	userType.New(types.NewValueFieldData("age"))
 
 	validate.Validate(eng, func(
 		l engine.LibraryName, r engine.RowID, c engine.ColumnID, err error,
