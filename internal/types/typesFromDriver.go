@@ -11,7 +11,7 @@ import (
 
 const typePrefix = "type_"
 
-func typesOfDriver(
+func TypesOfDriver(
 	drv driver.Driver,
 ) (Types, error) {
 	types := &types{
