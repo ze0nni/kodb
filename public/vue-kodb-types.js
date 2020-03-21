@@ -54,7 +54,19 @@ Vue.component("kodb-type-view", {
         props:[
                 "type"
         ],
+        computed: {
+                cases() {
+                        const fields = Object.values(this.type.fields)
+                        return [...new Set(fields.map(f => f.case))]
+                },
+        },
         methods: {
+                fieldsForCase(c) {
+                        return Object
+                                .values(this.type.fields)
+                                .filter(f => f['case'] == c)
+                },
+
                 newField() {
                         this.$wsocket.send({
                                 "command": "newField",
@@ -65,13 +77,15 @@ Vue.component("kodb-type-view", {
         template:
 `
 <v-simple-table>
-        <tr>
-                <td>
-                        Default
+        <tr v-for="c in cases"
+                :key="c"
+        >
+                <td class="text-right">
+                        {{ c || 'Default' }}
                 </td>
                 <td>
                         <v-chip-group column>
-                                <kodb-type-field-view v-for="f in type.fields"
+                                <kodb-type-field-view v-for="f in fieldsForCase(c)"
                                         :key="f.id"
 
                                         :type="type"

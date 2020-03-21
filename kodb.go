@@ -110,17 +110,17 @@ func main() {
 	mathOp, _ := eng.Types().New(types.TypeName("mathOp"))
 
 	constValue, _ := mathOp.New(types.NewValueFieldData("value"))
-	constValue.SetCase("const")
+	constValue.SetCase(types.FieldCase("Const"))
 
 	opSumLeft, _ := mathOp.New(types.NewValueFieldData("left"))
 	opSumRight, _ := mathOp.New(types.NewValueFieldData("right"))
-	opSumLeft.SetCase("Sum")
-	opSumRight.SetCase("Sum")
+	opSumLeft.SetCase(types.FieldCase("Sum"))
+	opSumRight.SetCase(types.FieldCase("Sum"))
 
 	opMultLeft, _ := mathOp.New(types.NewValueFieldData("left"))
 	opMultRight, _ := mathOp.New(types.NewValueFieldData("right"))
-	opMultLeft.SetCase("Mult")
-	opMultRight.SetCase("Mult")
+	opMultLeft.SetCase(types.FieldCase("Mult"))
+	opMultRight.SetCase(types.FieldCase("Mult"))
 
 	validate.Validate(eng, func(
 		l engine.LibraryName, r engine.RowID, c engine.ColumnID, err error,
