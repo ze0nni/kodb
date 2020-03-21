@@ -15,8 +15,9 @@ func TypesOfDriver(
 	drv driver.Driver,
 ) (Types, error) {
 	types := &types{
-		driver: drv,
-		dict:   make(map[TypeName]Type),
+		driver:   drv,
+		listener: newTypesListener(),
+		dict:     make(map[TypeName]Type),
 	}
 
 	ps, err := drv.Prefixes()
@@ -38,8 +39,9 @@ func TypesOfDriver(
 }
 
 type types struct {
-	driver driver.Driver
-	dict   map[TypeName]Type
+	driver   driver.Driver
+	listener *typesListener
+	dict     map[TypeName]Type
 }
 
 func (ts *types) Names() []TypeName {
@@ -84,4 +86,8 @@ func (ts *types) Delete(name TypeName) error {
 		return nil
 	}
 	return fmt.Errorf("Type <%s> not exists", name)
+}
+
+func (ts *types) Listen(l TypesListener) func() {
+	return ts.listener.Listen(l)
 }

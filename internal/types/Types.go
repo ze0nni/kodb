@@ -51,4 +51,17 @@ type Types interface {
 	New(TypeName) (Type, error)
 	Get(TypeName) (Type, error)
 	Delete(TypeName) error
+
+	Listen(TypesListener) func()
+}
+
+//TypesListener type
+type TypesListener interface {
+	OnNewType(TypeName)
+	OnDeleteType(TypeName)
+	OnChangedType(TypeName)
+
+	OnNewField(TypeName, FieldID)
+	OnDeleteField(TypeName, FieldID)
+	OnChangedField(TypeName, FieldID)
 }
