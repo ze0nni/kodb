@@ -66,6 +66,8 @@ func (ts *types) New(name TypeName) (Type, error) {
 	t := newCommonType(name, lens, ts.listener)
 	ts.dict[name] = t
 
+	ts.listener.OnNewType(name)
+
 	return t, nil
 }
 
@@ -85,6 +87,9 @@ func (ts *types) Delete(name TypeName) error {
 		}
 
 		delete(ts.dict, name)
+
+		ts.listener.OnDeleteType(name)
+
 		return nil
 	}
 	return fmt.Errorf("Type <%s> not exists", name)

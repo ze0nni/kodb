@@ -44,7 +44,15 @@ func (t *commonType) New(field Field) (Field, error) {
 	if nil != err {
 		return nil, err
 	}
-	return t.register(FieldID(uuid.String()), field)
+	newField, err := t.register(FieldID(uuid.String()), field)
+
+	if nil != err {
+		return nil, err
+	}
+
+	t.lisrener.OnNewField(t.name, newField.ID())
+
+	return newField, nil
 }
 
 func (t *commonType) register(id FieldID, field Field) (Field, error) {
@@ -55,6 +63,10 @@ func (t *commonType) register(id FieldID, field Field) (Field, error) {
 	field.newID(id)
 
 	t.fields[id] = field
+
+	field.setListener(func() {
+		t.lisrener.OnChangedField(t.name, id)
+	})
 
 	return field, nil
 }
@@ -71,6 +83,9 @@ func (t *commonType) Delete(field Field) error {
 	}
 
 	delete(t.fields, field.ID())
+	field.setListener(nil)
+
+	t.lisrener.OnDeleteField(t.name, field.ID())
 
 	return nil
 }
