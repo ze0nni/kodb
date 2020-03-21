@@ -24,10 +24,12 @@ type Field interface {
 	newID(id FieldID)
 
 	Name() string
+	Rename(string)
 	Kind() FieldDataKind
 
 	fromEntry(entry.Entry) error
 	toEntry() entry.Entry
+	setListener(l func())
 }
 
 //Type type

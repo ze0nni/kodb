@@ -31,9 +31,10 @@ const (
 )
 
 type fieldData struct {
-	id   FieldID
-	name string
-	kind FieldDataKind
+	id       FieldID
+	name     string
+	kind     FieldDataKind
+	listener func()
 }
 
 func (fd fieldData) ID() FieldID {
@@ -46,6 +47,12 @@ func (fd *fieldData) newID(id FieldID) {
 
 func (fd fieldData) Name() string {
 	return fd.name
+}
+
+func (fd *fieldData) Rename(name string) {
+	fd.name = name
+
+	fd.onChanged()
 }
 
 func (fd fieldData) Kind() FieldDataKind {
@@ -75,6 +82,16 @@ func (fd fieldData) createEntry() entry.Entry {
 	e["name"] = fd.name
 
 	return e
+}
+
+func (fd *fieldData) setListener(l func()) {
+	fd.listener = l
+}
+
+func (fd *fieldData) onChanged() {
+	if nil != fd.listener {
+		fd.listener()
+	}
 }
 
 //ReferenceFieldData type
