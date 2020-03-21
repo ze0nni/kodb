@@ -78,6 +78,7 @@ Vue.component("kodb", {
                 return {
                         selectedLibrary: null,
                         schema: {
+                                types: {},
                                 list: [],
                                 map: {},
                                 rowsMap: {}
@@ -87,10 +88,16 @@ Vue.component("kodb", {
         webSockets: {
                 connected() {
                         this.$wsocket.send({
+                                "command": "getTypes"
+                        })
+                        this.$wsocket.send({
                                 "command": "getSchema"
                         })
                 },
                 command: {
+                        setTypes(msg) {
+                                this.schema.types = msg.types
+                        },
                         setSchema(msg) {
                                 
                                 
@@ -214,6 +221,11 @@ Vue.component("kodb", {
                 <v-btn icon>
                         <v-icon>mdi-magnify</v-icon>
                 </v-btn>
+                
+                <kodb-types-dialog
+                        :types="schema.types"
+                >
+                </kodb-types-dialog>
 
                 <v-dialog>
                         <template v-slot:activator="{ on }">
