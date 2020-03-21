@@ -8,10 +8,10 @@ type msgGetTypes struct {
 	clientID ClientID
 }
 
-func (m *msgGetTypes) Perform(srv *serverInstance) {
+func (m *msgGetTypes) Perform(srv *serverInstance) error {
 	client := srv.clients[m.clientID]
 	if nil == client {
-		return
+		return nil
 	}
 
 	types := simplejson.New()
@@ -32,4 +32,6 @@ TypesLoop:
 	resp.Set("types", types)
 
 	client.Send(resp)
+
+	return nil
 }

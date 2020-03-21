@@ -99,12 +99,18 @@ func (server *serverInstance) clientDisconnected(client *clientConnection) {
 
 // Perform
 
-func (server *serverInstance) Perform(msg ClientMsg) {
+func (server *serverInstance) Perform(msg ClientMsg, err error) {
+	if nil != err {
+		log.Print(err)
+	}
 	server.msgQueue <- msg
 }
 
 func (server *serverInstance) perform(msg ClientMsg) {
-	msg.Perform(server)
+	err := msg.Perform(server)
+	if nil != err {
+		log.Printf("Error when perform %s: %s", msg, err)
+	}
 }
 
 func (server *serverInstance) GetSchema(clientId ClientID) {

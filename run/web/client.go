@@ -12,14 +12,14 @@ import (
 type ClientID int
 
 type ClientMsg interface {
-	Perform(*serverInstance)
+	Perform(*serverInstance) error
 }
 
 type serverController interface {
 	ClientConnected(client *clientConnection)
 	ClientDisconnected(client *clientConnection)
 
-	Perform(ClientMsg)
+	Perform(ClientMsg, error)
 
 	GetSchema(ClientID)
 	GetLibraryRows(ClientID, string)
@@ -118,7 +118,9 @@ func (client *clientConnection) clientRecieveMessage(
 
 	switch command {
 	case "getTypes":
-		client.server.Perform(&(msgGetTypes{client.id}))
+		client.server.Perform(&(msgGetTypes{client.id}), nil)
+	case "newField":
+		client.server.Perform(msgNewFieldFromJson(client.id, msg))
 	case "getSchema":
 		client.server.GetSchema(client.id)
 	case "getLibraryRows":

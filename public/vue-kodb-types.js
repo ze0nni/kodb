@@ -54,6 +54,14 @@ Vue.component("kodb-type-view", {
         props:[
                 "type"
         ],
+        methods: {
+                newField() {
+                        this.$wsocket.send({
+                                "command": "newField",
+                                "type": this.type.name
+                        })
+                }
+        },
         template:
 `
 <v-simple-table>
@@ -70,7 +78,7 @@ Vue.component("kodb-type-view", {
                                         :field="f"
                                 >
                                 </kodb-type-field-view>
-                                <v-chip color="green">
+                                <v-chip color="green" @click="newField">
                                         +
                                 </v-chip>
                         </v-chip-group>
@@ -94,6 +102,8 @@ Vue.component("kodb-type-field-view", {
                 "type",
                 "field"
         ],
+        methods: {
+        },
         template:
 `
 <v-menu offset-y>
