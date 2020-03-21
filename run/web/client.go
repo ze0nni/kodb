@@ -121,6 +121,8 @@ func (client *clientConnection) clientRecieveMessage(
 		client.server.Perform(&(msgGetTypes{client.id}), nil)
 	case "newField":
 		client.server.Perform(msgNewFieldFromJson(client.id, msg))
+	case "deleteField":
+		client.server.Perform(msgDeleteFieldFromJson(client.id, msg))
 	case "getSchema":
 		client.server.GetSchema(client.id)
 	case "getLibraryRows":

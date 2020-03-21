@@ -40,6 +40,7 @@ type Type interface {
 	Name() TypeName
 	Fields() []Field
 	New(Field) (Field, error)
+	Get(FieldID) (Field, error)
 	Delete(Field) error
 
 	FillJson(*simplejson.Json)

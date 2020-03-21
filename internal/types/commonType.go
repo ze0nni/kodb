@@ -71,6 +71,14 @@ func (t *commonType) register(id FieldID, field Field) (Field, error) {
 	return field, nil
 }
 
+func (t *commonType) Get(id FieldID) (Field, error) {
+	stored, ok := t.fields[id]
+	if false == ok {
+		return nil, fmt.Errorf("Field <%s> not registerd", id)
+	}
+	return stored, nil
+}
+
 func (t *commonType) Delete(field Field) error {
 	stored, ok := t.fields[field.ID()]
 

@@ -103,6 +103,13 @@ Vue.component("kodb-type-field-view", {
                 "field"
         ],
         methods: {
+                deleteField() {
+                        this.$wsocket.send({
+                                "command": "deleteField",
+                                "type": this.type.name,
+                                "field": this.field.id,
+                        })
+                }
         },
         template:
 `
@@ -121,7 +128,7 @@ Vue.component("kodb-type-field-view", {
                         <v-list-item-title>Move right</v-list-item-title>
                 </v-list-item>
 
-                <v-list-item @click="">
+                <v-list-item @click="deleteField">
                         <v-list-item-title>Delete</v-list-item-title>
                 </v-list-item>
         </v-list>
