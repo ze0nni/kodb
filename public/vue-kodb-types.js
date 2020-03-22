@@ -135,6 +135,12 @@ Vue.component("kodb-type-field-view", {
         </template>
 
         <v-list>
+                <kodb-type-field-view-rename
+                        :field="field"
+                        :type="type"
+                >
+                </kodb-type-field-view-rename>
+
                 <v-list-item @click="">
                         <v-list-item-title>Move left</v-list-item-title>
                 </v-list-item>
@@ -147,5 +153,65 @@ Vue.component("kodb-type-field-view", {
                 </v-list-item>
         </v-list>
 </v-menu>
+`
+})
+
+Vue.component("kodb-type-field-view-rename", {
+        props:[
+                "type",
+                "field"
+        ],
+        data() {
+                return {
+                        dialog: false,
+
+                        dialogName: "",
+                }
+        },
+        methods: {
+                save() {
+                        this.dialog = false
+
+                        this.$wsocket.send({
+                                "command": "updateField",
+
+                                "type": this.type.name,
+                                "field": this.field.id,
+
+                                "name": this.dialogName
+                        })
+                }
+        },
+        watch: {
+                dialog(value) {
+                        if (value) {
+                                this.dialogName = this.field.name
+                        }
+                }
+        },
+        template:
+`
+<v-dialog v-model="dialog">
+        <template v-slot:activator="{ on }">
+                <v-list-item v-on="on">Rename</v-list-item>
+        </template>
+        <v-card>
+                <v-toolbar dark>
+                        Edit "{{type.name}}.{{field.name}}"
+                </v-toolbar>
+                <v-card-text>
+                        <v-text-field
+                                v-model="dialogName"
+                                label="name"
+                        ></v-text-field>
+                </v-card-text>
+                <v-card-actions>
+                        <v-spacer></v-spacer>
+                        <v-btn text @click="save">
+                                Save
+                        </v-btn>
+                </v-card-actions>
+        </v-card>
+</v-dialog>
 `
 })
