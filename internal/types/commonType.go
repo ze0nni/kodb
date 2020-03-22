@@ -15,6 +15,7 @@ func newCommonType(name TypeName, lens driver.Lens, lisrener TypesListener) Type
 		lens:     lens,
 		lisrener: lisrener,
 		fields:   make(map[FieldID]Field),
+		cases:    []FieldCase{""},
 	}
 }
 
@@ -23,6 +24,7 @@ type commonType struct {
 	lens     driver.Lens
 	lisrener TypesListener
 	fields   map[FieldID]Field
+	cases    []FieldCase
 }
 
 func (t *commonType) Name() TypeName {
@@ -101,6 +103,12 @@ func (t *commonType) Delete(field Field) error {
 func (t *commonType) FillJson(body *simplejson.Json) {
 	body.Set("name", t.name.String())
 
+	cases := make([]string, 0, len(t.cases))
+	for _, c := range t.cases {
+		cases = append(cases, c.String())
+	}
+	body.Set("cases", cases)
+
 	fields := simplejson.New()
 	for n, f := range t.fields {
 		fbody := simplejson.New()
@@ -109,4 +117,14 @@ func (t *commonType) FillJson(body *simplejson.Json) {
 	}
 
 	body.Set("fields", fields)
+}
+
+func (t *commonType) Cases() []FieldCase {
+	out := make([]FieldCase, 0, len(t.cases))
+	return append(out, t.cases...)
+}
+
+func (t *commonType) UpdateCases(value []FieldCase) {
+	copy := make([]FieldCase, 0, len(value))
+	t.cases = append(copy, value...)
 }

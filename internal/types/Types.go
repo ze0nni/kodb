@@ -52,6 +52,9 @@ type Type interface {
 	Get(FieldID) (Field, error)
 	Delete(Field) error
 
+	Cases() []FieldCase
+	UpdateCases([]FieldCase)
+
 	FillJson(*simplejson.Json)
 }
 
