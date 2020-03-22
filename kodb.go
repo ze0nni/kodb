@@ -108,6 +108,11 @@ func main() {
 	userType.New(types.NewValueFieldData("age"))
 
 	mathOp, _ := eng.Types().New(types.TypeName("mathOp"))
+	mathOp.UpdateCases([]types.FieldCase{
+		types.FieldCase("Const"),
+		types.FieldCase("Sum"),
+		types.FieldCase("Mult"),
+	})
 
 	constValue, _ := mathOp.New(types.NewValueFieldData("value"))
 	constValue.SetCase(types.FieldCase("Const"))
