@@ -13,13 +13,19 @@ func msgNewFieldFromJson(
 	if nil != err {
 		return nil, err
 	}
+	fieldCase, err := msg.Get("case").String()
+	if nil != err {
+		return nil, err
+	}
 	return &msgNewField{
-		typeName: types.TypeName(typeName),
+		typeName:  types.TypeName(typeName),
+		fieldCase: types.FieldCase(fieldCase),
 	}, nil
 }
 
 type msgNewField struct {
-	typeName types.TypeName
+	typeName  types.TypeName
+	fieldCase types.FieldCase
 }
 
 func (msg *msgNewField) Perform(srv *serverInstance) error {
@@ -28,7 +34,10 @@ func (msg *msgNewField) Perform(srv *serverInstance) error {
 		return err
 	}
 
-	_, err = t.New(types.NewValueFieldData("newField"))
+	newType := types.NewValueFieldData("newField")
+	newType.SetCase(msg.fieldCase)
+
+	_, err = t.New(newType)
 	if nil != err {
 		return err
 	}

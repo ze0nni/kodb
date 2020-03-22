@@ -67,10 +67,11 @@ Vue.component("kodb-type-view", {
                                 .filter(f => f['case'] == c)
                 },
 
-                newField() {
+                newField(fieldCase) {
                         this.$wsocket.send({
                                 "command": "newField",
-                                "type": this.type.name
+                                "type": this.type.name,
+                                "case": fieldCase
                         })
                 }
         },
@@ -92,7 +93,7 @@ Vue.component("kodb-type-view", {
                                         :field="f"
                                 >
                                 </kodb-type-field-view>
-                                <v-chip color="green" @click="newField">
+                                <v-chip color="green" @click="newField(c)">
                                         +
                                 </v-chip>
                         </v-chip-group>
