@@ -54,12 +54,6 @@ Vue.component("kodb-type-view", {
         props:[
                 "type"
         ],
-        computed: {
-                cases() {
-                        const fields = Object.values(this.type.fields)
-                        return [...new Set(fields.map(f => f.case))]
-                },
-        },
         methods: {
                 fieldsForCase(c) {
                         return Object
@@ -78,7 +72,7 @@ Vue.component("kodb-type-view", {
         template:
 `
 <v-simple-table>
-        <tr v-for="c in cases"
+        <tr v-for="c in type.cases"
                 :key="c"
         >
                 <td class="text-right">
