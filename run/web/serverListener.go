@@ -76,6 +76,13 @@ func (l *serverListener) OnUpdateValue(
 	}
 }
 
+func (l *serverListener) OnSwap(
+	name engine.LibraryName,
+	i, j int,
+	rowI, rowJ engine.RowID,
+) {
+}
+
 func (l *serverListener) OnNewType(types.TypeName) {
 	//TODO newType
 	rsp, err := rspSetTypes(l.server.engine.Types())

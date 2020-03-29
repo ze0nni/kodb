@@ -1,6 +1,7 @@
 package engine
 
 import (
+	"fmt"
 	"strconv"
 
 	"github.com/ze0nni/kodb/internal/driver"
@@ -33,4 +34,17 @@ func (o *rowsByOrder) Less(i, j int) bool {
 
 func (o *rowsByOrder) Swap(i, j int) {
 	o.rows[i], o.rows[j] = o.rows[j], o.rows[i]
+}
+
+func SwapRowsByID(library Library, r, r0 RowID) error {
+	i, ok := library.RowIndex(r)
+	if false == ok {
+		return fmt.Errorf("Row <%s> not found in <%s>", r.ToString(), library.Name().ToString())
+	}
+	j, ok := library.RowIndex(r0)
+	if false == ok {
+		return fmt.Errorf("Row <%s> not found in <%s>", r0.ToString(), library.Name().ToString())
+	}
+
+	return library.Swap(i, j)
 }

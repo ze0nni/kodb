@@ -43,6 +43,7 @@ type (
 		DeleteRow(RowID) error
 
 		RowID(int) (RowID, error)
+		RowIndex(RowID) (int, bool)
 
 		Swap(int, int) error
 
@@ -313,6 +314,15 @@ func (lib *libraryImp) RowID(index int) (RowID, error) {
 	}
 
 	return lib.rows[index], nil
+}
+
+func (lib *libraryImp) RowIndex(row RowID) (int, bool) {
+	for i, r := range lib.rows {
+		if r == row {
+			return i, true
+		}
+	}
+	return 0, false
 }
 
 func (lib *libraryImp) Swap(i, j int) error {

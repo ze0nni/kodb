@@ -177,6 +177,27 @@ Vue.component("kodb-library-rows-menu", {
                                 })
                         }
                         //this.selectedRows = []
+                },
+                swapWith(direction) {
+                        if (1 != this.selectedRows.length) {
+                                return
+                        }
+                        const row = this.selectedRows[0]
+                        const rowIndex = this.libraryRows.indexOf(row)
+                        const row0 = this.libraryRows[rowIndex + direction]
+
+                        this.$wsocket.send({
+                                "command": "swapRows",
+                                "library": this.libraryName,
+                                "row": row.rowId,
+                                "row0": row0.rowId
+                        })
+                },
+                moveUp() {
+                        this.swapWith(-1)
+                },
+                moveDown(direction) {
+                        this.swapWith(+1)
                 }
         },
         template:
@@ -195,11 +216,14 @@ Vue.component("kodb-library-rows-menu", {
         </v-btn>
 
         <v-btn :disabled="false == canMoveUp"
+                v-on:click="moveUp"
                 icon color="primary"
+
         >
                 <v-icon>mdi-arrow-up</v-icon>
         </v-btn>
         <v-btn :disabled="false == canMoveDown"
+                v-on:click="moveDown"
                 icon color="primary"
         >
                 <v-icon>mdi-arrow-down</v-icon>

@@ -147,6 +147,8 @@ func (client *clientConnection) clientRecieveMessage(
 		columnID := msg.Get("columnId").MustString()
 		value := msg.Get("value").MustString()
 		client.server.UpdateValue(client.id, libraryName, rowID, columnID, value)
+	case "swapRows":
+		client.server.Perform(msgSwapRowsFromJson(client.id, msg))
 	case "addLibrary":
 		libraryName := msg.Get("library").MustString()
 		client.server.AddLibrary(client.id, libraryName)
