@@ -81,6 +81,10 @@ func (l *serverListener) OnSwap(
 	i, j int,
 	rowI, rowJ engine.RowID,
 ) {
+	rsp := rspSwapRows(name, i, j, rowI, rowJ)
+	for _, client := range l.server.clients {
+		client.Send(rsp)
+	}
 }
 
 func (l *serverListener) OnNewType(types.TypeName) {

@@ -201,6 +201,25 @@ Vue.component("kodb", {
                                 Vue.set(columnData, "exists", msg.exists)
                                 Vue.set(columnData, "value", msg.value)
                                 Vue.set(columnData, "error", msg.error)
+                        },
+                        swapRows(msg) {
+                                const rows = this.schema.rowsMap[msg.library]
+                                if (null == rows) {
+                                        return
+                                }
+                                const row = rows[msg.j]
+                                const row0 = rows[msg.i]
+                                if (row.rowId == msg.row && row0.rowId == msg.row0) {
+                                        Vue.set(rows, msg.i, row)
+                                        Vue.set(rows, msg.j, row0)
+                                } else {
+                                        log.warn("Invalidate library", msg.library)
+
+                                        this.$wsocket.send({
+                                                "command": "getLibraryRows",
+                                                "library": msg.library
+                                        })
+                                }
                         }
                 }
         },
