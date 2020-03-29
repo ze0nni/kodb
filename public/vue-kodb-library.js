@@ -106,6 +106,7 @@ Vue.component("kodb-library", {
                         <v-spacer></v-spacer>
                         
                         <kodb-library-rows-menu
+                                :schema="schema"
                                 :libraryName="libraryName"
                                 :selectedRows="selectedRows"
                         >
@@ -118,10 +119,39 @@ Vue.component("kodb-library", {
 
 Vue.component("kodb-library-rows-menu", {
         props: [
+                "schema",
                 "libraryName",
 
                 "selectedRows"
         ],
+        computed: {
+                canMoveUp() {
+                        if (0 == this.selectedRows.length) {
+                                return false
+                        }
+                        const rows = this.schema.rowsMap[this.libraryName]
+                        for (let r of this.selectedRows) {
+                                if (0 == rows.indexOf(r)) {
+                                        return false
+                                }
+                        }
+                        return true
+
+                },
+                canMoveDown() {
+                        if (0 == this.selectedRows.length) {
+                                return false
+                        }
+                        const rows = this.schema.rowsMap[this.libraryName]
+                        const lastRowId = rows.length - 1
+                        for (let r of this.selectedRows) {
+                                if (lastRowId == rows.indexOf(r)) {
+                                        return false
+                                }
+                        }
+                        return true
+                },
+        },
         methods: {
                 newRow() {
                         this.$wsocket.send({
@@ -155,12 +185,12 @@ Vue.component("kodb-library-rows-menu", {
                 <v-icon>mdi-delete</v-icon>
         </v-btn>
 
-        <v-btn :disabled="selectedRows.length == 0"
+        <v-btn :disabled="false == canMoveUp"
                 icon color="primary"
         >
                 <v-icon>mdi-arrow-up</v-icon>
         </v-btn>
-        <v-btn :disabled="selectedRows.length == 0"
+        <v-btn :disabled="false == canMoveDown"
                 icon color="primary"
         >
                 <v-icon>mdi-arrow-down</v-icon>
