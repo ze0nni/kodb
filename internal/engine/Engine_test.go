@@ -156,3 +156,24 @@ func TestEngine_Listener_UpdateValue(t *testing.T) {
 		ll.getLog(),
 	)
 }
+
+func TestEngine_Listener_Swap(t *testing.T) {
+	eng := New(driver.InMemory())
+	l, _ := eng.AddLibrary(LibraryName("library"))
+
+	l.AddRow(RowID("r1"))
+	l.AddRow(RowID("r2"))
+	l.AddRow(RowID("r3"))
+	l.AddRow(RowID("r4"))
+
+	ll := newLogListener()
+	eng.Listen(ll)
+
+	l.Swap(1, 3)
+
+	assert.Equal(
+		t,
+		[]string{"swap library 1 3 r4 r2"},
+		ll.getLog(),
+	)
+}

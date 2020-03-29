@@ -25,3 +25,7 @@ func (lm *listenerNilInst) OnDeleteRow(LibraryName, RowID) {
 func (lm *listenerNilInst) OnUpdateValue(LibraryName, RowID, ColumnID, bool, string, error) {
 
 }
+
+func (lm *listenerNilInst) OnSwap(LibraryName, int, int, RowID, RowID) {
+
+}

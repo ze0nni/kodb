@@ -51,3 +51,13 @@ func (l *logListener) OnUpdateValue(name LibraryName, row RowID, col ColumnID, e
 		value,
 	))
 }
+
+func (l *logListener) OnSwap(name LibraryName, i, j int, iID, jID RowID) {
+	l.log = append(l.log, fmt.Sprintf("swap %s %d %d %s %s",
+		name.ToString(),
+		i,
+		j,
+		iID.ToString(),
+		jID.ToString(),
+	))
+}

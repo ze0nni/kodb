@@ -348,6 +348,9 @@ func (lib *libraryImp) Swap(i, j int) error {
 	lib.rows[i] = rowJ
 	lib.rows[j] = rowI
 
+	//rowJ, rowI after swap
+	lib.listener.OnSwap(lib.name, i, j, rowJ, rowI)
+
 	return nil
 }
 

@@ -46,6 +46,8 @@ type Listener interface {
 	OnNewRow(LibraryName, RowID)
 	OnDeleteRow(LibraryName, RowID)
 	OnUpdateValue(LibraryName, RowID, ColumnID, bool, string, error)
+
+	OnSwap(LibraryName, int, int, RowID, RowID)
 }
 
 type engine struct {
@@ -122,4 +124,8 @@ func (e *engine) Listen(listener Listener) func() {
 
 func (e *engine) ListenLibrary(library LibraryName, listener Listener) func() {
 	return e.listeners.listenLibrary(library, listener)
+}
+
+func (e *engine) OnSwap(name LibraryName, i, j int, iID, jID RowID) {
+	panic("Not implements")
 }

@@ -87,3 +87,12 @@ func (lm *listenerFromMap) OnUpdateValue(name LibraryName, row RowID, col Column
 		l.OnUpdateValue(name, row, col, exixts, value, cellErr)
 	})
 }
+
+func (lm *listenerFromMap) OnSwap(name LibraryName, i, j int, iID, jID RowID) {
+	for l, _ := range lm.listeners {
+		l.OnSwap(name, i, j, iID, jID)
+	}
+	lm.forLibrary(name, func(l Listener) {
+		l.OnSwap(name, i, j, iID, jID)
+	})
+}
