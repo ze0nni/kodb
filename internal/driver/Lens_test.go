@@ -86,3 +86,21 @@ func TestLens_driver(t *testing.T) {
 	assert.NotNil(t, e2)
 	assert.Equal(t, "world", e2["hello"])
 }
+
+func TestLens_Keys(t *testing.T) {
+	l := LensOf("prefix", InMemory())
+
+	l.Put("1", entry.Entry{})
+	l.Put("2", entry.Entry{})
+	l.Put("6", entry.Entry{})
+	l.Put("1", entry.Entry{})
+
+	keys, err := l.Keys()
+
+	assert.NoError(t, err)
+	assert.ElementsMatch(
+		t,
+		[]string{"1", "2", "6"},
+		keys,
+	)
+}

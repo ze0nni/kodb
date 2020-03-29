@@ -6,6 +6,7 @@ import (
 
 // Lens type
 type Lens interface {
+	Keys() ([]string, error)
 	Get(id string) (entry.Entry, error)
 	Put(id string, entry entry.Entry) error
 	Delete(id string) error
@@ -22,6 +23,10 @@ func LensOf(prefix string, driver Driver) Lens {
 type driverLens struct {
 	prefix string
 	driver Driver
+}
+
+func (lens *driverLens) Keys() ([]string, error) {
+	return lens.driver.IDs(lens.prefix)
 }
 
 func (lens *driverLens) Get(id string) (entry.Entry, error) {
