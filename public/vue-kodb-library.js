@@ -38,24 +38,6 @@ Vue.component("kodb-library", {
                             }
                         }
                 },
-
-                newRow() {
-                        this.$wsocket.send({
-                                "command": "newRow",
-                                "library": this.libraryName
-                        })
-                },
-
-                deleteSelectedRows() {
-                        for (let row of this.selectedRows) {
-                                this.$wsocket.send({
-                                        "command": "deleteRow",
-                                        "library": this.libraryName,
-                                        "rowId": row.rowId
-                                })
-                        }
-                        this.selectedRows = []
-                },
         },
         template:
 `
@@ -122,31 +104,67 @@ Vue.component("kodb-library", {
                         <v-switch v-model="multiSelect" label="Multi select" />
 
                         <v-spacer></v-spacer>
-
-                        <v-btn v-on:click="newRow"
-                                icon color="primary"
+                        
+                        <kodb-library-rows-menu
+                                :libraryName="libraryName"
+                                :selectedRows="selectedRows"
                         >
-                                <v-icon>mdi-plus</v-icon>
-                        </v-btn>
-                        <v-btn v-on:click="deleteSelectedRows"
-                                :disabled="selectedRows.length == 0"
-                                icon color="error"
-                        >
-                                <v-icon>mdi-delete</v-icon>
-                        </v-btn>
-
-                        <v-btn :disabled="selectedRows.length == 0"
-                                icon color="primary"
-                        >
-                                <v-icon>mdi-arrow-up</v-icon>
-                        </v-btn>
-                        <v-btn :disabled="selectedRows.length == 0"
-                                icon color="primary"
-                        >
-                                <v-icon>mdi-arrow-down</v-icon>
-                        </v-btn>
+                        </kodb-library-rows-menu>
                 </v-toolbar>
         </template>
 </v-data-table>
+`
+});
+
+Vue.component("kodb-library-rows-menu", {
+        props: [
+                "libraryName",
+
+                "selectedRows"
+        ],
+        methods: {
+                newRow() {
+                        this.$wsocket.send({
+                                "command": "newRow",
+                                "library": this.libraryName
+                        })
+                },
+                deleteSelectedRows() {
+                        for (let row of this.selectedRows) {
+                                this.$wsocket.send({
+                                        "command": "deleteRow",
+                                        "library": this.libraryName,
+                                        "rowId": row.rowId
+                                })
+                        }
+                        //this.selectedRows = []
+                }
+        },
+        template:
+`
+<v-item-group>
+        <v-btn v-on:click="newRow"
+                icon color="primary"
+        >
+                <v-icon>mdi-plus</v-icon>
+        </v-btn>
+        <v-btn v-on:click="deleteSelectedRows"
+                :disabled="selectedRows.length == 0"
+                icon color="error"
+        >
+                <v-icon>mdi-delete</v-icon>
+        </v-btn>
+
+        <v-btn :disabled="selectedRows.length == 0"
+                icon color="primary"
+        >
+                <v-icon>mdi-arrow-up</v-icon>
+        </v-btn>
+        <v-btn :disabled="selectedRows.length == 0"
+                icon color="primary"
+        >
+                <v-icon>mdi-arrow-down</v-icon>
+        </v-btn>
+</v-item-group>
 `
 });
