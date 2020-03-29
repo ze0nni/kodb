@@ -17,19 +17,9 @@ Vue.component("kodb-library-expanded", {
     computed: {
         columns() {
                 return this.getLibraryColumns(this.libraryName)
-        }
-    },
-    methods: {
-            newRow() {
-                this.$wsocket.send({
-                        "command": "newRow",
-                        "library": this.libraryName,
-                        "parentLibrary": this.parentLibraryName,
-                        "parentRow": this.parentRowId,
-                        "parentColumn": this.parentColumnId
-                })
-            },
-            filterItems(rows) {
+        },
+        rows() {
+                const rows = this.schema.rowsMap[this.libraryName]
                 const columns = this.columns
                 const parentLibraryId = this.parentLibraryName
                 const parentRowId = this.parentRowId
@@ -46,7 +36,9 @@ Vue.component("kodb-library-expanded", {
                                 { extendedRow: true, row: r, columns:[], numColumns: columns.length }
                         ])
                         .reduce((a, b) => a.concat(b), [])
-            },
+        }
+    },
+    methods: {
             expandRow(library, columnId) {
                     return () => {
                         if (this.expandedLibraryName == library) {
@@ -70,11 +62,23 @@ Vue.component("kodb-library-expanded", {
                                 <th :colspan="columns.length + 1"
                                         style="margin:0; padding:0"
                                 >
-                                        <v-card tile dark>
-                                                <v-col>
-                                                {{ getColumnName(parentLibraryName, parentColumnId) }}
-                                                </v-col>
-                                        </v-card>
+                                        <v-toolbar tile dark dense>
+                                                <v-toolbar-title>{{ getColumnName(parentLibraryName, parentColumnId) }}</v-toolbar-title>
+
+                                                <v-spacer></v-spacer>
+                                                
+                                                <kodb-library-rows-menu
+                                                        :libraryName="libraryName"
+                                                        :libraryRows="rows"
+
+                                                        :parentLibraryName="parentLibraryName"
+                                                        :parentRowId="parentRowId"
+                                                        :parentColumnId="parentColumnId"
+
+                                                        :selectedRows="[]"
+                                                >
+                                                </kodb-library-rows-menu>
+                                        </v-toolbar>
                                 </th>
                         </tr>
                         <tr>
@@ -90,7 +94,7 @@ Vue.component("kodb-library-expanded", {
                         </tr>
                 </thead>
                 <tbody>
-                        <tr v-for="r in filterItems(schema.rowsMap[libraryName])"
+                        <tr v-for="r in rows"
                         >
                                 <td v-if="!r.extendedRow"></td>
                                 <td v-for="col in r.columns"
@@ -129,19 +133,6 @@ Vue.component("kodb-library-expanded", {
                                 </td>
                         </tr>
                 </tbody>
-                <tfoot>
-                        <tr>
-                                <td
-                                        :colspan="columns.length + 1"
-                                >
-                                        <v-btn small text
-                                                v-on:click="newRow"
-                                        >
-                                                New row
-                                        </v-btn>
-                                </td>
-                        </tr>
-                </tfoot>
         </v-simple-table>
 </v-card>
 `

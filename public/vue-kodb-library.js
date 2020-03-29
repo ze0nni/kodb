@@ -106,8 +106,9 @@ Vue.component("kodb-library", {
                         <v-spacer></v-spacer>
                         
                         <kodb-library-rows-menu
-                                :schema="schema"
                                 :libraryName="libraryName"
+                                :libraryRows="schema.rowsMap[libraryName]"
+
                                 :selectedRows="selectedRows"
                         >
                         </kodb-library-rows-menu>
@@ -119,8 +120,12 @@ Vue.component("kodb-library", {
 
 Vue.component("kodb-library-rows-menu", {
         props: [
-                "schema",
                 "libraryName",
+                "libraryRows",
+
+                "parentLibraryName",
+                "parentRowId",
+                "parentColumnId",
 
                 "selectedRows"
         ],
@@ -129,7 +134,7 @@ Vue.component("kodb-library-rows-menu", {
                         if (0 == this.selectedRows.length) {
                                 return false
                         }
-                        const rows = this.schema.rowsMap[this.libraryName]
+                        const rows = this.libraryRows
                         for (let r of this.selectedRows) {
                                 if (0 == rows.indexOf(r)) {
                                         return false
@@ -142,7 +147,7 @@ Vue.component("kodb-library-rows-menu", {
                         if (0 == this.selectedRows.length) {
                                 return false
                         }
-                        const rows = this.schema.rowsMap[this.libraryName]
+                        const rows = this.libraryRows
                         const lastRowId = rows.length - 1
                         for (let r of this.selectedRows) {
                                 if (lastRowId == rows.indexOf(r)) {
@@ -156,7 +161,11 @@ Vue.component("kodb-library-rows-menu", {
                 newRow() {
                         this.$wsocket.send({
                                 "command": "newRow",
-                                "library": this.libraryName
+                                "library": this.libraryName,
+
+                                "parentLibrary": this.parentLibraryName,
+                                "parentRow": this.parentRowId,
+                                "parentColumn": this.parentColumnId
                         })
                 },
                 deleteSelectedRows() {
