@@ -10,6 +10,8 @@ Vue.component("kodb-library-expanded", {
     ],
     data() {
         return {
+                selectedRow: [],
+
                 expandedLibraryName: null,
                 expandedColumnId: null,
         }
@@ -20,7 +22,6 @@ Vue.component("kodb-library-expanded", {
         },
         rows() {
                 const rows = this.schema.rowsMap[this.libraryName]
-                const columns = this.columns
                 const parentLibraryId = this.parentLibraryName
                 const parentRowId = this.parentRowId
                 const parentColumnId = this.parentColumnId
@@ -31,6 +32,10 @@ Vue.component("kodb-library-expanded", {
                                 parentColumnId,
                                 r
                         ))
+        },
+        expandedRows() {
+                const columns = this.columns
+                return this.rows
                         .map(r => [
                                 {extendedRow: false, row: r, columns: columns},
                                 { extendedRow: true, row: r, columns:[], numColumns: columns.length }
@@ -39,6 +44,19 @@ Vue.component("kodb-library-expanded", {
         }
     },
     methods: {
+            isSelected(row) {
+                    return -1 != this.selectedRow.indexOf(row)
+            },
+            toggleSelect(row) {
+                const selected = this.selectedRow
+                if (0 == selected.length) {
+                        selected.push(row)
+                } else if (row == selected[0]) {
+                        selected.splice(0, selected.length)
+                } else {
+                        selected.splice(0, selected.length, row)
+                }
+            },
             expandRow(library, columnId) {
                     return () => {
                         if (this.expandedLibraryName == library) {
@@ -75,7 +93,7 @@ Vue.component("kodb-library-expanded", {
                                                         :parentRowId="parentRowId"
                                                         :parentColumnId="parentColumnId"
 
-                                                        :selectedRows="[]"
+                                                        :selectedRows="selectedRow"
                                                 >
                                                 </kodb-library-rows-menu>
                                         </v-toolbar>
@@ -94,9 +112,13 @@ Vue.component("kodb-library-expanded", {
                         </tr>
                 </thead>
                 <tbody>
-                        <tr v-for="r in rows"
+                        <tr v-for="r in expandedRows"
                         >
-                                <td v-if="!r.extendedRow"></td>
+                                <td v-if="!r.extendedRow">
+                                        <v-icon v-on:click="toggleSelect(r.row)">
+                                                {{ isSelected(r.row) ? "mdi-check-box-outline" : "mdi-checkbox-blank-outline" }}
+                                        </v-icon>
+                                </td>
                                 <td v-for="col in r.columns"
                                 >
                                         <kodb-library-cell
