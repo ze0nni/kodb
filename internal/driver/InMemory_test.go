@@ -121,13 +121,13 @@ func TestInMemory_DeletePrefix(t *testing.T) {
 	assert.NotNil(t, b3)
 }
 
-func TestInMemory_IDs_error_when_prefix_not_exists(t *testing.T) {
+func TestInMemory_IDs_no_error_when_prefix_not_exists(t *testing.T) {
 	m := InMemory()
 
 	fs, err := m.IDs("foo")
 
-	assert.Nil(t, fs)
-	assert.Error(t, err)
+	assert.Len(t, fs, 0)
+	assert.NoError(t, err)
 }
 
 func TestInMemory_IDs(t *testing.T) {

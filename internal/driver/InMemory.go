@@ -27,7 +27,7 @@ func (d *inMemory) Prefixes() ([]string, error) {
 func (d *inMemory) IDs(prefix string) ([]string, error) {
 	entrys := d.data[prefix]
 	if nil == entrys {
-		return nil, fmt.Errorf("Entry storage not exists: %s", prefix)
+		return []string{}, nil
 	}
 
 	out := []string{}
