@@ -40,3 +40,14 @@ func (lens *driverLens) Put(id string, entry entry.Entry) error {
 func (lens *driverLens) Delete(id string) error {
 	return lens.driver.Delete(lens.prefix, id)
 }
+
+// UpdateLens entry
+func UpdateLens(l Lens, id string, consumer func(entry.Entry)) error {
+	e, err := l.Get(id)
+	if nil != err {
+		return err
+	}
+	consumer(e)
+
+	return l.Put(id, e)
+}

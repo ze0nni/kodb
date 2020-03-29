@@ -3,6 +3,7 @@ package engine
 import (
 	"errors"
 	"fmt"
+	"sort"
 	"strconv"
 
 	uuid "github.com/nu7hatch/gouuid"
@@ -43,6 +44,8 @@ type (
 
 		RowID(int) (RowID, error)
 
+		Swap(int, int) error
+
 		GetValueAt(int, ColumnID) (string, bool, error)
 		GetValue(RowID, ColumnID) (string, bool, error)
 		UpdateValue(RowID, ColumnID, string) error
@@ -73,15 +76,29 @@ func newLibraryInst(
 	if root, _ := schema.Get("root"); nil == root {
 		schema.Put("root", make(entry.Entry))
 	}
-	return &libraryImp{
+
+	rowKeys, err := data.Keys()
+	if nil != err {
+		panic(err)
+	}
+
+	rows := []RowID{}
+	for _, id := range rowKeys {
+		rows = append(rows, RowID(id))
+	}
+	sort.Sort(&rowsByOrder{data, rows})
+
+	lib := &libraryImp{
 		name:     name,
 		context:  context,
 		listener: listener,
 		schema:   schema,
 		data:     data,
 		meta:     meta,
-		rows:     []RowID{},
+		rows:     rows,
 	}
+
+	return lib
 }
 
 // Columns return slice for ColumnData
@@ -239,7 +256,10 @@ func (lib *libraryImp) NewRow() (RowID, error) {
 }
 
 func (l *libraryImp) AddRow(rowID RowID) error {
-	err := l.data.Put(rowID.ToString(), make(entry.Entry))
+	e := make(entry.Entry)
+	e["order"] = strconv.Itoa(len(l.rows))
+
+	err := l.data.Put(rowID.ToString(), e)
 	if nil != err {
 		return err
 	}
@@ -293,6 +313,42 @@ func (lib *libraryImp) RowID(index int) (RowID, error) {
 	}
 
 	return lib.rows[index], nil
+}
+
+func (lib *libraryImp) Swap(i, j int) error {
+	if 0 == len(lib.rows) {
+		return errors.New("Library is empty")
+	}
+
+	rowI, err := lib.RowID(i)
+	if nil != err {
+		return err
+	}
+
+	rowJ, err := lib.RowID(j)
+	if nil != err {
+		return err
+	}
+
+	// Todo: transaction!
+	err = driver.UpdateLens(lib.data, rowI.ToString(), func(e entry.Entry) {
+		e["order"] = strconv.Itoa(j)
+	})
+	if nil != err {
+		return err
+	}
+
+	err = driver.UpdateLens(lib.data, rowJ.ToString(), func(e entry.Entry) {
+		e["order"] = strconv.Itoa(i)
+	})
+	if nil != err {
+		return err
+	}
+
+	lib.rows[i] = rowJ
+	lib.rows[j] = rowI
+
+	return nil
 }
 
 func (lib *libraryImp) GetValueAt(
