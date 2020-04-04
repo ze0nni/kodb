@@ -1,6 +1,10 @@
 package engine
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/ze0nni/kodb/internal/types"
+)
 
 func newEngineColumnContext(eng *engine) *engineColumnContext {
 	return &engineColumnContext{eng}
@@ -16,4 +20,8 @@ func (c *engineColumnContext) HasRow(library, row string) (bool, error) {
 		return false, fmt.Errorf("Library <%s> not exists", library)
 	}
 	return lib.HasRow(RowID(row)), nil
+}
+
+func (c *engineColumnContext) GetType(name types.TypeName) (types.Type, error) {
+	return c.eng.types.Get(name)
 }

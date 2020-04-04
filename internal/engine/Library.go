@@ -9,6 +9,7 @@ import (
 	uuid "github.com/nu7hatch/gouuid"
 	"github.com/ze0nni/kodb/internal/driver"
 	"github.com/ze0nni/kodb/internal/entry"
+	"github.com/ze0nni/kodb/internal/types"
 )
 
 type (
@@ -25,16 +26,7 @@ type (
 	Library interface {
 		Name() LibraryName
 
-		Columns() int
-
-		NewColumn(ColumnData) (ColumnData, error)
-		AddColumn(ColumnID, ColumnData) (ColumnData, error)
-
-		Column(index int) (ColumnID, error)
-		ColumnName(index int) (string, error)
-		ColumnData(int) (ColumnData, error)
-		ColumnDataOf(id ColumnID) (ColumnData, error)
-		UpdateColumnData(data ColumnData) (ColumnData, error)
+		Type() (types.Type, error)
 
 		Rows() int
 		NewRow() (RowID, error)
@@ -50,6 +42,9 @@ type (
 		GetValueAt(int, ColumnID) (string, bool, error)
 		GetValue(RowID, ColumnID) (string, bool, error)
 		UpdateValue(RowID, ColumnID, string) error
+
+		Case(RowID) (types.FieldCase, error)
+		UpdateCase(RowID, types.FieldCase) error
 	}
 )
 
@@ -67,6 +62,7 @@ func (id RowID) ToString() string {
 
 func newLibraryInst(
 	name LibraryName,
+	typeName types.TypeName,
 	context ColumnContext,
 	listener Listener,
 	schema driver.Lens,
@@ -91,6 +87,7 @@ func newLibraryInst(
 
 	lib := &libraryImp{
 		name:     name,
+		typeName: typeName,
 		context:  context,
 		listener: listener,
 		schema:   schema,
@@ -102,22 +99,9 @@ func newLibraryInst(
 	return lib
 }
 
-// Columns return slice for ColumnData
-func Columns(library Library) ([]ColumnData, error) {
-	columns := library.Columns()
-	out := make([]ColumnData, columns)
-	for i := 0; i < columns; i++ {
-		c, err := library.ColumnData(i)
-		if nil != err {
-			return nil, err
-		}
-		out = append(out, c)
-	}
-	return out, nil
-}
-
 type libraryImp struct {
 	name     LibraryName
+	typeName types.TypeName
 	context  ColumnContext
 	listener Listener
 	schema   driver.Lens
@@ -130,100 +114,8 @@ func (lib *libraryImp) Name() LibraryName {
 	return lib.name
 }
 
-func (lib *libraryImp) Columns() int {
-	root, err := lib.getSchemaRoot()
-	if nil != err {
-		return 0
-	}
-	return entry.IntDef("columns", 0, root)
-}
-
-func (lib *libraryImp) NewColumn(data ColumnData) (ColumnData, error) {
-	columnV4, err := uuid.NewV4()
-	if nil != err {
-		return ColumnData{nil}, err
-	}
-	id := ColumnID(columnV4.String())
-	return lib.AddColumn(id, data)
-}
-
-func (lib *libraryImp) AddColumn(id ColumnID, data ColumnData) (ColumnData, error) {
-	root, err := lib.getSchemaRoot()
-	if nil != err {
-		return ColumnData{nil}, err
-	}
-
-	if s, _ := lib.schema.Get(id.ToString()); nil != s {
-		return ColumnData{nil}, errors.New("duplicate column " + id.ToString())
-	}
-
-	num := entry.IntDef("columns", 0, root)
-	entry.SetInt("columns", num+1, root)
-
-	entry.SetString("column_"+strconv.Itoa(num), id.ToString(), root)
-
-	data = data.NewID(id)
-
-	lib.schema.Put(id.ToString(), data.entry)
-	lib.schema.Put("root", root)
-
-	lib.listener.OnNewColumn(lib.Name(), id)
-
-	return data, nil
-}
-
-func (lib *libraryImp) Column(index int) (ColumnID, error) {
-	root, err := lib.getSchemaRoot()
-	if nil != err {
-		return ColumnID(""), err
-	}
-	if columnIdentity, ok := root["column_"+strconv.Itoa(index)]; ok {
-		return ColumnID(columnIdentity), nil
-	}
-
-	return ColumnID(""), errors.New("not found")
-}
-
-func (lib *libraryImp) ColumnName(index int) (string, error) {
-	data, err := lib.ColumnData(index)
-	if nil != err {
-		return "", err
-	}
-	return data.Name(), nil
-}
-
-func (lib *libraryImp) ColumnData(index int) (ColumnData, error) {
-	root, err := lib.getSchemaRoot()
-	if nil != err {
-		return ColumnData{nil}, err
-	}
-	if columnIdentity, ok := root["column_"+strconv.Itoa(index)]; ok {
-		return lib.ColumnDataOf(ColumnID(columnIdentity))
-	}
-
-	return ColumnData{nil}, fmt.Errorf("Column <%d> not exists", index)
-}
-
-func (lib *libraryImp) ColumnDataOf(id ColumnID) (ColumnData, error) {
-	columnEntry, err := lib.schema.Get(id.ToString())
-	if nil != err {
-		return ColumnData{nil}, err
-	}
-	return ColumnData{columnEntry}, nil
-}
-
-func (lib *libraryImp) UpdateColumnData(data ColumnData) (ColumnData, error) {
-	columnEntry, err := lib.schema.Get(data.ID().ToString())
-	if nil != err {
-		return ColumnData{nil}, err
-	}
-	if nil == columnEntry {
-		return ColumnData{nil}, fmt.Errorf("column %s not exists", data.Name())
-	}
-
-	lib.schema.Put(data.ID().ToString(), data.entry)
-
-	return lib.ColumnDataOf(data.ID())
+func (lib *libraryImp) Type() (types.Type, error) {
+	return lib.context.GetType(lib.typeName)
 }
 
 func (lib *libraryImp) getSchemaRoot() (entry.Entry, error) {
@@ -415,7 +307,12 @@ func (lib *libraryImp) UpdateValue(
 		return errors.New("Row not exists")
 	}
 
-	colData, err := lib.ColumnDataOf(col)
+	tp, err := lib.Type()
+	if nil != err {
+		return err
+	}
+
+	_, err = tp.Get(types.FieldID(col.ToString()))
 	if nil != err {
 		return err
 	}
@@ -428,9 +325,24 @@ func (lib *libraryImp) UpdateValue(
 		return err
 	}
 
-	cellErr := colData.Validate(lib.context, value)
+	var cellErr error = nil //TODO: field.Validate(context, value)
 
 	lib.listener.OnUpdateValue(lib.name, id, col, true, value, cellErr)
 
 	return nil
+}
+
+func (lib *libraryImp) Case(id RowID) (types.FieldCase, error) {
+	v, ok, err := lib.GetValue(id, ColumnID("case"))
+	if nil != err {
+		return types.FieldCase(""), err
+	}
+	if false == ok {
+		return types.FieldCase(""), errors.New("Row not exists")
+	}
+	return types.FieldCase(v), nil
+}
+
+func (lib *libraryImp) UpdateCase(id RowID, fieldCase types.FieldCase) error {
+	return lib.UpdateValue(id, ColumnID("case"), fieldCase.String())
 }

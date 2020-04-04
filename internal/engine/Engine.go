@@ -33,7 +33,7 @@ type Engine interface {
 	Librarys() []LibraryName
 	Library(LibraryName) (Library, error)
 
-	AddLibrary(LibraryName) (Library, error)
+	AddLibrary(LibraryName, types.TypeName) (Library, error)
 
 	Listen(Listener) func()
 	ListenLibrary(LibraryName, Listener) func()
@@ -63,8 +63,14 @@ func loadLibrarys(e *engine) {
 	if ps, err := e.driver.Prefixes(); nil == err {
 		for _, p := range ps {
 			if strings.HasSuffix(p, "$schema") {
+				root, err := e.driver.Get(p, "root")
+				if nil != err {
+					panic(err)
+				}
+
 				libraryName := LibraryName(p[:len(p)-7])
-				e.AddLibrary(libraryName) //TODO: e.recoveryLibrary
+				libraryType := types.TypeName(root["type"])
+				e.AddLibrary(libraryName, libraryType) //TODO: e.recoveryLibrary
 			}
 		}
 	}
@@ -98,13 +104,14 @@ func (e *engine) Library(name LibraryName) (Library, error) {
 	return nil, fmt.Errorf("Library <%s> not exits", name)
 }
 
-func (e *engine) AddLibrary(name LibraryName) (Library, error) {
+func (e *engine) AddLibrary(name LibraryName, typeName types.TypeName) (Library, error) {
 	if _, exists := e.librarys[name]; exists {
 		return nil, fmt.Errorf("Library <%s> already exits", name)
 	}
 
 	newLib := newLibraryInst(
 		name,
+		typeName,
 		e.Context(),
 		e.listeners,
 		driver.LensOf(name.ToString()+"$schema", e.driver),
