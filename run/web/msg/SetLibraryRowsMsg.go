@@ -3,6 +3,7 @@ package msg
 import (
 	"github.com/bitly/go-simplejson"
 	"github.com/ze0nni/kodb/internal/engine"
+	"github.com/ze0nni/kodb/internal/types"
 )
 
 type SetLibraryRowsMsg struct {
@@ -12,8 +13,9 @@ type SetLibraryRowsMsg struct {
 }
 
 type RowSchema struct {
-	RowID engine.RowID     `json:"rowId"`
-	Data  *simplejson.Json `json:"data"`
+	RowID     engine.RowID     `json:"rowId"`
+	FieldCase types.FieldCase  `json:"case"`
+	Data      *simplejson.Json `json:"data"`
 }
 
 func SetLibraryRowsMsgFromEngine(
@@ -31,14 +33,15 @@ func SetLibraryRowsMsgFromEngine(
 		Rows:    []RowSchema{},
 	}
 
-	columns, err := engine.Columns(l)
+	tp, err := l.Type()
 	if nil != err {
 		return msg
 	}
+	fields := tp.Fields()
 
 	rows := l.Rows()
 	for i := 0; i < rows; i++ {
-		r, err := RowSchemaFromLibrary(i, columns, eng.Context(), l)
+		r, err := RowSchemaFromLibrary(i, fields, eng.Context(), l)
 		if nil == err {
 			msg.Rows = append(msg.Rows, r)
 		}
@@ -49,7 +52,7 @@ func SetLibraryRowsMsgFromEngine(
 
 func RowSchemaFromLibrary(
 	index int,
-	columns []engine.ColumnData,
+	fields []types.Field,
 	context engine.ColumnContext,
 	library engine.Library,
 ) (RowSchema, error) {
@@ -57,30 +60,33 @@ func RowSchemaFromLibrary(
 	if nil != err {
 		return RowSchema{}, err
 	}
+	fieldCase, _ := library.Case(rowId)
 
 	row := RowSchema{
-		RowID: rowId,
-		Data:  simplejson.New(),
+		RowID:     rowId,
+		FieldCase: fieldCase,
+		Data:      simplejson.New(),
 	}
 
-	for _, col := range columns {
-		colID := col.ID() // TODO: cache id's
-		v, ok, err := library.GetValueAt(index, colID)
+	for _, field := range fields {
+		fieldID := field.ID()
+		v, ok, err := library.GetValueAt(index, engine.ColumnID(fieldID.String()))
 
 		colData := simplejson.New()
 		colData.Set("exists", ok)
 		if ok {
 			colData.Set("value", v)
-			cellErr := col.Validate(context, v)
-			if nil != cellErr {
-				colData.Set("error", cellErr.Error())
-			}
+			//TODO: field.Validate
+			//cellErr := col.Validate(context, v)
+			//if nil != cellErr {
+			//	colData.Set("error", cellErr.Error())
+			//}
 		}
 		if nil != err {
 			colData.Set("error", err)
 		}
 
-		row.Data.Set(colID.ToString(), colData)
+		row.Data.Set(fieldID.String(), colData)
 	}
 
 	return row, nil

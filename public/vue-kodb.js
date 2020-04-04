@@ -108,16 +108,6 @@ Vue.component("kodb", {
                                         // HACK!!!
                                         l.value = l.id
 
-                                        // HACK
-                                        l.columnsMap = {
-
-                                        }
-
-                                        for (let c of l.columns) {
-                                                c.value = c.id
-                                                l.columnsMap[c.id] = c
-                                        }
-
                                         newList.push(l)
                                         newMap[l.name] = l
                                                 
@@ -244,22 +234,7 @@ Vue.component("kodb", {
                 <kodb-types-dialog
                         :types="schema.types"
                 >
-                </kodb-types-dialog>
-
-                <v-dialog>
-                        <template v-slot:activator="{ on }">
-                        <v-btn text v-on="on">
-                                <v-icon left>mdi-shape-outline</v-icon>
-                                Types
-                        </v-btn>
-                        </template>
-
-                        <kodb-schema-manager
-                                :schema="schema"
-                        >
-                        </kodb-schema-manager>
-                </v-dialog>
-            
+                </kodb-types-dialog>            
 
                 <template v-slot:extension>
                         <v-tabs dense
@@ -276,8 +251,8 @@ Vue.component("kodb", {
                 </template>
         </v-app-bar>
 
-        <v-content>
-                <v-container>
+        <v-content >
+                <v-container fluid>
                         <v-tabs-items
                                 v-model="selectedLibrary"
                         >

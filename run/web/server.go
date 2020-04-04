@@ -6,6 +6,7 @@ import (
 	"github.com/ze0nni/kodb/run/web/msg"
 
 	"github.com/ze0nni/kodb/internal/engine"
+	"github.com/ze0nni/kodb/internal/types"
 )
 
 func newServer(engine engine.Engine) *serverInstance {
@@ -24,8 +25,6 @@ func newServer(engine engine.Engine) *serverInstance {
 		msgUpdateValueCh:    make(chan msgUpdateValue),
 
 		msgAddLibraryCh: make(chan msgAddLibrary),
-
-		msgNewColumnCh: make(chan msgNewColumn),
 	}
 }
 
@@ -67,8 +66,6 @@ type serverInstance struct {
 	msgUpdateValueCh    chan msgUpdateValue
 
 	msgAddLibraryCh chan msgAddLibrary
-
-	msgNewColumnCh chan msgNewColumn
 }
 
 // ClientConnected
@@ -102,6 +99,10 @@ func (server *serverInstance) clientDisconnected(client *clientConnection) {
 func (server *serverInstance) Perform(msg ClientMsg, err error) {
 	if nil != err {
 		log.Print(err)
+		return
+	}
+	if nil == msg {
+		panic("msg can't be nil")
 	}
 	server.msgQueue <- msg
 }
@@ -209,28 +210,10 @@ func (server *serverInstance) AddLibrary(clientID ClientID, libraryName string) 
 }
 
 func (server *serverInstance) addLibrary(m msgAddLibrary) {
-	_, err := server.engine.AddLibrary(m.LibraryName)
+	//TODO: pass library name
+	_, err := server.engine.AddLibrary(m.LibraryName, types.TypeName(""))
 	if nil != err {
 		log.Printf("Error when <addLibrary>: %s", err)
-	}
-}
-
-//
-
-func (server *serverInstance) NewColumn(m msgNewColumn) {
-	server.msgNewColumnCh <- m
-}
-
-func (server *serverInstance) newColumn(m msgNewColumn) {
-	l, err := server.engine.Library(m.libraryName)
-	if nil != err {
-		log.Printf("Error when <newColumn>: %s", err)
-		return
-	}
-	_, err = l.NewColumn(m.columnData)
-	if nil != err {
-		log.Printf("Error when <newColumn>: %s", err)
-		return
 	}
 }
 
@@ -265,8 +248,6 @@ func (server *serverInstance) listen() {
 			server.updateValue(msg)
 		case msg := <-server.msgAddLibraryCh:
 			server.addLibrary(msg)
-		case msg := <-server.msgNewColumnCh:
-			server.newColumn(msg)
 		}
 	}
 }
