@@ -3,120 +3,245 @@ Vue.component("kodb-library", {
                 "schema",
                 "libraryName",
         ],
-        data: function() {
+        data() {
                 return {
-                        multiSelect: false,
-                        selectedRows:[],
-
-                        expandedLibraryName: null,
-                        expandedColumnId: null,
+                        
+                }
+        },
+        computed: {
+                type() {
+                        const table = this.schema.map[this.libraryName]
+                        if (null == table) {
+                                return null
+                        }
+                        return this.schema.types[table.type]
+                },
+                cases() {
+                        return this.type.cases
+                },
+                multiCase() {
+                        return  1 < this.cases.length
+                },
+                fields() {
+                        return Object.values(this.type.fields).filter(f => f['case'] == "")
+                },
+                originRows() {
+                        return this.schema.rowsMap[this.libraryName]
+                },
+                rows() {
+                        return this.originRows
+                                .map(r => [
+                                        {
+                                                expanded: false,
+                                                fields: this.fields,
+                                                row: r,
+                                        },
+                                        {
+                                                expanded: true,
+                                                fields: [],
+                                                row: r,
+                                        }
+                                ])
+                                .reduce((a,b) => a.concat(b), [])
+                },
+                selectedRows() {
+                        return []
                 }
         },
         methods: {
-                mapColumns(columns) {
-                        return columns.map(col => {
-                                return Object.assign(
-                                        {},
-                                        col,
-                                        {
-                                                text: col.name,
-                                                value: col.id
-                                        }
-                                )
-                        })
+                isRowSelected(row) {
+                        return false
                 },
-
-                expandRow(expand, library, columnId) {
-                        return () => {
-                            if (this.expandedLibraryName == library) {
-                                    this.expandedLibraryName = null
-                                    expand(false)
-                            } else {
-                                    this.expandedLibraryName = library
-                                    this.expandedColumnId = columnId
-                                    expand(true)
-                            }
+                rowFields(row) {
+                        const rowCase = row['case'] || ""
+                        const fields = this.type.fields
+                        return Object.values(fields).filter(f => f['case'] == rowCase)
+                },
+                canDisplayRow(row) {
+                        if (false == row.expanded) {
+                                return true
                         }
-                },
+                        return false
+                }
         },
         template:
 `
-<v-data-table
-        :headers="mapColumns(getLibraryColumns(libraryName))"
-        :items="schema.rowsMap[libraryName]"
-        :items-per-page="10"
-        item-key="rowId"
-
-        v-model="selectedRows"
-
-        dense
-        show-select
-        :single-select="!multiSelect"
->       
-        <template v-slot:item="{ item,headers,select,isSelected,expand,isExpanded }">
-        
-                <tr v-on:click="select(!isSelected)">
-                        <td v-for="col in headers"
-                        >
-                                <v-icon
-                                        v-if="col.value == 'data-table-select'"
-                                >
-                                        {{ isSelected ? "mdi-check-box-outline" : "mdi-checkbox-blank-outline" }}
-                                </v-icon>
-                                <kodb-library-cell
-                                        v-else
-
-                                        :schema="schema"
-                                        :libraryName="libraryName"
-                                        :rowId="item.rowId"
-                                        :columnId="col.id"
-
-                                        :rowData="item"
-                                        :cellData="item.data[col.value]"
-                                        
-                                        :expandRow="expandRow(expand, col.reference, col.value)"
-                                        :isExpanded="expandedLibraryName == col.reference && isExpanded"
-                                >
-                                </kodb-library-cell>
-                        </td>
-                </tr>
-        </template>
-
-        <template v-slot:expanded-item="{ item, headers }">
-                <td>{{expandedLibraryName}}</td>
-                <td :colspan="headers.length-1"
-                >
-                        <kodb-library-expanded
-                                depth=1
-                                :schema="schema"
-                                :libraryName="expandedLibraryName"
-                                
-                                :parentLibraryName="libraryName"
-                                :parentColumnId="expandedColumnId"
-                                :parentRowId="item.rowId"
-                        >
-                        </kodb-library-expanded>
-                </td>
-        </template>
-
-        <template v-slot:top>
-                <v-toolbar flat>
-                        <v-switch v-model="multiSelect" label="Multi select" />
-
-                        <v-spacer></v-spacer>
-                        
+<v-data-iterator
+        :items="rows"
+>
+        <template v-slot:header>
+                <v-toolbar>
                         <kodb-library-rows-menu
                                 :libraryName="libraryName"
-                                :libraryRows="schema.rowsMap[libraryName]"
+                                :libraryRows="originRows"
 
                                 :selectedRows="selectedRows"
                         >
                         </kodb-library-rows-menu>
                 </v-toolbar>
         </template>
-</v-data-table>
+
+        <template v-slot:default="{ items }">
+                <v-card tile>
+                        <v-simple-table
+                                dense
+                        >
+                                <thead>
+                                        <tr>
+                                                <th width="1em">
+                                                </th>
+
+                                                <th v-for="f in fields">
+                                                        {{ f.name }}
+                                                </th>
+
+                                                <th v-if="multiCase"
+                                                        width="1em"
+                                                >
+                                                        Case
+                                                </th>
+
+                                                <th v-if="multiCase">
+                                                        Type
+                                                </th>
+                                        </tr>
+                                </thead>
+                                <tbody>
+                                        <tr v-for="i in items" v-if="canDisplayRow(i)">
+                                                <td v-if="i.expanded"
+                                                        :colspan="multiCase ? 3 : fields.length + 1"
+                                                >
+                                                </td>
+
+                                                <td v-if="false == i.expanded">
+                                                        <v-icon
+                                                        >
+                                                                {{ isRowSelected(i.row) ? "mdi-check-box-outline" : "mdi-checkbox-blank-outline" }}
+                                                        </v-icon>
+                                                </td>
+
+                                                <td v-for="f in i.fields"
+                                                >
+                                                        <kodb-library-cell
+                                                                :schema="schema"
+                                                                :libraryName="libraryName"
+                                                                
+                                                                :row="i.row"
+                                                                :field="f"
+                                                        >
+                                                        </kodb-library-cell>
+                                                </td>
+
+                                                <td v-if="false == i.expanded && multiCase" 
+                                                >
+                                                        <kodb-library-card-case
+                                                                :libraryName="libraryName"
+
+                                                                :row="i.row"
+                                                                :type="type"
+                                                        >
+                                                        </kodb-library-card-case>
+                                                </td>
+
+                                                <td v-if="false == i.expanded && multiCase" 
+                                                >
+                                                        <kodb-library-card
+                                                                :schema="schema"
+                                                                :libraryName="libraryName"
+
+                                                                :row="i.row"
+                                                                :type="type"
+                                                        >
+                                                        </kodb-library-card>
+                                                </td>
+                                        </tr>
+                                </tbody>
+                        </v-simple-table>
+                </v-card>
+        </template>
+</v-data-iterator>
 `
 });
+
+Vue.component("kodb-library-card-case", {
+        props: [
+                "libraryName",
+
+                "row",
+                "type"
+        ],
+        methods: {
+                updateCase(c) {
+                        this.$wsocket.send({
+                                "command": "updateRowCase",
+                                "library": this.libraryName,
+                                "rowId": this.row.rowId,
+                                "case": c
+                        })
+                }
+        },
+        template:
+`
+<v-menu offset-y>
+        <template v-slot:activator="{ on }">
+                <v-btn outlined block text v-on="on">
+                        {{ row['case'] }}
+                </v-btn>
+        </template>
+
+        <v-list>
+                <v-list-item v-for="c in type.cases"
+                        :key="c"
+                        v-on:click="updateCase(c)"
+                >
+                        {{ c }}
+                </v-list-item>
+        </v-list>
+</v-menu>
+`
+})
+
+Vue.component("kodb-library-card", {
+        props: [
+                "schema",
+                "libraryName",
+
+                "row",
+                "type"
+        ],
+        computed: {
+                fields() {
+                        const rowCase = this.row['case'] || "Mult"
+                        const fields = this.type.fields
+                        
+                        return Object.values(fields).filter(f => f['case'] == rowCase)
+                },
+                columns() {
+                        return [
+                                this.fields
+                        ]
+                }
+        },
+        template:
+`
+<v-row justify="space-between">
+        <v-col v-for="col in columns">
+                <v-row v-for="f in col"
+                        :key="f.id"
+                >
+                        <kodb-library-cell
+                                :schema="schema"
+                                :libraryName="libraryName"
+                                
+                                :row="row"
+                                :field="f"
+                        >
+                        </kodb-library-cell>
+                </v-row>
+        </v-col>
+</v-row>
+`
+})
 
 Vue.component("kodb-library-rows-menu", {
         props: [

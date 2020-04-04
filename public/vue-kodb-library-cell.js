@@ -2,11 +2,9 @@ Vue.component("kodb-library-cell", {
         props: [
                 "schema",
                 "libraryName",
-                "rowId",
-                "columnId",
 
-                "rowData",
-                "cellData",
+                "row",
+                "field",
 
                 "expandRow",
                 "isExpanded"
@@ -21,7 +19,7 @@ Vue.component("kodb-library-cell", {
                         this.$wsocket.send({
                                 "command": "updateValue",
                                 "library": this.libraryName,
-                                "rowId": this.rowId,
+                                "rowId": this.row.rowId,
                                 "columnId": this.columnId,
                                 "value": value
                         })
@@ -30,18 +28,17 @@ Vue.component("kodb-library-cell", {
         template:
 `
 <v-row>
-        <kodb-library-literal-cell 
-                v-if="'literal' == getColumnType(libraryName, columnId)"
+        <kodb-library-value-cell 
+                v-if="'value' == field.kind"
 
                 v-on:update="updateValue"
 
-                :column="getColumnData(libraryName, columnId)"
-                :rowData="rowData"
-                :cellData="cellData"
-        ></kodb-library-literal-cell>
+                :cellData="row.data[field.id]"
+                :field="field"
+        ></kodb-library-value-cell>
 
         <kodb-library-reference-cell 
-                v-else-if="'reference' == getColumnType(libraryName, columnId)"
+                v-else-if="'reference' == field.kind"
 
                 v-on:update="updateValue"
                 
@@ -53,7 +50,7 @@ Vue.component("kodb-library-cell", {
         ></kodb-library-reference-cell>
 
         <kodb-library-list-cell 
-                v-else-if="'list' == getColumnType(libraryName, columnId)"
+                v-else-if="'list' == field.kind"
 
                 v-on:update="updateValue"
 
@@ -72,17 +69,16 @@ Vue.component("kodb-library-cell", {
                 v-else
                 color="error"
         >
-                Unknown type: {{ getColumnType(libraryName, columnId) }}
+                Unknown type: {{ field.kind }}
         </v-chip>
 </v-row>
 `
 });
 
-Vue.component("kodb-library-literal-cell", {
+Vue.component("kodb-library-value-cell", {
         props: [
-                "column",
-                "rowData",
-                "cellData"
+                "cellData",
+                "field"
         ],
         data() {
                 return {
