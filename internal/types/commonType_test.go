@@ -12,7 +12,7 @@ func emptyLens() driver.Lens {
 }
 
 func Test_commonType_Fields_empty(t *testing.T) {
-	f := newCommonType("newType", emptyLens())
+	f := newCommonType("newType", emptyLens(), newTypesListener())
 
 	fs := f.Fields()
 
@@ -21,7 +21,7 @@ func Test_commonType_Fields_empty(t *testing.T) {
 }
 
 func Test_commonType_New(t *testing.T) {
-	f := newCommonType("newType", emptyLens())
+	f := newCommonType("newType", emptyLens(), newTypesListener())
 
 	fs, err := f.New(NewValueFieldData("fName"))
 	fields := f.Fields()
@@ -34,7 +34,7 @@ func Test_commonType_New(t *testing.T) {
 }
 
 func Test_commonType_New_error_if_FieldNotNew(t *testing.T) {
-	f := newCommonType("newType", emptyLens())
+	f := newCommonType("newType", emptyLens(), newTypesListener())
 
 	fs, _ := f.New(NewValueFieldData("fName"))
 	fs2, err := f.New(fs)
@@ -46,7 +46,7 @@ func Test_commonType_New_error_if_FieldNotNew(t *testing.T) {
 }
 
 func Test_commonType_Delete_error_if_field_not_exists(t *testing.T) {
-	tp := newCommonType("newType", emptyLens())
+	tp := newCommonType("newType", emptyLens(), newTypesListener())
 
 	err := tp.Delete(NewValueFieldData("fname"))
 
@@ -54,7 +54,7 @@ func Test_commonType_Delete_error_if_field_not_exists(t *testing.T) {
 }
 
 func Test_commonType_Delete(t *testing.T) {
-	tp := newCommonType("newType", emptyLens())
+	tp := newCommonType("newType", emptyLens(), newTypesListener())
 
 	f1, _ := tp.New(NewValueFieldData("f1"))
 	f2, _ := tp.New(NewValueFieldData("f2"))

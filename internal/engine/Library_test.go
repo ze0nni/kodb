@@ -5,6 +5,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/ze0nni/kodb/internal/driver"
+	"github.com/ze0nni/kodb/internal/types"
 )
 
 func emptyTestLibrary() (Library, driver.Driver) {
@@ -18,6 +19,7 @@ func testLibraryOfDriver(d driver.Driver) (Library, driver.Driver) {
 
 	return newLibraryInst(
 		LibraryName("libraryName"),
+		types.TypeName(""),
 		newNilColumnContext(),
 		listenerNil(),
 		schema,
