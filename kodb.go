@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"log"
-	"strconv"
 
 	"github.com/ze0nni/kodb/internal/driver"
 	"github.com/ze0nni/kodb/internal/engine"
@@ -16,96 +15,56 @@ import (
 
 func main() {
 	eng := engine.New(driver.InMemory())
-	userLib, _ := eng.AddLibrary(engine.LibraryName("user"))
-	firstname, _ := userLib.NewColumn(engine.NewLiteralColumn("firstName"))
-	secondName, _ := userLib.NewColumn(engine.NewLiteralColumn("secondName"))
-	age, _ := userLib.NewColumn(engine.NewLiteralColumn("age"))
-	for i := 0; i < 10; i++ {
-		row, _ := userLib.NewRow()
-		userLib.UpdateValue(row, firstname.ID(), randomdata.FirstName(0))
-		userLib.UpdateValue(row, secondName.ID(), randomdata.LastName())
-		userLib.UpdateValue(row, age.ID(), strconv.Itoa(randomdata.Number(16, 40)))
-	}
-
-	invLib, _ := eng.AddLibrary(engine.LibraryName("location"))
-	name, _ := invLib.NewColumn(engine.NewLiteralColumn("name"))
-	invLib.NewColumn(engine.NewLiteralColumn("type"))
-	invLib.NewColumn(engine.NewLiteralColumn("title"))
-	invLib.NewColumn(engine.NewLiteralColumn("picture"))
-	owner, _ := invLib.NewColumn(engine.NewRefColumn("owner", userLib.Name()))
-	for i := 0; i < 20; i++ {
-		row, _ := invLib.NewRow()
-		invLib.UpdateValue(row, name.ID(), randomdata.Adjective())
-		invLib.UpdateValue(row, owner.ID(), randomdata.Alphanumeric(32))
-	}
-
-	rewardsLib, _ := eng.AddLibrary(engine.LibraryName("rewards"))
-	makeOwned(rewardsLib)
-	rwTitle, _ := rewardsLib.NewColumn(engine.NewLiteralColumn("title"))
-	rwType, _ := rewardsLib.NewColumn(engine.NewLiteralColumn("type"))
-	rwPrice, _ := rewardsLib.NewColumn(engine.NewLiteralColumn("price"))
-
-	tasksLib, _ := eng.AddLibrary(engine.LibraryName("tasks"))
-	makeOwned(tasksLib)
-	taskRewars, _ := tasksLib.NewColumn(engine.NewListColumn("rewards", rewardsLib.Name()))
-
-	questLib, _ := eng.AddLibrary("quest")
-	questName, _ := questLib.NewColumn(engine.NewLiteralColumn("name"))
-	questTasks, _ := questLib.NewColumn(engine.NewListColumn("tasks", engine.LibraryName("tasks")))
-
-	for i := 1; i <= 3; i++ {
-		questRow, _ := questLib.NewRow()
-		questLib.UpdateValue(questRow, questName.ID(), "quest_00"+strconv.Itoa(i))
-
-		for j := 1; j <= 1+i; j++ {
-			taskRow, _ := tasksLib.NewRow()
-			setOwner(
-				questLib.Name(),
-				questRow,
-				questTasks.ID(),
-				tasksLib,
-				taskRow,
-			)
-
-			for k := 1; k < 4; k++ {
-				rewardRow, _ := rewardsLib.NewRow()
-				setOwner(
-					tasksLib.Name(),
-					taskRow,
-					taskRewars.ID(),
-					rewardsLib,
-					rewardRow,
-				)
-
-				rewardsLib.UpdateValue(
-					rewardRow,
-					rwTitle.ID(),
-					randomdata.Email(),
-				)
-
-				rewardsLib.UpdateValue(
-					rewardRow,
-					rwType.ID(),
-					randomdata.Adjective(),
-				)
-
-				rewardsLib.UpdateValue(
-					rewardRow,
-					rwPrice.ID(),
-					randomdata.StringNumber(2, "."),
-				)
-			}
-		}
-	}
 
 	userType, _ := eng.Types().New(types.TypeName("user"))
-	userType.New(types.NewValueFieldData("picture"))
-	userType.New(types.NewValueFieldData("firstName"))
-	userType.New(types.NewValueFieldData("secondName"))
-	userType.New(types.NewValueFieldData("ht"))
-	userType.New(types.NewValueFieldData("dx"))
-	userType.New(types.NewValueFieldData("iq"))
-	userType.New(types.NewValueFieldData("age"))
+	user_picture, _ := userType.New(types.NewValueFieldData("picture"))
+	user_firstName, _ := userType.New(types.NewValueFieldData("firstName"))
+	user_secondName, _ := userType.New(types.NewValueFieldData("secondName"))
+	user_ht, _ := userType.New(types.NewValueFieldData("ht"))
+	user_dx, _ := userType.New(types.NewValueFieldData("dx"))
+	user_iq, _ := userType.New(types.NewValueFieldData("iq"))
+	user_age, _ := userType.New(types.NewValueFieldData("age"))
+
+	userLib, _ := eng.AddLibrary(engine.LibraryName("users"), userType.Name())
+
+	for i := 0; i < 10; i++ {
+		row, _ := userLib.NewRow()
+		userLib.UpdateValue(
+			row,
+			engine.ColumnID(user_picture.ID().String()),
+			randomdata.PhoneNumber(),
+		)
+		userLib.UpdateValue(
+			row,
+			engine.ColumnID(user_firstName.ID().String()),
+			randomdata.FirstName(0),
+		)
+		userLib.UpdateValue(
+			row,
+			engine.ColumnID(user_secondName.ID().String()),
+			randomdata.LastName(),
+		)
+		userLib.UpdateValue(
+			row,
+			engine.ColumnID(user_ht.ID().String()),
+			randomdata.StringNumber(2, "-"),
+		)
+		userLib.UpdateValue(
+			row,
+			engine.ColumnID(user_dx.ID().String()),
+			randomdata.StringNumber(2, "-"),
+		)
+		userLib.UpdateValue(
+			row,
+			engine.ColumnID(user_iq.ID().String()),
+			randomdata.StringNumber(2, "-"),
+		)
+		userLib.UpdateValue(
+			row,
+			engine.ColumnID(user_age.ID().String()),
+			randomdata.StringNumber(2, "-"),
+		)
+	}
 
 	mathOp, _ := eng.Types().New(types.TypeName("mathOp"))
 	mathOp.UpdateCases([]types.FieldCase{
@@ -127,6 +86,11 @@ func main() {
 	opMultLeft.SetCase(types.FieldCase("Mult"))
 	opMultRight.SetCase(types.FieldCase("Mult"))
 
+	operationsLib, _ := eng.AddLibrary(engine.LibraryName("operations"), mathOp.Name())
+	operationsLib.NewRow()
+	operationsLib.NewRow()
+	operationsLib.NewRow()
+
 	validate.Validate(eng, func(
 		l engine.LibraryName, r engine.RowID, c engine.ColumnID, err error,
 	) {
@@ -137,43 +101,4 @@ func main() {
 	if nil != err {
 		log.Fatal(err)
 	}
-}
-
-func makeOwned(l engine.Library) {
-	l.AddColumn(
-		engine.ListParentLibrary,
-		engine.NewLiteralColumn("parentLibrary").SetHidden(true),
-	)
-	l.AddColumn(
-		engine.ListParentRow,
-		engine.NewLiteralColumn("parentRow").SetHidden(true),
-	)
-	l.AddColumn(
-		engine.ListParentColumn,
-		engine.NewLiteralColumn("parentColumn").SetHidden(true),
-	)
-}
-
-func setOwner(
-	parentLibrary engine.LibraryName,
-	parentRow engine.RowID,
-	parentColumn engine.ColumnID,
-	l engine.Library,
-	row engine.RowID,
-) {
-	l.UpdateValue(
-		row,
-		engine.ListParentLibrary,
-		parentLibrary.ToString(),
-	)
-	l.UpdateValue(
-		row,
-		engine.ListParentRow,
-		parentRow.ToString(),
-	)
-	l.UpdateValue(
-		row,
-		engine.ListParentColumn,
-		parentColumn.ToString(),
-	)
 }
