@@ -31,37 +31,37 @@ func main() {
 		row, _ := userLib.NewRow()
 		userLib.UpdateValue(
 			row,
-			engine.ColumnID(user_picture.ID().String()),
+			user_picture.ID(),
 			randomdata.PhoneNumber(),
 		)
 		userLib.UpdateValue(
 			row,
-			engine.ColumnID(user_firstName.ID().String()),
+			user_firstName.ID(),
 			randomdata.FirstName(0),
 		)
 		userLib.UpdateValue(
 			row,
-			engine.ColumnID(user_secondName.ID().String()),
+			user_secondName.ID(),
 			randomdata.LastName(),
 		)
 		userLib.UpdateValue(
 			row,
-			engine.ColumnID(user_ht.ID().String()),
+			user_ht.ID(),
 			randomdata.StringNumber(2, "-"),
 		)
 		userLib.UpdateValue(
 			row,
-			engine.ColumnID(user_dx.ID().String()),
+			user_dx.ID(),
 			randomdata.StringNumber(2, "-"),
 		)
 		userLib.UpdateValue(
 			row,
-			engine.ColumnID(user_iq.ID().String()),
+			user_iq.ID(),
 			randomdata.StringNumber(2, "-"),
 		)
 		userLib.UpdateValue(
 			row,
-			engine.ColumnID(user_age.ID().String()),
+			user_age.ID(),
 			randomdata.StringNumber(2, "-"),
 		)
 	}
@@ -92,9 +92,9 @@ func main() {
 	operationsLib.NewRow()
 
 	validate.Validate(eng, func(
-		l engine.LibraryName, r engine.RowID, c engine.ColumnID, err error,
+		l engine.LibraryName, r engine.RowID, f engine.FieldID, err error,
 	) {
-		fmt.Printf("Error in %s:%s%s: %s\n", l, r, c, err)
+		fmt.Printf("Error in %s:%s%s: %s\n", l, r, f, err)
 	})
 
 	err := web.Run(eng)

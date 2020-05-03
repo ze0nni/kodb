@@ -52,12 +52,12 @@ func (lm *listenerFromMap) OnNewLibrary(name LibraryName) {
 	})
 }
 
-func (lm *listenerFromMap) OnNewColumn(name LibraryName, col ColumnID) {
+func (lm *listenerFromMap) OnNewColumn(name LibraryName, field FieldID) {
 	for l, _ := range lm.listeners {
-		l.OnNewColumn(name, col)
+		l.OnNewColumn(name, field)
 	}
 	lm.forLibrary(name, func(l Listener) {
-		l.OnNewColumn(name, col)
+		l.OnNewColumn(name, field)
 	})
 }
 
@@ -79,12 +79,12 @@ func (lm *listenerFromMap) OnDeleteRow(name LibraryName, row RowID) {
 	})
 }
 
-func (lm *listenerFromMap) OnUpdateValue(name LibraryName, row RowID, col ColumnID, exixts bool, value string, cellErr error) {
+func (lm *listenerFromMap) OnUpdateValue(name LibraryName, row RowID, field FieldID, exixts bool, value string, cellErr error) {
 	for l, _ := range lm.listeners {
-		l.OnUpdateValue(name, row, col, exixts, value, cellErr)
+		l.OnUpdateValue(name, row, field, exixts, value, cellErr)
 	}
 	lm.forLibrary(name, func(l Listener) {
-		l.OnUpdateValue(name, row, col, exixts, value, cellErr)
+		l.OnUpdateValue(name, row, field, exixts, value, cellErr)
 	})
 }
 

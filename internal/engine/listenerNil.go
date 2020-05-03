@@ -10,7 +10,7 @@ func (lm *listenerNilInst) OnNewLibrary(name LibraryName) {
 
 }
 
-func (lm *listenerNilInst) OnNewColumn(LibraryName, ColumnID) {
+func (lm *listenerNilInst) OnNewColumn(LibraryName, FieldID) {
 
 }
 
@@ -22,7 +22,7 @@ func (lm *listenerNilInst) OnDeleteRow(LibraryName, RowID) {
 
 }
 
-func (lm *listenerNilInst) OnUpdateValue(LibraryName, RowID, ColumnID, bool, string, error) {
+func (lm *listenerNilInst) OnUpdateValue(LibraryName, RowID, FieldID, bool, string, error) {
 
 }
 

@@ -19,7 +19,7 @@ func (l *serverListener) OnNewLibrary(engine.LibraryName) {
 	}
 }
 
-func (l *serverListener) OnNewColumn(libraryName engine.LibraryName, col engine.ColumnID) {
+func (l *serverListener) OnNewColumn(libraryName engine.LibraryName, field engine.FieldID) {
 	setLibraryRowsMsg := msg.SetLibraryRowsMsgFromEngine(libraryName, l.server.engine)
 	for _, client := range l.server.clients {
 		client.SetLibraryRows(setLibraryRowsMsg)
@@ -57,7 +57,7 @@ func (l *serverListener) OnDeleteRow(name engine.LibraryName, row engine.RowID) 
 func (l *serverListener) OnUpdateValue(
 	name engine.LibraryName,
 	row engine.RowID,
-	col engine.ColumnID,
+	col engine.FieldID,
 	exists bool,
 	value string,
 	cellErr error,

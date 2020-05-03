@@ -70,7 +70,7 @@ func RowSchemaFromLibrary(
 
 	for _, field := range fields {
 		fieldID := field.ID()
-		v, ok, err := library.GetValueAt(index, engine.ColumnID(fieldID.String()))
+		v, ok, err := library.GetValueAt(index, fieldID)
 
 		colData := simplejson.New()
 		colData.Set("exists", ok)

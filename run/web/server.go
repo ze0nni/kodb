@@ -43,7 +43,7 @@ type msgUpdateValue = struct {
 	ClientID    ClientID
 	LibraryName engine.LibraryName
 	RowID       engine.RowID
-	ColumnID    engine.ColumnID
+	FieldID     engine.FieldID
 	value       string
 }
 type msgAddLibrary = struct {
@@ -157,9 +157,9 @@ func (server *serverInstance) newRow(m msgNewRow) {
 		return
 	}
 	if m.HasParent {
-		l.UpdateValue(id, engine.ColumnID("parentLibrary"), m.ParentLibraryName.ToString())
-		l.UpdateValue(id, engine.ColumnID("parentRow"), m.ParentRowID.ToString())
-		l.UpdateValue(id, engine.ColumnID("parentColumn"), m.ParentColumnID.ToString())
+		l.UpdateValue(id, engine.FieldID("parentLibrary"), m.ParentLibraryName.ToString())
+		l.UpdateValue(id, engine.FieldID("parentRow"), m.ParentRowID.ToString())
+		l.UpdateValue(id, engine.FieldID("parentColumn"), m.ParentFieldID.String())
 	}
 }
 
@@ -179,12 +179,12 @@ func (server *serverInstance) deleteRow(m msgDeleteRow) {
 	}
 }
 
-func (server *serverInstance) UpdateValue(clientID ClientID, libraryName, rowID, columnID, value string) {
+func (server *serverInstance) UpdateValue(clientID ClientID, libraryName, rowID, fieldID, value string) {
 	server.msgUpdateValueCh <- msgUpdateValue{
 		clientID,
 		engine.LibraryName(libraryName),
 		engine.RowID(rowID),
-		engine.ColumnID(columnID),
+		engine.FieldID(fieldID),
 		value,
 	}
 }
@@ -194,7 +194,7 @@ func (server *serverInstance) updateValue(m msgUpdateValue) {
 	if nil != err {
 		log.Printf("Error when <updateValue>: %s", err)
 	}
-	err = l.UpdateValue(m.RowID, m.ColumnID, m.value)
+	err = l.UpdateValue(m.RowID, m.FieldID, m.value)
 	if nil != err {
 		log.Printf("Error when <updateValue>: %s", err)
 	}

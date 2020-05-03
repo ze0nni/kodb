@@ -16,8 +16,8 @@ type (
 	// LibraryName type
 	LibraryName string
 
-	// ColumnID type
-	ColumnID string
+	// FieldID type
+	FieldID = types.FieldID
 
 	// RowID type
 	RowID string
@@ -39,9 +39,9 @@ type (
 
 		Swap(int, int) error
 
-		GetValueAt(int, ColumnID) (string, bool, error)
-		GetValue(RowID, ColumnID) (string, bool, error)
-		UpdateValue(RowID, ColumnID, string) error
+		GetValueAt(int, FieldID) (string, bool, error)
+		GetValue(RowID, FieldID) (string, bool, error)
+		UpdateValue(RowID, FieldID, string) error
 
 		Case(RowID) (types.FieldCase, error)
 		UpdateCase(RowID, types.FieldCase) error
@@ -50,10 +50,6 @@ type (
 
 func (name LibraryName) ToString() string {
 	return string(name)
-}
-
-func (id ColumnID) ToString() string {
-	return string(id)
 }
 
 func (id RowID) ToString() string {
@@ -258,7 +254,7 @@ func (lib *libraryImp) Swap(i, j int) error {
 
 func (lib *libraryImp) GetValueAt(
 	index int,
-	column ColumnID,
+	field FieldID,
 ) (string, bool, error) {
 	id, err := lib.RowID(index)
 	if nil != err {
@@ -271,13 +267,13 @@ func (lib *libraryImp) GetValueAt(
 	if nil == e {
 		return "", false, errors.New("Row not exists")
 	}
-	v, ok := e[column.ToString()]
+	v, ok := e[id.ToString()]
 	return v, ok, nil
 }
 
 func (lib *libraryImp) GetValue(
 	id RowID,
-	col ColumnID,
+	field FieldID,
 ) (string, bool, error) {
 	e, err := lib.data.Get(id.ToString())
 	if nil != err {
@@ -287,7 +283,7 @@ func (lib *libraryImp) GetValue(
 		return "", false, errors.New("Row not exists")
 	}
 
-	v, exists := e[col.ToString()]
+	v, exists := e[field.String()]
 	if false == exists {
 		return "", false, nil
 	}
@@ -296,7 +292,7 @@ func (lib *libraryImp) GetValue(
 
 func (lib *libraryImp) UpdateValue(
 	id RowID,
-	col ColumnID,
+	field FieldID,
 	value string,
 ) error {
 	e, err := lib.data.Get(id.ToString())
@@ -312,12 +308,12 @@ func (lib *libraryImp) UpdateValue(
 		return err
 	}
 
-	_, err = tp.Get(types.FieldID(col.ToString()))
+	_, err = tp.Get(types.FieldID(field.String()))
 	if nil != err {
 		return err
 	}
 
-	e[col.ToString()] = value
+	e[field.String()] = value
 
 	err = lib.data.Put(id.ToString(), e)
 
@@ -327,13 +323,13 @@ func (lib *libraryImp) UpdateValue(
 
 	var cellErr error = nil //TODO: field.Validate(context, value)
 
-	lib.listener.OnUpdateValue(lib.name, id, col, true, value, cellErr)
+	lib.listener.OnUpdateValue(lib.name, id, field, true, value, cellErr)
 
 	return nil
 }
 
 func (lib *libraryImp) Case(id RowID) (types.FieldCase, error) {
-	v, ok, err := lib.GetValue(id, ColumnID("case"))
+	v, ok, err := lib.GetValue(id, FieldID("case"))
 	if nil != err {
 		return types.FieldCase(""), err
 	}
@@ -344,5 +340,5 @@ func (lib *libraryImp) Case(id RowID) (types.FieldCase, error) {
 }
 
 func (lib *libraryImp) UpdateCase(id RowID, fieldCase types.FieldCase) error {
-	return lib.UpdateValue(id, ColumnID("case"), fieldCase.String())
+	return lib.UpdateValue(id, FieldID("case"), fieldCase.String())
 }

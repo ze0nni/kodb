@@ -41,11 +41,11 @@ type Engine interface {
 
 type Listener interface {
 	OnNewLibrary(LibraryName)
-	OnNewColumn(LibraryName, ColumnID)
+	OnNewColumn(LibraryName, FieldID)
 
 	OnNewRow(LibraryName, RowID)
 	OnDeleteRow(LibraryName, RowID)
-	OnUpdateValue(LibraryName, RowID, ColumnID, bool, string, error)
+	OnUpdateValue(LibraryName, RowID, FieldID, bool, string, error)
 
 	OnSwap(LibraryName, int, int, RowID, RowID)
 }

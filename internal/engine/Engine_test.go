@@ -140,7 +140,7 @@ func TestEngine_Listener_DeleteRow(t *testing.T) {
 func TestEngine_Listener_UpdateValue(t *testing.T) {
 	eng := New(driver.InMemory())
 
-	colID := ColumnID("name")
+	colID := FieldID("name")
 
 	foo, _ := eng.AddLibrary(LibraryName("foo"), types.TypeName(""))
 	foo.AddColumn(colID, NewLiteralColumn("no name"))

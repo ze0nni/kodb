@@ -20,7 +20,7 @@ func (l *logListener) OnNewLibrary(name LibraryName) {
 	l.log = append(l.log, "newLibrary "+name.ToString())
 }
 
-func (l *logListener) OnNewColumn(LibraryName, ColumnID) {
+func (l *logListener) OnNewColumn(LibraryName, FieldID) {
 	panic("not inplements")
 }
 
@@ -32,12 +32,12 @@ func (l *logListener) OnDeleteRow(name LibraryName, row RowID) {
 	l.log = append(l.log, fmt.Sprintf("deleteRow %s:%s", name.ToString(), row.ToString()))
 }
 
-func (l *logListener) OnUpdateValue(name LibraryName, row RowID, col ColumnID, exists bool, value string, cellErr error) {
+func (l *logListener) OnUpdateValue(name LibraryName, row RowID, field FieldID, exists bool, value string, cellErr error) {
 	if nil != cellErr {
 		l.log = append(l.log, fmt.Sprintf("updateRow %s:%s:%s error %s",
 			name.ToString(),
 			row.ToString(),
-			col.ToString(),
+			field.String(),
 			cellErr,
 		))
 		return
@@ -46,7 +46,7 @@ func (l *logListener) OnUpdateValue(name LibraryName, row RowID, col ColumnID, e
 	l.log = append(l.log, fmt.Sprintf("updateRow %s:%s:%s %t %s",
 		name.ToString(),
 		row.ToString(),
-		col.ToString(),
+		field.String(),
 		exists,
 		value,
 	))

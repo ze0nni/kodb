@@ -13,14 +13,14 @@ func msgNewRowFromJson(
 	if data, ok := json.CheckGet("parentLibrary"); ok {
 		parentLibrary := engine.LibraryName(data.MustString())
 		parentRow := engine.RowID(json.Get("parentRow").MustString())
-		parentColumn := engine.ColumnID(json.Get("parentColumn").MustString())
+		parentField := engine.FieldID(json.Get("parentField").MustString())
 		return msgNewRow{
 			ClientID:          clientID,
 			LibraryName:       engine.LibraryName(libraryName),
 			HasParent:         true,
 			ParentLibraryName: parentLibrary,
 			ParentRowID:       parentRow,
-			ParentColumnID:    parentColumn,
+			ParentFieldID:     parentField,
 		}, nil
 	}
 	return msgNewRow{
@@ -36,5 +36,5 @@ type msgNewRow = struct {
 	HasParent         bool
 	ParentLibraryName engine.LibraryName
 	ParentRowID       engine.RowID
-	ParentColumnID    engine.ColumnID
+	ParentFieldID     engine.FieldID
 }
