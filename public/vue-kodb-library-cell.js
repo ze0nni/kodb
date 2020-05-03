@@ -14,7 +14,17 @@ Vue.component("kodb-library-cell", {
                         
                 }
         },
-        methods: {                
+        computed: {
+                cellData() {
+                        if (null == this.row || null == this.row.data || null == this.row.data[this.field.id]) {
+                                return {
+                                        exists: false
+                                }
+                        }
+                        return this.row.data[this.field.id];
+                }
+        },
+        methods: {           
                 updateValue(value) {
                         this.$wsocket.send({
                                 "command": "updateValue",
@@ -23,7 +33,7 @@ Vue.component("kodb-library-cell", {
                                 "columnId": this.columnId,
                                 "value": value
                         })
-                }
+                },
         },
         template:
 `
@@ -33,7 +43,7 @@ Vue.component("kodb-library-cell", {
 
                 v-on:update="updateValue"
 
-                :cellData="row.data[field.id]"
+                :cellData="cellData"
                 :field="field"
         ></kodb-library-value-cell>
 

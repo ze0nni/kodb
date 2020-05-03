@@ -14,7 +14,6 @@ func (m *msgGetTypes) Perform(srv *serverInstance) error {
 	if nil != err {
 		return err
 	}
-
 	client.Send(resp)
 
 	return nil

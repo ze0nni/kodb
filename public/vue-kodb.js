@@ -143,20 +143,8 @@ Vue.component("kodb", {
                                         return
                                 }
 
-                                // HACK:
-                                const data = {
-
-                                }
-
-                                for (const col of library.columns) {
-                                        data[col.id] = {
-                                                "exists": false
-                                        }
-                                }
-
                                 rows.push({
-                                        "rowId": msg.rowId,
-                                        "data": data
+                                        "rowId": msg.rowId
                                 })
                         },
                         deleteRow(msg) {
