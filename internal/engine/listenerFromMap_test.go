@@ -19,8 +19,8 @@ func TestListenerFromMap_ListenLibrary(t *testing.T) {
 	l.OnNewLibrary(bar)
 	l.OnNewRow(foo, RowID("row"))
 	l.OnNewRow(bar, RowID("row"))
-	l.OnUpdateValue(foo, RowID("row"), ColumnID("col"), true, "value", nil)
-	l.OnUpdateValue(bar, RowID("row"), ColumnID("col"), true, "value", nil)
+	l.OnUpdateValue(foo, RowID("row"), FieldID("col"), true, "value", nil)
+	l.OnUpdateValue(bar, RowID("row"), FieldID("col"), true, "value", nil)
 	l.OnDeleteRow(foo, RowID("row"))
 	l.OnDeleteRow(bar, RowID("row"))
 

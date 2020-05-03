@@ -16,54 +16,62 @@ import (
 func main() {
 	eng := engine.New(driver.InMemory())
 
-	userType, _ := eng.Types().New(types.TypeName("user"))
-	user_picture, _ := userType.New(types.NewValueFieldData("picture"))
-	user_firstName, _ := userType.New(types.NewValueFieldData("firstName"))
-	user_secondName, _ := userType.New(types.NewValueFieldData("secondName"))
-	user_ht, _ := userType.New(types.NewValueFieldData("ht"))
-	user_dx, _ := userType.New(types.NewValueFieldData("dx"))
-	user_iq, _ := userType.New(types.NewValueFieldData("iq"))
-	user_age, _ := userType.New(types.NewValueFieldData("age"))
+	userType, err := eng.Types().New(types.TypeName("user"))
+	logError(err)
+	user_picture, err := userType.New(types.NewValueFieldData("picture"))
+	logError(err)
+	user_firstName, err := userType.New(types.NewValueFieldData("firstName"))
+	logError(err)
+	user_secondName, err := userType.New(types.NewValueFieldData("secondName"))
+	logError(err)
+	user_ht, err := userType.New(types.NewValueFieldData("ht"))
+	logError(err)
+	user_dx, err := userType.New(types.NewValueFieldData("dx"))
+	logError(err)
+	user_iq, err := userType.New(types.NewValueFieldData("iq"))
+	logError(err)
+	user_age, err := userType.New(types.NewValueFieldData("age"))
+	logError(err)
 
 	userLib, _ := eng.AddLibrary(engine.LibraryName("users"), userType.Name())
 
 	for i := 0; i < 10; i++ {
 		row, _ := userLib.NewRow()
-		userLib.UpdateValue(
+		logError(userLib.UpdateValue(
 			row,
 			user_picture.ID(),
 			randomdata.PhoneNumber(),
-		)
-		userLib.UpdateValue(
+		))
+		logError(userLib.UpdateValue(
 			row,
 			user_firstName.ID(),
 			randomdata.FirstName(0),
-		)
-		userLib.UpdateValue(
+		))
+		logError(userLib.UpdateValue(
 			row,
 			user_secondName.ID(),
 			randomdata.LastName(),
-		)
-		userLib.UpdateValue(
+		))
+		logError(userLib.UpdateValue(
 			row,
 			user_ht.ID(),
 			randomdata.StringNumber(2, "-"),
-		)
-		userLib.UpdateValue(
+		))
+		logError(userLib.UpdateValue(
 			row,
 			user_dx.ID(),
 			randomdata.StringNumber(2, "-"),
-		)
-		userLib.UpdateValue(
+		))
+		logError(userLib.UpdateValue(
 			row,
 			user_iq.ID(),
 			randomdata.StringNumber(2, "-"),
-		)
-		userLib.UpdateValue(
+		))
+		logError(userLib.UpdateValue(
 			row,
 			user_age.ID(),
 			randomdata.StringNumber(2, "-"),
-		)
+		))
 	}
 
 	mathOp, _ := eng.Types().New(types.TypeName("mathOp"))
@@ -97,8 +105,14 @@ func main() {
 		fmt.Printf("Error in %s:%s%s: %s\n", l, r, f, err)
 	})
 
-	err := web.Run(eng)
+	err = web.Run(eng)
 	if nil != err {
 		log.Fatal(err)
+	}
+}
+
+func logError(err error) {
+	if nil != err {
+		log.Panic(err)
 	}
 }

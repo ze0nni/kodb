@@ -1,6 +1,7 @@
 package engine
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -139,21 +140,20 @@ func TestEngine_Listener_DeleteRow(t *testing.T) {
 
 func TestEngine_Listener_UpdateValue(t *testing.T) {
 	eng := New(driver.InMemory())
+	tp, _ := eng.Types().New("typeName")
+	field, _ := tp.New(types.NewValueFieldData("field"))
 
-	colID := FieldID("name")
-
-	foo, _ := eng.AddLibrary(LibraryName("foo"), types.TypeName(""))
-	foo.AddColumn(colID, NewLiteralColumn("no name"))
-	foo.AddRow(RowID("bar"))
+	foo, _ := eng.AddLibrary(LibraryName("foo"), tp.Name())
+	rowID, _ := foo.NewRow()
 
 	ll := newLogListener()
 	eng.Listen(ll)
 
-	foo.UpdateValue(RowID("bar"), colID, "hello world")
+	foo.UpdateValue(rowID, field.ID(), "hello world")
 
 	assert.Equal(
 		t,
-		[]string{"updateRow foo:bar:name true hello world"},
+		[]string{fmt.Sprintf("updateRow foo:%s:%s true hello world", rowID.ToString(), field.ID().String())},
 		ll.getLog(),
 	)
 }
