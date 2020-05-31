@@ -3,15 +3,28 @@ import Html exposing (Html, button, div, text)
 import Html.Events exposing (onClick)
 import Html.Attributes exposing (id, class)
 import Model.Schema exposing (..)
+import Platform.Sub exposing (Sub)
 import List
 
 main =
-  Browser.sandbox { init = newModel, update = update, view = view }
-
-newModel =
-  { selectedTable = "Users"
-  , schema = newSchema
+  Browser.element
+  { init = init
+  , update = update
+  , view = view
+  , subscriptions = subscriptions 
   }
+
+type alias Model =
+  { selectedTable: String
+  , schema: Model.Schema.Schema
+  }
+init : () -> (Model, Cmd Msg)
+init _ =
+  ( { selectedTable = "Users"
+    , schema = newSchema
+    }
+  , Cmd.none
+  )
 
 newSchema : Schema
 newSchema =
@@ -19,9 +32,11 @@ newSchema =
   , tables =
     [ { name = "Users"
       , tableType = usersType
+      , rows = []
       }
     , { name = "Inventory"
       , tableType = inventoryType
+      , rows = []
       }
     ]
   }
@@ -46,16 +61,21 @@ inventoryType =
     ]
   }
 
-type Msg = SelectTable String
+type Msg
+  = Init
+  | Recieve
+  | SelectTable String
 
-type alias Model =
-  { name: String
-  }
-
+update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
   case msg of 
+    Init -> (model, Cmd.none)
+    Recieve -> (model, Cmd.none)
     SelectTable name ->
-      { model | selectedTable = name }
+      ( { model | selectedTable = name },  Cmd.none )
+
+subscriptions : Model -> Sub Msg
+subscriptions model = Sub.none
 
 view model =
   Html.header []
