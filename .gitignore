@@ -1,1 +1,2 @@
-public-src/elm-stuff/*
+elm-stuff/*
+public/elm.js

@@ -1,6 +1,7 @@
 import Browser
 import Html exposing (Html, button, div, text)
 import Html.Events exposing (onClick)
+import Html.Attributes exposing (id, class)
 import Model.Schema exposing (..)
 import List
 
@@ -64,8 +65,10 @@ tableTabs model=
   Html.section []
   [ Html.header []
     [ Html.nav []
-      [ Html.ul []
-        (List.map (tableHeader model.selectedTable) model.schema.tables)
+      [ Html.div [class "nav-wrapper"]
+        [ Html.ul [id "nav-mobile", class "right"]
+          (List.map (tableHeader model.selectedTable) model.schema.tables)
+        ]
       ]
     ]
   , Html.article []
@@ -76,17 +79,15 @@ tableTabs model=
 
 tableHeader selected table =
   if table.name == selected then
-    Html.li [] [text table.name]
+    Html.li [class "active"] [Html.a [] [text table.name]]
   else
-    Html.li [Html.Events.onClick (SelectTable table.name) ] [text table.name]
+    Html.li [] [Html.a [Html.Events.onClick (SelectTable table.name) ] [text table.name]]
 
 
 tableView: Model.Schema.Table -> Html msg
 tableView table =
   Html.table []
-  [ Html.caption []
-    [text table.name]
-  , Html.thead []
+  [ Html.thead []
     [ Html.tr []
       (List.map headerView table.tableType.fields)
     ]
