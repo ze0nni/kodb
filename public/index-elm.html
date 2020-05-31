@@ -14,15 +14,45 @@
         node: document.getElementById("elm-app-is-loaded-here")
       });      
 
-      var socket = new WebSocket('ws://localhost:8000/ws/');
+      var socket = null;
 
-      app.ports.sendMessage.subscribe(function(message) {
+      app.ports.wsConnect.subscribe(function(message) {
+        socket = new WebSocket('ws://localhost:8000/ws/');
+        socket.onopen = onConnected;
+        socket.onclose = onDisconnected;
+        socket.onmessage = onMessage;
+        socket.onerror = onError;
+      });
+
+      // app.ports.wsDisconnect.subscribe(function(message) {
+      //     socket.send(message);
+      // });
+
+      app.ports.wsSendMessage.subscribe(function(message) {
           socket.send(message);
       });
 
-      socket.addEventListener("message", function(event) {
-        app.ports.messageReceiver.send(event.data);
-      });
+      function onConnected() {
+        app.ports.wsConnected.send(null);
+      }
+
+      function onDisconnected() {
+        socket.onopen = null;
+        socket.onclose = null;
+        socket.onmessage = null;
+        socket.onerror = null;
+        socket = null;
+
+        app.ports.wsDisconnected.send(null);
+      }
+
+      function onMessage() {
+        app.ports.wsMessageReceiver("");
+      }
+
+      function onError() {
+        
+      }
     </script>
   </body>
 </html>

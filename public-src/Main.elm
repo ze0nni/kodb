@@ -17,13 +17,19 @@ main =
   , subscriptions = subscriptions 
   }
 
-port sendMessage : String -> Cmd msg
-port messageReceiver : (String -> msg) -> Sub msg
+port wsConnect : () -> Cmd msg
+port wsDisconnect : () -> Cmd msg
+port wsSendMessage : String -> Cmd msg
+
+port wsConnected : (() -> msg) -> Sub msg
+port wsDisconnected : (() -> msg) -> Sub msg
+port wsMessageReceiver : (String -> msg) -> Sub msg
 
 type Model
-  = Loading
+  = Disconnected
+  | Loading
   | ErrorPage String
-  | Connected ContentModel
+  | Content ContentModel
 
 
 type alias ContentModel =
@@ -33,8 +39,8 @@ type alias ContentModel =
 
 init : () -> (Model, Cmd Msg)
 init _ =
-  ( Loading
-  , sendMessage ""
+  ( Disconnected
+  , wsConnect ()
   )
 
 newSchema : Schema
@@ -73,7 +79,8 @@ inventoryType =
   }
 
 type Msg
-  = Init
+  = WSConnected
+  | WSDisconnected
   | Request String
   | GotContentMsg ContentMsg
 
@@ -83,11 +90,12 @@ type ContentMsg
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model = case msg of
-  Init -> (model, Cmd.none)
-  Request _-> (model, Cmd.none)
+  WSConnected -> (Loading, wsSendMessage "getSchema")
+  WSDisconnected -> (Disconnected, Cmd.none)
+  Request _-> (Content { selectedTable ="", schema = newSchema }, Cmd.none)
   GotContentMsg innerMsg -> case model of 
-    Connected innerModel -> case (updateContent innerMsg innerModel) of
-      (innerModel1, cmd) -> (Connected innerModel1, Cmd.map GotContentMsg cmd)
+    Content innerModel -> case (updateContent innerMsg innerModel) of
+      (innerModel1, cmd) -> (Content innerModel1, Cmd.map GotContentMsg cmd)
     _ -> (model, Cmd.none)
 
 updateContent : ContentMsg -> ContentModel -> (ContentModel, Cmd ContentMsg)
@@ -98,13 +106,18 @@ updateContent msg model =
 
 
 subscriptions : Model -> Sub Msg
-subscriptions model = messageReceiver Request
+subscriptions model = Platform.Sub.batch
+  [ wsConnected (\_ -> WSConnected)
+  , wsDisconnected (\_ -> WSDisconnected)
+  , wsMessageReceiver Request
+  ]
 
 view : Model -> Html Msg
 view model = case model of 
+    Disconnected -> Html.h1 [] [text "Connecting..."]
     Loading -> Html.h1 [] [text "Loading..."]
     ErrorPage msg -> Html.h1 [] [text msg]
-    Connected m -> contentView m |> Html.map GotContentMsg 
+    Content m -> contentView m |> Html.map GotContentMsg 
 
 
 contentView : ContentModel -> (Html ContentMsg)
