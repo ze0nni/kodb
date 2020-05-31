@@ -1,3 +1,5 @@
+port module Main exposing (..)
+
 import Browser
 import Html exposing (Html, button, div, text)
 import Html.Events exposing (onClick)
@@ -6,6 +8,7 @@ import Model.Schema exposing (..)
 import Platform.Sub exposing (Sub)
 import List
 
+main : Program () Model Msg
 main =
   Browser.element
   { init = init
@@ -13,6 +16,9 @@ main =
   , view = view
   , subscriptions = subscriptions 
   }
+
+port sendMessage : String -> Cmd msg
+port messageReceiver : (String -> msg) -> Sub msg
 
 type alias Model =
   { selectedTable: String
@@ -63,19 +69,20 @@ inventoryType =
 
 type Msg
   = Init
-  | Recieve
+  | Request String
   | SelectTable String
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
   case msg of 
-    Init -> (model, Cmd.none)
-    Recieve -> (model, Cmd.none)
+    Init -> (model, sendMessage "Auth")
+    Request _ -> (model, Cmd.none)
     SelectTable name ->
       ( { model | selectedTable = name },  Cmd.none )
 
+
 subscriptions : Model -> Sub Msg
-subscriptions model = Sub.none
+subscriptions model = messageReceiver Request
 
 view model =
   Html.header []
