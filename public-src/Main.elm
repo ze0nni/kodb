@@ -20,16 +20,21 @@ main =
 port sendMessage : String -> Cmd msg
 port messageReceiver : (String -> msg) -> Sub msg
 
-type alias Model =
+type Model
+  = Loading
+  | ErrorPage String
+  | Connected ContentModel
+
+
+type alias ContentModel =
   { selectedTable: String
   , schema: Model.Schema.Schema
   }
+
 init : () -> (Model, Cmd Msg)
 init _ =
-  ( { selectedTable = "Users"
-    , schema = newSchema
-    }
-  , Cmd.none
+  ( Loading
+  , sendMessage ""
   )
 
 newSchema : Schema
@@ -70,13 +75,24 @@ inventoryType =
 type Msg
   = Init
   | Request String
-  | SelectTable String
+  | GotContentMsg ContentMsg
+
+type ContentMsg
+  = SelectTable String
+
 
 update : Msg -> Model -> (Model, Cmd Msg)
-update msg model =
-  case msg of 
-    Init -> (model, sendMessage "Auth")
-    Request _ -> (model, Cmd.none)
+update msg model = case msg of
+  Init -> (model, Cmd.none)
+  Request _-> (model, Cmd.none)
+  GotContentMsg innerMsg -> case model of 
+    Connected innerModel -> case (updateContent innerMsg innerModel) of
+      (innerModel1, cmd) -> (Connected innerModel1, Cmd.map GotContentMsg cmd)
+    _ -> (model, Cmd.none)
+
+updateContent : ContentMsg -> ContentModel -> (ContentModel, Cmd ContentMsg)
+updateContent msg model =
+  case msg of
     SelectTable name ->
       ( { model | selectedTable = name },  Cmd.none )
 
@@ -84,7 +100,15 @@ update msg model =
 subscriptions : Model -> Sub Msg
 subscriptions model = messageReceiver Request
 
-view model =
+view : Model -> Html Msg
+view model = case model of 
+    Loading -> Html.h1 [] [text "Loading..."]
+    ErrorPage msg -> Html.h1 [] [text msg]
+    Connected m -> contentView m |> Html.map GotContentMsg 
+
+
+contentView : ContentModel -> (Html ContentMsg)
+contentView model =
   Html.header []
   [ tableTabs model]
 
