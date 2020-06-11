@@ -115,6 +115,8 @@ func (client *clientConnection) clientRecieveMessage(
 	}
 
 	switch command {
+	case "fetch":
+		client.server.Perform(&(msgFetch{client.id}), nil)
 	case "getTypes":
 		client.server.Perform(&(msgGetTypes{client.id}), nil)
 	case "newField":
